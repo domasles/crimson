@@ -14,8 +14,8 @@ project "crimson"
     kind "ConsoleApp"
     language "C++"
 
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+    targetdir ("bin/" .. outputdir)
+    objdir ("bin-int/" .. outputdir)
 
     files {
         "%{prj.name}/src/**.h",
@@ -26,11 +26,6 @@ project "crimson"
     libdirs "vendor/lib/sdl3/x64"
     links "SDL3"
 
-    postbuildcommands {
-        "{MKDIR} ../bin/" .. outputdir,
-        "{COPY} vendor/lib/sdl3/x64/SDL3.dll ../bin/" .. outputdir
-    }
-
     filter "system:windows"
         cppdialect "C++17"
         staticruntime "On"
@@ -38,9 +33,26 @@ project "crimson"
 
         defines "CRIMSON_PLATFORM_WINDOWS"
 
-        links {
-            "SDL3",
-            "SDL3main"
+        postbuildcommands {
+            ("{MKDIR} ../bin/" .. outputdir),
+            ("{COPY} ../vendor/lib/sdl3/x64/SDL3.dll ../bin/" .. outputdir)
+        }
+
+    filter "system:linux"
+        cppdialect "C++17"
+        staticruntime "Off"
+        toolset "gcc"
+
+        defines "CRIMSON_PLATFORM_LINUX"
+        
+        linkoptions {
+            "-Wl,-rpath,'$$ORIGIN'",
+            "-Wl,-rpath-link,'$$ORIGIN'"
+        }
+
+        postbuildcommands {
+            ("{MKDIR} ../bin/" .. outputdir),
+            ("{COPY} ../vendor/lib/sdl3/x64/libSDL3.so ../bin/" .. outputdir)
         }
     
     filter "configurations:Debug"
