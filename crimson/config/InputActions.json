@@ -1,0 +1,32 @@
+{
+    "actions": {
+        "move_up": {
+            "type": "directional",
+            "key": "w",
+            "vector": [ 0, -1 ]
+        },
+
+        "move_down": {
+            "type": "directional",
+            "key": "s",
+            "vector": [ 0, 1 ]
+        },
+
+        "move_left": {
+            "type": "directional",
+            "key": "a",
+            "vector": [ -1, 0 ]
+        },
+
+        "move_right": {
+            "type": "directional",
+            "key": "d",
+            "vector": [ 1, 0 ]
+        },
+
+        "shoot": {
+            "type": "simple",
+            "key": "SPACE"
+        }
+    }
+}

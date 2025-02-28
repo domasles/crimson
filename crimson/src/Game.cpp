@@ -1,12 +1,6 @@
-#include "include/Game.h"
+#include <Game.h>
 
 namespace crimson {
-    Game::Game() : m_Window(nullptr), m_Renderer(nullptr), m_Running(false) {}
-
-    Game::~Game() {
-        quit();
-    }
-
     bool Game::init(const std::string& title, int width, int height) {
         if (SDL_Init(SDL_INIT_VIDEO) < 0) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_Init failed: %s", SDL_GetError());
@@ -27,6 +21,7 @@ namespace crimson {
             return false;
         }
 
+        m_Logic.init();
         m_Running = true;
 
         return true;
@@ -35,6 +30,9 @@ namespace crimson {
     void Game::run() {
         while (m_Running) {
             processEvents();
+
+            m_Logic.handleInput();
+
             render();
         }
     }
@@ -51,11 +49,6 @@ namespace crimson {
         SDL_Quit();
     }
 
-    void Game::render() {
-        SDL_RenderClear(m_Renderer);
-        SDL_RenderPresent(m_Renderer);
-    }
-
     void Game::processEvents() {
         SDL_Event event;
 
@@ -65,5 +58,10 @@ namespace crimson {
             m_Running = false;
             quit();
         }
+    }
+
+    void Game::render() {
+        SDL_RenderClear(m_Renderer);
+        SDL_RenderPresent(m_Renderer);
     }
 }

@@ -1,3 +1,6 @@
 [submodule "crimson/vendor/sdl3"]
 	path = crimson/vendor/sdl3
 	url = https://github.com/libsdl-org/SDL.git
+[submodule "crimson/vendor/json"]
+	path = crimson/vendor/json
+	url = https://github.com/nlohmann/json.git

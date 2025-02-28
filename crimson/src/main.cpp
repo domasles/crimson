@@ -1,7 +1,9 @@
-#include "include/Game.h"
+#include <Game.h>
+
+using namespace crimson;
 
 int main() {
-    crimson::Game game;
+    Game game;
 
     if (!game.init("Crimson", 800, 600)) {
         return -1;

@@ -1,5 +1,12 @@
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+if os.target() == "windows" then
+    SDLlibname = "SDL3.dll"
+
+elseif os.target() == "linux" then
+    SDLlibname = "libSDL3.so.0"
+end
+
 workspace "crimson"
     architecture "x64"
 
@@ -22,7 +29,18 @@ project "crimson"
         "%{prj.name}/src/**.cpp"
     }
 
-    includedirs "%{prj.name}/vendor/sdl3/include"
+    includedirs {
+        "%{prj.name}/src/include",
+        "%{prj.name}/vendor/sdl3/include",
+        "%{prj.name}/vendor/json/include"
+    }
+
+    postbuildcommands {
+        ("{MKDIR} %{cfg.targetdir}"),
+        ("{COPY} ../vendor/lib/sdl3/x64/" .. SDLlibname .. " %{cfg.targetdir}"),
+        ("{COPYDIR} config %{cfg.targetdir}/config")
+    }
+    
     libdirs "vendor/lib/sdl3/x64"
     links "SDL3"
 
@@ -32,11 +50,6 @@ project "crimson"
         systemversion "latest"
 
         defines "CRIMSON_PLATFORM_WINDOWS"
-
-        postbuildcommands {
-            ("{MKDIR} ../bin/" .. outputdir),
-            ("{COPY} ../vendor/lib/sdl3/x64/SDL3.dll ../bin/" .. outputdir)
-        }
 
     filter "system:linux"
         cppdialect "C++17"
@@ -48,11 +61,6 @@ project "crimson"
         linkoptions {
             "-Wl,-rpath,'$$ORIGIN'",
             "-Wl,-rpath-link,'$$ORIGIN'"
-        }
-
-        postbuildcommands {
-            ("{MKDIR} ../bin/" .. outputdir),
-            ("{COPY} ../vendor/lib/sdl3/x64/libSDL3.so ../bin/" .. outputdir)
         }
     
     filter "configurations:Debug"
