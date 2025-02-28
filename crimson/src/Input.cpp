@@ -37,7 +37,10 @@ namespace crimson {
     }
 
     void InputSystem::LoadInputActions(const std::string& filename) {
-        std::ifstream file(filename);
+        std::string basePath = SDL_GetBasePath();
+        std::string fullPath = basePath + filename;
+
+        std::ifstream file(fullPath);
 
         if (!file.is_open()) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to open input actions file!");
