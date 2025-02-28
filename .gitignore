@@ -10,3 +10,6 @@
 *.vcxproj
 *.vcxproj.filters
 *.sln
+
+# Makefiles
+Makefile
