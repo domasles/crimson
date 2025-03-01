@@ -2,26 +2,27 @@
 
 namespace crimson {
     bool Game::init(const std::string& title, int width, int height) {
-        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        if (!SDL_Init(SDL_INIT_VIDEO)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_Init failed: %s", SDL_GetError());
             return false;
         }
 
-        m_Window = SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_RESIZABLE);
+        m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_RESIZABLE), SDL_DestroyWindow);
 
         if (!m_Window) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateWindow failed: %s", SDL_GetError());
             return false;
         }
 
-        m_Renderer = SDL_CreateRenderer(m_Window, nullptr);
+        m_Renderer = std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)>(SDL_CreateRenderer(m_Window.get(), nullptr), SDL_DestroyRenderer);
 
         if (!m_Renderer) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateRenderer failed: %s", SDL_GetError());
             return false;
         }
 
-        m_Logic.init();
+        Logic::getInstance().init();
+
         m_Running = true;
 
         return true;
@@ -31,37 +32,24 @@ namespace crimson {
         while (m_Running) {
             processEvents();
 
-            m_Logic.handleInput();
+            Logic::getInstance().update();
 
             render();
         }
     }
 
-    void Game::quit() {
-        if (m_Renderer) {
-            SDL_DestroyRenderer(m_Renderer);
-        }
-
-        if (m_Window) {
-            SDL_DestroyWindow(m_Window);
-        }
-
-        SDL_Quit();
-    }
-
     void Game::processEvents() {
         SDL_Event event;
 
-        SDL_PollEvent(&event);
-
-        if (event.type == SDL_EVENT_QUIT) {
-            m_Running = false;
-            quit();
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_EVENT_QUIT) {
+                m_Running = false;
+            }
         }
     }
 
     void Game::render() {
-        SDL_RenderClear(m_Renderer);
-        SDL_RenderPresent(m_Renderer);
+        SDL_RenderClear(m_Renderer.get());
+        SDL_RenderPresent(m_Renderer.get());
     }
 }

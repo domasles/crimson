@@ -1,42 +1,42 @@
 #include <Input.h>
 
 namespace crimson {
-    Vector2 Vector2::Normalize() const {
+    Vector2 Vector2::normalize() const {
         float length = SDL_sqrtf(x * x + y * y);
         return (length > 0) ? Vector2{ x / length, y / length } : Vector2{ 0, 0 };
     }
 
-    bool DirectionalInputAction::IsPressed() const {
+    bool DirectionalInputAction::isPressed() const {
         const bool* state = SDL_GetKeyboardState(nullptr);
         return state[SDL_GetScancodeFromKey(m_Key, nullptr)] != 0;
     }
 
-    bool SimpleInputAction::IsPressed() const {
+    bool SimpleInputAction::isPressed() const {
         const bool* state = SDL_GetKeyboardState(nullptr);
         return state[SDL_GetScancodeFromKey(m_Key, nullptr)] != 0;
     }
 
-    Vector2 InputSystem::GetMovementVector() {
+    Vector2 InputSystem::getMovementVector() const {
         Vector2 movement = { 0, 0 };
 
-        for (const auto& [name, action] : actions) {
-            if (action->IsPressed()) {
-                movement = movement + action->GetDirection();
+        for (const auto& [name, action] : m_Actions) {
+            if (action->isPressed()) {
+                movement = movement + action->getDirection();
             }
         }
 
-        return movement.Normalize();
+        return movement.normalize();
     }
 
-    bool InputSystem::IsActionPressed(const std::string& actionName) {
-        if (actions.count(actionName)) {
-            return actions[actionName]->IsPressed();
+    bool InputSystem::isActionPressed(const std::string& actionName) {
+        if (m_Actions.count(actionName)) {
+            return m_Actions[actionName]->isPressed();
         }
 
         return false;
     }
 
-    void InputSystem::LoadInputActions(const std::string& filename) {
+    void InputSystem::loadInputActions(const std::string& filename) {
         std::string basePath = SDL_GetBasePath();
         std::string fullPath = basePath + filename;
 
@@ -48,7 +48,14 @@ namespace crimson {
         }
 
         json inputJson;
-        file >> inputJson;
+
+        try {
+            file >> inputJson;
+        }
+
+        catch (const std::exception& e) {
+            std::cerr << "JSON parsing error: " << e.what() << std::endl;
+        }
 
         for (const auto& [name, data] : inputJson["actions"].items()) {
             std::string type = data["type"];
@@ -60,13 +67,13 @@ namespace crimson {
                 continue;
             }
 
-            if (type == "directional") {
+            if (type == "movement") {
                 Vector2 direction = { data["vector"][0], data["vector"][1] };
-                AddDirectionalAction(name, key, direction);
+                addMovementAction(name, key, direction);
             }
 
             else if (type == "simple") {
-                AddSimpleAction(name, key);
+                addSimpleAction(name, key);
             }
         }
     }

@@ -1,25 +1,25 @@
 {
     "actions": {
         "move_up": {
-            "type": "directional",
+            "type": "movement",
             "key": "w",
-            "vector": [ 0, -1 ]
-        },
-
-        "move_down": {
-            "type": "directional",
-            "key": "s",
             "vector": [ 0, 1 ]
         },
 
+        "move_down": {
+            "type": "movement",
+            "key": "s",
+            "vector": [ 0, -1 ]
+        },
+
         "move_left": {
-            "type": "directional",
+            "type": "movement",
             "key": "a",
             "vector": [ -1, 0 ]
         },
 
         "move_right": {
-            "type": "directional",
+            "type": "movement",
             "key": "d",
             "vector": [ 1, 0 ]
         },
