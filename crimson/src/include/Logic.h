@@ -1,8 +1,8 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <utils/image.h>
 
-#include <Image.h>
 #include <Scene.h>
 #include <Input.h>
 #include <Game.h>

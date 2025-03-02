@@ -1,7 +1,7 @@
-#include <Image.h>
+#include <utils/image.h>
 
-namespace crimson {
-    std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)> Image::LoadImage(SDL_Renderer* renderer, const std::string& fileName) {
+namespace crimson::utils::image {
+    std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)> LoadImage(SDL_Renderer* renderer, const std::string& fileName) {
         std::string basePath = SDL_GetBasePath();
         std::string fullPath = basePath + fileName;
 
@@ -15,7 +15,7 @@ namespace crimson {
         return std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)>(texture, SDL_DestroyTexture);
     }
 
-    bool Image::RenderTexture(SDL_Renderer* renderer, SDL_Texture* texture, const float posX, const float posY, const float stretchX, const float stretchY) {
+    bool RenderTexture(SDL_Renderer* renderer, SDL_Texture* texture, const float posX, const float posY, const float stretchX, const float stretchY) {
         SDL_FRect rect{ posX, posY, stretchX, stretchY };
         
         if (!SDL_RenderTexture(renderer, texture, nullptr, &rect)) {

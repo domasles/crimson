@@ -3,7 +3,7 @@
 namespace crimson {
     void TestScene::init() {
         m_TestScene2 = std::make_shared<TestScene2>();
-        m_TestTexture = Image::LoadImage(Game::getInstance().m_Renderer.get(), "assets/Square.png");
+        m_TestTexture = utils::image::LoadImage(Game::getInstance().m_Renderer.get(), "assets/Square.png");
     }
 
     void TestScene::update(const float deltaTime) {
@@ -21,7 +21,7 @@ namespace crimson {
     }
 
     void TestScene::render() {
-        if (!Image::RenderTexture(Game::getInstance().m_Renderer.get(), m_TestTexture.get(), m_PlayerX, m_PlayerY, 100, 100)) return;
+        if (!utils::image::RenderTexture(Game::getInstance().m_Renderer.get(), m_TestTexture.get(), m_PlayerX, m_PlayerY, 100, 100)) return;
     }
 
     void TestScene2::init() {
