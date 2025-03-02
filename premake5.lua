@@ -6,6 +6,7 @@ if os.target() == "windows" then
 
 elseif os.target() == "linux" then
     SDLlibname = "libSDL3.so.0"
+    SDLimagelibname = "libSDL3_image.so.0"
 end
 
 workspace "crimson"
@@ -44,7 +45,7 @@ project "crimson"
         ("{COPY} ../vendor/lib/sdl3/x64/" .. SDLimagelibname .. " %{cfg.targetdir}"),
 
         ("{COPYDIR} config %{cfg.targetdir}/config"),
-        ("{COPYDIR} assets %{cfg.targetdir}/config")
+        ("{COPYDIR} assets %{cfg.targetdir}/assets")
     }
 
     links {

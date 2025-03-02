@@ -2,7 +2,10 @@
 
 namespace crimson {
     std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)> Image::LoadImage(SDL_Renderer* renderer, const std::string& fileName) {
-        SDL_Texture* texture = IMG_LoadTexture(renderer, fileName.c_str());
+        std::string basePath = SDL_GetBasePath();
+        std::string fullPath = basePath + fileName;
+
+        SDL_Texture* texture = IMG_LoadTexture(renderer, fullPath.c_str());
 
         if (!texture) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "IMG_LoadTexture Error: %s", SDL_GetError());
