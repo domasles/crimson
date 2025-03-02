@@ -36,9 +36,9 @@ namespace crimson {
         return false;
     }
 
-    void InputSystem::loadInputActions(const std::string& filename) {
+    void InputSystem::loadInputActions(const std::string& fileName) {
         std::string basePath = SDL_GetBasePath();
-        std::string fullPath = basePath + filename;
+        std::string fullPath = basePath + fileName;
 
         std::ifstream file(fullPath);
 

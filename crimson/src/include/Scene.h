@@ -25,8 +25,6 @@ namespace crimson {
 
     class SceneManager {
         public:
-            ~SceneManager();
-
             static SceneManager& getInstance() {
                 static SceneManager instance;
                 return instance;
@@ -42,6 +40,10 @@ namespace crimson {
 
         private:
             SceneManager() : m_LastFrameTime(SDL_GetTicks()) {}
+            ~SceneManager();
+
+            SceneManager(const SceneManager&) = delete;
+            SceneManager& operator=(const SceneManager&) = delete;
 
             void handleSceneTransition();
 

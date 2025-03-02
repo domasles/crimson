@@ -2,6 +2,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 if os.target() == "windows" then
     SDLlibname = "SDL3.dll"
+    SDLimagelibname = "SDL3_image.dll"
 
 elseif os.target() == "linux" then
     SDLlibname = "libSDL3.so.0"
@@ -32,18 +33,27 @@ project "crimson"
     includedirs {
         "%{prj.name}/src/include",
         "%{prj.name}/vendor/sdl3/include",
-        "%{prj.name}/vendor/json/include"
+        "%{prj.name}/vendor/json/include",
+        "%{prj.name}/vendor/sdl3-image/include"
     }
 
     postbuildcommands {
         ("{MKDIR} %{cfg.targetdir}"),
+
         ("{COPY} ../vendor/lib/sdl3/x64/" .. SDLlibname .. " %{cfg.targetdir}"),
-        ("{COPYDIR} config %{cfg.targetdir}/config")
+        ("{COPY} ../vendor/lib/sdl3/x64/" .. SDLimagelibname .. " %{cfg.targetdir}"),
+
+        ("{COPYDIR} config %{cfg.targetdir}/config"),
+        ("{COPYDIR} assets %{cfg.targetdir}/config")
+    }
+
+    links {
+        "SDL3",
+        "SDL3_image"
     }
     
     libdirs "vendor/lib/sdl3/x64"
-    links "SDL3"
-
+    
     filter "system:windows"
         cppdialect "C++17"
         staticruntime "On"

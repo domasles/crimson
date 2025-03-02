@@ -51,7 +51,7 @@ namespace crimson {
         public:
             void addMovementAction(const std::string& name, SDL_Keycode key, const Vector2& m_Direction) { m_Actions[name] = std::make_shared<DirectionalInputAction>(key, m_Direction); }
             void addSimpleAction(const std::string& name, SDL_Keycode key) { m_Actions[name] = std::make_shared<SimpleInputAction>(key); }
-            void loadInputActions(const std::string& filename);
+            void loadInputActions(const std::string& fileName);
 
             bool isActionPressed(const std::string& actionName);
 

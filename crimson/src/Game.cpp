@@ -34,7 +34,9 @@ namespace crimson {
 
             Logic::getInstance().update();
 
-            render();
+            SDL_RenderClear(m_Renderer.get());
+            Logic::getInstance().render();
+            SDL_RenderPresent(m_Renderer.get());
         }
     }
 
@@ -46,10 +48,5 @@ namespace crimson {
                 m_Running = false;
             }
         }
-    }
-
-    void Game::render() {
-        SDL_RenderClear(m_Renderer.get());
-        SDL_RenderPresent(m_Renderer.get());
     }
 }

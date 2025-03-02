@@ -2,8 +2,11 @@
 
 #include <SDL3/SDL.h>
 
+#include <Image.h>
 #include <Scene.h>
 #include <Input.h>
+#include <Game.h>
+
 #include <memory>
 
 namespace crimson {
@@ -12,16 +15,23 @@ namespace crimson {
 
     class TestScene : public Scene {
         public:
-            TestScene() { m_Name = "TestScene"; }
+            TestScene() : m_TestTexture(nullptr, SDL_DestroyTexture) { m_Name = "TestScene"; }
 
-            void init() override { m_TestScene2 = std::make_shared<TestScene2>(); }
+            void init() override;
             void update(float deltaTime) override;
-            void render() override {}
+            void render() override;
             void cleanup() override {}
 
         private:
             int changeCount = 0;
+
+            float m_PlayerX = 300;
+            float m_PlayerY = 300;
+
+            float m_Speed = 200;
+
             std::shared_ptr<TestScene2> m_TestScene2;
+            std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)> m_TestTexture;
     };
 
     class TestScene2 : public Scene {
@@ -46,10 +56,16 @@ namespace crimson {
 
             void init();
             void update() { SceneManager::getInstance().update(); }
+            void render() { SceneManager::getInstance().render(); }
 
             InputSystem getInputSystem() { return m_InputSystem; }
 
         private:
+            Logic() {}
+
+            Logic(const Logic&) = delete;
+            Logic& operator=(const Logic&) = delete;
+
             InputSystem m_InputSystem;
 
             std::shared_ptr<TestScene> m_TestScene;

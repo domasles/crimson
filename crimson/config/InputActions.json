@@ -3,13 +3,13 @@
         "move_up": {
             "type": "movement",
             "key": "w",
-            "vector": [ 0, 1 ]
+            "vector": [ 0, -1 ]
         },
 
         "move_down": {
             "type": "movement",
             "key": "s",
-            "vector": [ 0, -1 ]
+            "vector": [ 0, 1 ]
         },
 
         "move_left": {
