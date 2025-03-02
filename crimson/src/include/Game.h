@@ -16,7 +16,7 @@ namespace crimson {
                 return instance;
             }
 
-            bool init(const std::string& title, int width, int height);
+            bool init(const std::string& title, const int width, const int height);
             void run();
 
             std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)> m_Renderer;

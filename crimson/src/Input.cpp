@@ -28,6 +28,14 @@ namespace crimson {
         return movement.normalize();
     }
 
+    void InputSystem::addMovementAction(const std::string& name, const SDL_Keycode key, const Vector2& m_Direction) {
+        m_Actions[name] = std::make_shared<DirectionalInputAction>(key, m_Direction);
+    }
+
+    void InputSystem::addSimpleAction(const std::string& name, const SDL_Keycode key) {
+        m_Actions[name] = std::make_shared<SimpleInputAction>(key);
+    }
+
     bool InputSystem::isActionPressed(const std::string& actionName) {
         if (m_Actions.count(actionName)) {
             return m_Actions[actionName]->isPressed();

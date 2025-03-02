@@ -15,7 +15,7 @@ namespace crimson {
         return std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)>(texture, SDL_DestroyTexture);
     }
 
-    bool Image::RenderTexture(SDL_Renderer* renderer, SDL_Texture* texture, float posX, float posY, float stretchX, float stretchY) {
+    bool Image::RenderTexture(SDL_Renderer* renderer, SDL_Texture* texture, const float posX, const float posY, const float stretchX, const float stretchY) {
         SDL_FRect rect{ posX, posY, stretchX, stretchY };
         
         if (!SDL_RenderTexture(renderer, texture, nullptr, &rect)) {

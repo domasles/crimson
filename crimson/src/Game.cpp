@@ -1,7 +1,7 @@
 #include <Game.h>
 
 namespace crimson {
-    bool Game::init(const std::string& title, int width, int height) {
+    bool Game::init(const std::string& title, const int width, const int height) {
         if (!SDL_Init(SDL_INIT_VIDEO)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_Init failed: %s", SDL_GetError());
             return false;

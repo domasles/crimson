@@ -18,7 +18,7 @@ namespace crimson {
             TestScene() : m_TestTexture(nullptr, SDL_DestroyTexture) { m_Name = "TestScene"; }
 
             void init() override;
-            void update(float deltaTime) override;
+            void update(const float deltaTime) override;
             void render() override;
             void cleanup() override {}
 
@@ -38,8 +38,8 @@ namespace crimson {
         public:
             TestScene2() { m_Name = "TestScene2"; }
 
-            void init() override { m_TestScene = std::make_shared<TestScene>(); }
-            void update(float deltaTime) override;
+            void init() override;
+            void update(const float deltaTime) override;
             void render() override {}
             void cleanup() override {}
 
@@ -55,8 +55,8 @@ namespace crimson {
             }
 
             void init();
-            void update() { SceneManager::getInstance().update(); }
-            void render() { SceneManager::getInstance().render(); }
+            void update();
+            void render();
 
             InputSystem getInputSystem() { return m_InputSystem; }
 
