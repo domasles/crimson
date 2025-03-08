@@ -1,5 +1,3 @@
-#pragma once
-
 #ifdef CRIMSON_PLATFORM_WINDOWS
     #include <Windows.h>
 #endif
