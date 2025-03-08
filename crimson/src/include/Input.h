@@ -1,24 +1,11 @@
 #pragma once
 
-#include <nlohmann/json.hpp>
-#include <SDL3/SDL.h>
+#include <utils/math.h>
 
-#include <unordered_map>
-#include <iostream>
-#include <fstream>
-
+using namespace crimson::utils::math;
 using json = nlohmann::json;
 
 namespace crimson {
-    struct Vector2 {
-        Vector2 operator+(const Vector2& other) const { return { x + other.x, y + other.y }; }
-        Vector2 operator*(float scalar) const { return { x * scalar, y * scalar }; }
-
-        Vector2 normalize() const;
-
-        float x = 0;
-        float y = 0;
-    };
 
     class InputAction {
         public:

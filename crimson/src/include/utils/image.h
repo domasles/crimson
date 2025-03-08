@@ -1,12 +1,10 @@
 #pragma once
 
-#include <SDL3_image/SDL_image.h>
-#include <SDL3/SDL.h>
+#include <utils/math.h>
 
-#include <memory>
-#include <string>
+using namespace crimson::utils::math;
 
 namespace crimson::utils::image {
-    std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)> LoadImage(SDL_Renderer* renderer, const std::string& fileName);
-    bool RenderTexture(SDL_Renderer* renderer, SDL_Texture* texture, const float posX, const float posY, const float stretchX, const float stretchY);
+    std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)> loadImage(SDL_Renderer* renderer, const std::string& fileName);
+    bool renderTexture(SDL_Renderer* renderer, SDL_Texture* texture, const Vector2 position, const Vector2 stretch);
 }

@@ -1,3 +1,5 @@
+#include <pch.h>
+
 #include <Scene.h>
 
 namespace crimson {
@@ -46,7 +48,6 @@ namespace crimson {
         }
 
         m_CurrentScene = scene;
-        m_CurrentScene->init();
 
         return true;
     }

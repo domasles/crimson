@@ -26,15 +26,21 @@ project "crimson"
     targetdir ("bin/" .. outputdir)
     objdir ("bin-int/" .. outputdir)
 
+    pchheader "pch.h"
+    pchsource "%{prj.name}/src/pch/pch.cpp"
+
     files {
         "%{prj.name}/src/**.h",
         "%{prj.name}/src/**.cpp"
     }
 
     includedirs {
+        "%{prj.name}/src/pch",
         "%{prj.name}/src/include",
-        "%{prj.name}/vendor/sdl3/include",
+
         "%{prj.name}/vendor/json/include",
+
+        "%{prj.name}/vendor/sdl3/include",
         "%{prj.name}/vendor/sdl3-image/include"
     }
 

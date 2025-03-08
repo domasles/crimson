@@ -1,12 +1,5 @@
 #pragma once
 
-#include <SDL3/SDL.h>
-
-#include <unordered_map>
-#include <iostream>
-#include <string>
-#include <memory>
-
 namespace crimson {
     class Scene {
         public:

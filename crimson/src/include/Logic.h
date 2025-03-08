@@ -1,13 +1,13 @@
 #pragma once
 
-#include <SDL3/SDL.h>
+#include <entities/Player.h>
 #include <utils/image.h>
 
 #include <Scene.h>
 #include <Input.h>
-#include <Game.h>
 
-#include <memory>
+using namespace crimson::utils::image;
+using namespace crimson::utils::math;
 
 namespace crimson {
     class TestScene;
@@ -15,7 +15,7 @@ namespace crimson {
 
     class TestScene : public Scene {
         public:
-            TestScene() : m_TestTexture(nullptr, SDL_DestroyTexture) { m_Name = "TestScene"; }
+            TestScene() { m_Name = "TestScene"; }
 
             void init() override;
             void update(const float deltaTime) override;
@@ -23,15 +23,13 @@ namespace crimson {
             void cleanup() override {}
 
         private:
-            int changeCount = 0;
-
-            float m_PlayerX = 300;
-            float m_PlayerY = 300;
-
+            int m_ChangeCount = 0;
             float m_Speed = 200;
 
+            Vector2 m_Position = { 300, 300 };
+            
+            std::shared_ptr<Player> m_Player;
             std::shared_ptr<TestScene2> m_TestScene2;
-            std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)> m_TestTexture;
     };
 
     class TestScene2 : public Scene {

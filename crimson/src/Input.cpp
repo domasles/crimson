@@ -1,11 +1,8 @@
+#include <pch.h>
+
 #include <Input.h>
 
 namespace crimson {
-    Vector2 Vector2::normalize() const {
-        float length = SDL_sqrtf(x * x + y * y);
-        return (length > 0) ? Vector2{ x / length, y / length } : Vector2{ 0, 0 };
-    }
-
     bool DirectionalInputAction::isPressed() const {
         const bool* state = SDL_GetKeyboardState(nullptr);
         return state[SDL_GetScancodeFromKey(m_Key, nullptr)] != 0;
