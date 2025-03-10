@@ -1,20 +1,26 @@
 #pragma once
 
+using namespace std::chrono;
+
 namespace crimson {
     class Game {
         public:
             static Game& getInstance() {
-                static Game instance;
-                return instance;
+                static std::once_flag flag;
+                static Game* instance = nullptr;
+
+                std::call_once(flag, []() { instance = new Game(); });
+
+                return *instance;
             }
 
-            bool init(const std::string& title, const int width, const int height, const bool vSync=true, const int targetFPS=60);
+            bool init(const std::string& title, const int width=800, const int height=600, const bool fullscreen=false, const bool vSync=true, int targetFPS=60);
             void run();
 
-            std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)> m_Renderer;
+            const std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)>* getRenderer() const;
 
         private:
-            Game() : m_Window(nullptr, SDL_DestroyWindow), m_Renderer(nullptr, SDL_DestroyRenderer), m_Running(false), m_TargetFPS(0), m_FrameDelay(0), m_FrameTime(0), m_FrameStart(0) {}
+            Game() : m_Window(nullptr, SDL_DestroyWindow), m_Renderer(nullptr, SDL_DestroyRenderer) {}
             ~Game() { SDL_Quit(); }
 
             Game(const Game&) = delete;
@@ -22,14 +28,17 @@ namespace crimson {
 
             void processEvents();
 
-            int m_TargetFPS;
-            int m_FrameDelay;
-            int m_FrameTime;
+            int m_FrameDelay = 0;
+            int m_FrameTime = 0;
+            int m_FrameStart = 0;
 
-            bool m_Running;
+            int m_FullscreenFlag = 0;
 
-            Uint32 m_FrameStart;
+            bool m_Running = false;
 
             std::unique_ptr<SDL_Window, void(*)(SDL_Window*)> m_Window;
+            std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)> m_Renderer;
+
+            std::queue<SDL_Event> m_EventQueue;
     };
 }

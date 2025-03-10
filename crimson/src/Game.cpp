@@ -4,13 +4,21 @@
 #include <Logic.h>
 
 namespace crimson {
-    bool Game::init(const std::string& title, const int width, const int height, const bool vSync,  const int targetFPS) {
+    bool Game::init(const std::string& title, const int width, const int height, const bool fullscreen, const bool vSync, int targetFPS) {
         if (!SDL_Init(SDL_INIT_VIDEO)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_Init failed: %s", SDL_GetError());
             return false;
         }
 
-        m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_RESIZABLE), SDL_DestroyWindow);
+        if (fullscreen) {
+            m_FullscreenFlag = SDL_WINDOW_FULLSCREEN;
+        }
+
+        else {
+            m_FullscreenFlag = SDL_WINDOW_RESIZABLE;
+        }
+
+        m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, m_FullscreenFlag), SDL_DestroyWindow);
 
         if (!m_Window) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateWindow failed: %s", SDL_GetError());
@@ -32,36 +40,35 @@ namespace crimson {
         Logic::getInstance().init();
 
         if (vSync) {
-            m_TargetFPS = -1;
-        }
-
-        else {
-            m_TargetFPS = targetFPS;
+            targetFPS = -1;
         }
         
-        m_FrameDelay = 1000 / m_TargetFPS;
+        m_FrameDelay = 1000 / targetFPS;
         m_Running = true;
 
         return true;
     }
 
     void Game::run() {
-        while (m_Running) {
-            m_FrameStart = SDL_GetTicks();
+        auto lastTime = steady_clock::now();
 
-            SDL_RenderClear(m_Renderer.get());
+        while (m_Running) {
+            auto startTime = steady_clock::now();
+            float deltaTime = duration<float>(startTime - lastTime).count();
+
+            lastTime = startTime;
 
             processEvents();
-
             Logic::getInstance().update();
-            Logic::getInstance().render();
 
+            SDL_RenderClear(m_Renderer.get());
+            Logic::getInstance().render();
             SDL_RenderPresent(m_Renderer.get());
 
-            m_FrameTime = SDL_GetTicks() - m_FrameStart;
+            auto frameTime = duration_cast<milliseconds>(steady_clock::now() - startTime).count();
 
-            if (m_FrameDelay > m_FrameTime) {
-                SDL_Delay(m_FrameDelay - m_FrameTime);
+            if (m_FrameDelay > frameTime) {
+                std::this_thread::sleep_for(milliseconds(m_FrameDelay - frameTime));
             }
         }
     }
@@ -70,9 +77,25 @@ namespace crimson {
         SDL_Event event;
 
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_EVENT_QUIT) {
+            m_EventQueue.push(event);
+        }
+
+        while (!m_EventQueue.empty()) {
+            SDL_Event e = m_EventQueue.front();
+            m_EventQueue.pop();
+
+            if (e.type == SDL_EVENT_QUIT) {
                 m_Running = false;
             }
         }
+    }
+
+    const std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)>* Game::getRenderer() const {
+        if (!m_Renderer) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Renderer is not initialized yet!");
+            return nullptr;
+        }
+
+        return &m_Renderer;
     }
 }

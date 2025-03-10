@@ -8,7 +8,6 @@ namespace crimson {
     class Player : public Entity {
         public:
             Player() : m_Texture(nullptr, SDL_DestroyTexture) {}
-            ~Player() {}
 
             void init() override;
             void update(float deltatime) override {}

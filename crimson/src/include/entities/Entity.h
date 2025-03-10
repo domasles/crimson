@@ -18,10 +18,10 @@ namespace crimson {
             Vector2 getPosition() const { return m_Position; };
 
         protected:
-            Entity() : m_Position({ 0, 0 }) {}
-            ~Entity() {}
+            Entity() = default;
+            ~Entity() = default;
 
-            Vector2 m_Position;
-            Vector2 m_Stretch;
+            Vector2 m_Position{ 0, 0 };
+            Vector2 m_Stretch{ 0, 0 };
     };
 }

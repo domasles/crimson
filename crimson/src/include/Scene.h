@@ -8,11 +8,14 @@ namespace crimson {
             virtual void init() = 0;
             virtual void update(float deltaTime) = 0;
             virtual void render() = 0;
-            virtual void cleanup() = 0;
+
+            void setInitialized(bool value) { m_Initialized = value; }
+            bool getInitialized() const { return m_Initialized; }
 
             std::string getName() const { return m_Name; }
 
         protected:
+            bool m_Initialized = false;
             std::string m_Name;
     };
 
@@ -32,18 +35,16 @@ namespace crimson {
             std::string getCurrentSceneName() const;
 
         private:
-            SceneManager() : m_LastFrameTime(SDL_GetTicks()) {}
-            ~SceneManager();
+            SceneManager() : m_LastFrameTime(SDL_GetTicksNS()) {}
+            ~SceneManager() = default;
 
             SceneManager(const SceneManager&) = delete;
             SceneManager& operator=(const SceneManager&) = delete;
 
-            void handleSceneTransition();
-
             std::unordered_map<std::string, std::shared_ptr<Scene>> m_Scenes;
 
             std::shared_ptr<Scene> m_CurrentScene = nullptr;
-            std::shared_ptr<Scene> m_PendingScene = nullptr;
+            std::shared_ptr<Scene> m_PreviousScene = nullptr;
 
             uint64_t m_LastFrameTime;
     };

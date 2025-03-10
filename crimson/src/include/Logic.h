@@ -10,9 +10,6 @@ using namespace crimson::utils::image;
 using namespace crimson::utils::math;
 
 namespace crimson {
-    class TestScene;
-    class TestScene2;
-
     class TestScene : public Scene {
         public:
             TestScene() { m_Name = "TestScene"; }
@@ -20,36 +17,34 @@ namespace crimson {
             void init() override;
             void update(const float deltaTime) override;
             void render() override;
-            void cleanup() override {}
 
         private:
             int m_ChangeCount = 0;
             float m_Speed = 200;
 
-            Vector2 m_Position = { 300, 300 };
+            Vector2 m_Position{ 300, 300 };
             
-            std::shared_ptr<Player> m_Player;
-            std::shared_ptr<TestScene2> m_TestScene2;
+            std::unique_ptr<Player> m_Player;
     };
 
     class TestScene2 : public Scene {
         public:
             TestScene2() { m_Name = "TestScene2"; }
 
-            void init() override;
+            void init() override {}
             void update(const float deltaTime) override;
             void render() override {}
-            void cleanup() override {}
-
-        private:
-            std::shared_ptr<TestScene> m_TestScene;
     };
 
     class Logic {
         public:
             static Logic& getInstance() {
-                static Logic instance;
-                return instance;
+                static std::once_flag flag;
+                static Logic* instance = nullptr;
+
+                std::call_once(flag, []() { instance = new Logic(); });
+
+                return *instance;
             }
 
             void init();
@@ -59,7 +54,7 @@ namespace crimson {
             InputSystem getInputSystem() { return m_InputSystem; }
 
         private:
-            Logic() {}
+            Logic() = default;
 
             Logic(const Logic&) = delete;
             Logic& operator=(const Logic&) = delete;
