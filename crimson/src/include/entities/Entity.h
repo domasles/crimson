@@ -15,7 +15,7 @@ namespace crimson {
             void setPosition(Vector2 position) { m_Position = position; }
             void addPosition(Vector2 position) { m_Position += position; }
 
-            Vector2 getPosition() const { return m_Position; };
+            const Vector2& getPosition() const { return m_Position; }
 
         protected:
             Entity() = default;

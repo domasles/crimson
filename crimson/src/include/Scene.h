@@ -10,9 +10,9 @@ namespace crimson {
             virtual void render() = 0;
 
             void setInitialized(bool value) { m_Initialized = value; }
-            bool getInitialized() const { return m_Initialized; }
 
-            std::string getName() const { return m_Name; }
+            const bool getInitialized() const { return m_Initialized; }
+            const std::string& getName() const { return m_Name; }
 
         protected:
             bool m_Initialized = false;

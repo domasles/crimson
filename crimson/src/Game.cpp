@@ -90,12 +90,12 @@ namespace crimson {
         }
     }
 
-    const std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)>* Game::getRenderer() const {
+    SDL_Renderer* Game::getRenderer() const {
         if (!m_Renderer) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Renderer is not initialized yet!");
             return nullptr;
         }
 
-        return &m_Renderer;
+        return m_Renderer.get();
     }
 }

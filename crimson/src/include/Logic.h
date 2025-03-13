@@ -21,8 +21,6 @@ namespace crimson {
         private:
             int m_ChangeCount = 0;
             float m_Speed = 200;
-
-            Vector2 m_Position{ 300, 300 };
             
             std::unique_ptr<Player> m_Player;
     };
@@ -39,12 +37,8 @@ namespace crimson {
     class Logic {
         public:
             static Logic& getInstance() {
-                static std::once_flag flag;
-                static Logic* instance = nullptr;
-
-                std::call_once(flag, []() { instance = new Logic(); });
-
-                return *instance;
+                static Logic instance;
+                return instance;
             }
 
             void init();

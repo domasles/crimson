@@ -9,32 +9,29 @@ namespace crimson {
 
     class InputAction {
         public:
-            virtual ~InputAction() = default;
+            InputAction(const SDL_Keycode key) : m_Key(key) {}
 
-            virtual bool isPressed() const = 0;
-            virtual Vector2 getDirection() const { return { 0, 0 }; }
+            virtual ~InputAction() = default;
+            virtual const Vector2 getDirection() const { return { 0, 0 }; }
+
+            const bool isPressed() const;
+
+        protected:
+            SDL_Keycode m_Key;
     };
 
     class DirectionalInputAction : public InputAction {
         public:
-            DirectionalInputAction(const SDL_Keycode key, const Vector2 direction) : m_Key(key), m_Direction(direction) {}
-
-            bool isPressed() const override;
-
-            Vector2 getDirection() const override { return m_Direction; }
+            DirectionalInputAction(const SDL_Keycode key, const Vector2 direction) : InputAction(key), m_Direction(direction) {}
+            const Vector2 getDirection() const override { return m_Direction; }
 
         private:
-            SDL_Keycode m_Key;
             Vector2 m_Direction;
     };
 
     class SimpleInputAction : public InputAction {
         public:
-            SimpleInputAction(const SDL_Keycode key) : m_Key(key) {}
-            bool isPressed() const override;
-
-        private:
-            SDL_Keycode m_Key;
+            SimpleInputAction(const SDL_Keycode key) : InputAction(key) {}
     };
 
     class InputSystem {
@@ -43,9 +40,8 @@ namespace crimson {
             void addSimpleAction(const std::string& name, const SDL_Keycode key);
             void loadInputActions(const std::string& fileName);
 
-            bool isActionPressed(const std::string& actionName) const;
-
-            Vector2 getMovementVector() const;
+            const bool isActionPressed(const std::string& actionName) const;
+            const Vector2 getMovementVector() const;
 
         private:
             bool m_IsLoaded = false;

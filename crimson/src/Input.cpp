@@ -3,26 +3,16 @@
 #include <Input.h>
 
 namespace crimson {
-    bool DirectionalInputAction::isPressed() const {
+    const bool InputAction::isPressed() const {
         const bool* state = SDL_GetKeyboardState(nullptr);
-        return state[SDL_GetScancodeFromKey(m_Key, nullptr)] != 0;
-    }
 
-    bool SimpleInputAction::isPressed() const {
-        const bool* state = SDL_GetKeyboardState(nullptr);
-        return state[SDL_GetScancodeFromKey(m_Key, nullptr)] != 0;
-    }
+        SDL_Scancode scancode = SDL_GetScancodeFromKey(m_Key, nullptr);
 
-    Vector2 InputSystem::getMovementVector() const {
-        Vector2 movement = { 0, 0 };
-
-        for (const auto& [name, action] : m_Actions) {
-            if (action->isPressed()) {
-                movement += action->getDirection();
-            }
+        if (scancode == SDL_SCANCODE_UNKNOWN) {
+            return false;
         }
 
-        return movement.normalize();
+        return state[scancode] != 0;
     }
 
     void InputSystem::addMovementAction(const std::string& name, const SDL_Keycode key, const Vector2& m_Direction) {
@@ -31,16 +21,6 @@ namespace crimson {
 
     void InputSystem::addSimpleAction(const std::string& name, const SDL_Keycode key) {
         m_Actions[name] = std::make_shared<SimpleInputAction>(key);
-    }
-
-    bool InputSystem::isActionPressed(const std::string& actionName) const {
-        auto it = m_Actions.find(actionName);
-
-        if (it != m_Actions.end()) {
-            return it->second->isPressed();
-        }
-
-        return false;
     }
 
     void InputSystem::loadInputActions(const std::string& fileName) {
@@ -104,5 +84,27 @@ namespace crimson {
         catch (const std::exception& e) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "JSON parsing error: %s", e.what());
         }
+    }
+
+    const bool InputSystem::isActionPressed(const std::string& actionName) const {
+        auto it = m_Actions.find(actionName);
+
+        if (it != m_Actions.end()) {
+            return it->second->isPressed();
+        }
+
+        return false;
+    }
+
+    const Vector2 InputSystem::getMovementVector() const {
+        Vector2 movement = { 0, 0 };
+
+        for (const auto& [name, action] : m_Actions) {
+            if (action->isPressed()) {
+                movement += action->getDirection();
+            }
+        }
+
+        return movement.normalize();
     }
 }

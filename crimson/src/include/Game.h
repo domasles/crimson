@@ -6,18 +6,14 @@ namespace crimson {
     class Game {
         public:
             static Game& getInstance() {
-                static std::once_flag flag;
-                static Game* instance = nullptr;
-
-                std::call_once(flag, []() { instance = new Game(); });
-
-                return *instance;
+                static Game instance;
+                return instance;
             }
 
             bool init(const std::string& title, const int width=800, const int height=600, const bool fullscreen=false, const bool vSync=true, int targetFPS=60);
             void run();
 
-            const std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)>* getRenderer() const;
+            SDL_Renderer* getRenderer() const;
 
         private:
             Game() : m_Window(nullptr, SDL_DestroyWindow), m_Renderer(nullptr, SDL_DestroyRenderer) {}

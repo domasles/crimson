@@ -4,8 +4,8 @@
 
 namespace crimson::utils::image {
     std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)> loadImage(SDL_Renderer* renderer, const std::string& fileName) {
-        std::string basePath = SDL_GetBasePath();
-        std::string fullPath = basePath + fileName;
+        const std::string& basePath = SDL_GetBasePath();
+        const std::string& fullPath = basePath + fileName;
 
         SDL_Texture* texture = IMG_LoadTexture(renderer, fullPath.c_str());
 

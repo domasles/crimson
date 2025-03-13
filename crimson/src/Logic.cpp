@@ -9,7 +9,7 @@ namespace crimson {
             m_Player = std::make_unique<Player>();
 
             m_Player->init();
-            m_Player->setPosition(m_Position);
+            m_Player->setPosition({ 300, 300 });
         }
     }
 
