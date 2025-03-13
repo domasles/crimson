@@ -19,14 +19,15 @@ Either way will clone everything you need, and you'll be able to build the game.
 ```bash
 git submodule update --init
 ```
+to re-download or update required libraries.
 
 ## Building:
-Currently, this project *officially* supports only Windows and Linux on x86_64 processors, so any other platforms might require additional tinkering as they're not guaranteed to work out of the box.
+Currently, this project *officially* supports only Windows and Linux on x86_64 processors, so any other platform might require additional tinkering as they're not guaranteed to work out of the box.
 
 For project generation [Premake](https://premake.github.io) is being used, but editing the configuration isn't recommended unless you know what you're doing.
 
 ### Windows:
-This Project is in active development using [Visual Studio 2022](https://visualstudio.microsoft.com). Other versions aren't tested, so proceed at your own risk. Some of the modern ```C++``` features may not be available using older compilers.
+This Project is under active development using [Visual Studio 2022](https://visualstudio.microsoft.com). Other versions aren't tested, so proceed at your own risk. Some of the modern ```C++``` features may not be available using older compilers with a different set of the standard library.
 
 Upon cloning the repository, you should see ```GenerateProjects-Windows.bat``` at the root of the project. Run it to see ```crimson.sln``` appear.
 
