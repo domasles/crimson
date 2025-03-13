@@ -21,10 +21,7 @@ namespace crimson {
 
     class SceneManager {
         public:
-            static SceneManager& getInstance() {
-                static SceneManager instance;
-                return instance;
-            }
+            static SceneManager& getInstance();
 
             bool registerScene(const std::string& name, std::shared_ptr<Scene> scene);
             bool changeScene(const std::string& name);

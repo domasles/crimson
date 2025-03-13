@@ -3,6 +3,15 @@
 #include <Scene.h>
 
 namespace crimson {
+    SceneManager& SceneManager::getInstance() {
+        static SceneManager* instance = nullptr;
+        static std::once_flag flag;
+
+        std::call_once(flag, []() { instance = new SceneManager(); });
+
+        return *instance;
+    }
+
     bool SceneManager::registerScene(const std::string& name, std::shared_ptr<Scene> scene) {
         if (!scene) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Cannot register scene: Scene pointer is null!");

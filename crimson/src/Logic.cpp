@@ -4,6 +4,15 @@
 #include <Game.h>
 
 namespace crimson {
+    Logic& Logic::getInstance() {
+        static Logic* instance = nullptr;
+        static std::once_flag flag;
+
+        std::call_once(flag, []() { instance = new Logic(); });
+
+        return *instance;
+    }
+
     void TestScene::init() {
         if (!m_Player) {
             m_Player = std::make_unique<Player>();

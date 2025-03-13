@@ -5,10 +5,7 @@ using namespace std::chrono;
 namespace crimson {
     class Game {
         public:
-            static Game& getInstance() {
-                static Game instance;
-                return instance;
-            }
+            static Game& getInstance();
 
             bool init(const std::string& title, const int width=800, const int height=600, const bool fullscreen=false, const bool vSync=true, int targetFPS=60);
             void run();
@@ -27,7 +24,6 @@ namespace crimson {
             int m_FrameDelay = 0;
             int m_FrameTime = 0;
             int m_FrameStart = 0;
-
             int m_FullscreenFlag = 0;
 
             bool m_Running = false;

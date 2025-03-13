@@ -4,6 +4,15 @@
 #include <Logic.h>
 
 namespace crimson {
+    Game& Game::getInstance() {
+        static Game* instance = nullptr;
+        static std::once_flag flag;
+
+        std::call_once(flag, []() { instance = new Game(); });
+
+        return *instance;
+    }
+
     bool Game::init(const std::string& title, const int width, const int height, const bool fullscreen, const bool vSync, int targetFPS) {
         if (!SDL_Init(SDL_INIT_VIDEO)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_Init failed: %s", SDL_GetError());

@@ -36,10 +36,7 @@ namespace crimson {
 
     class Logic {
         public:
-            static Logic& getInstance() {
-                static Logic instance;
-                return instance;
-            }
+            static Logic& getInstance();
 
             void init();
             void update();
