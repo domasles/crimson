@@ -7,12 +7,8 @@ using namespace std::chrono;
 
 namespace engine {
     Core& Core::getInstance() {
-        static Core* instance = nullptr;
-        static std::once_flag flag;
-
-        std::call_once(flag, []() { instance = new Core(); });
-
-        return *instance;
+        static Core& instance = *new Core();
+        return instance;
     }
 
     bool Core::init(const std::string& title, const int width, const int height, const bool fullscreen) {

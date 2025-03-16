@@ -4,15 +4,8 @@
 
 namespace engine {
     SceneManager& SceneManager::getInstance() {
-        static SceneManager* instance = nullptr;
-        static std::once_flag flag;
-
-        std::call_once(flag, []() {
-            instance = new SceneManager();
-            std::atexit([]() { delete instance; });
-        });
-
-        return *instance;
+        static SceneManager& instance = *new SceneManager();
+        return instance;
     }
 
     bool SceneManager::registerScene(const std::string& name, std::shared_ptr<Scene> scene) {

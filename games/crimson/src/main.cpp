@@ -24,5 +24,5 @@ GAME_API void init() {
 }
 
 GAME_API void update() {
-    return engineCore.run();
+    engineCore.run();
 }
