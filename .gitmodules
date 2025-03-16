@@ -1,9 +1,9 @@
 [submodule "crimson/vendor/sdl3"]
-	path = crimson/vendor/sdl3
+	path = engine/vendor/sdl3
 	url = https://github.com/libsdl-org/SDL.git
 [submodule "crimson/vendor/json"]
-	path = crimson/vendor/json
+	path = engine/vendor/json
 	url = https://github.com/nlohmann/json.git
 [submodule "crimson/vendor/sdl3-image"]
-	path = crimson/vendor/sdl3-image
+	path = engine/vendor/sdl3-image
 	url = https://github.com/libsdl-org/SDL_image.git

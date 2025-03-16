@@ -11,6 +11,7 @@ end
 
 workspace "crimson"
     architecture "x64"
+    startproject "launcher"
 
     configurations {
         "Debug",
@@ -18,13 +19,158 @@ workspace "crimson"
         "Dist"
     }
 
-project "crimson"
-    location "crimson"
+project "launcher"
+    location "launcher"
     kind "ConsoleApp"
     language "C++"
 
     targetdir ("bin/" .. outputdir)
     objdir ("bin-int/" .. outputdir)
+
+    pchheader "pch.h"
+    pchsource "%{prj.name}/src/pch/pch.cpp"
+
+    files {
+        "%{prj.name}/src/**.h",
+        "%{prj.name}/src/**.cpp"
+    }
+
+    includedirs {
+        "%{prj.name}/src/include",
+        "%{prj.name}/src/pch"
+    }
+
+    dependson "crimson"
+    
+    filter "system:windows"
+        cppdialect "C++17"
+        staticruntime "On"
+        systemversion "latest"
+
+        defines "LAUNCHER_PLATFORM_WINDOWS"
+
+        postbuildcommands {
+            ("{MKDIR} %{cfg.targetdir}"),
+    
+            ("{COPY} ../vendor/lib/sdl3/x64/" .. SDLlibname .. " %{cfg.targetdir}"),
+            ("{COPY} ../vendor/lib/sdl3/x64/" .. SDLimagelibname .. " %{cfg.targetdir}"),
+        }
+
+    filter "system:linux"
+        cppdialect "C++17"
+        staticruntime "Off"
+        toolset "gcc"
+
+        defines "LAUNCHER_PLATFORM_LINUX"
+    
+    filter "configurations:Debug"
+        defines "LAUNCHER_DEBUG"
+        symbols "On"
+
+    filter "configurations:Release"
+        defines "LAUNCHER_RELEASE"
+        optimize "On"
+
+    filter "configurations:Dist"
+        defines "LAUNCHER_DIST"
+        optimize "On"
+
+project "crimson"
+    location "games/crimson"
+    kind "SharedLib"
+    language "C++"
+
+    targetdir ("bin/" .. outputdir .. "/games/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/games/%{prj.name}")
+
+    pchheader "pch.h"
+    pchsource "games/%{prj.name}/src/pch/pch.cpp"
+
+    files {
+        "games/%{prj.name}/src/**.h",
+        "games/%{prj.name}/src/**.cpp"
+    }
+
+    includedirs {
+        "games/%{prj.name}/src/pch",
+        "games/%{prj.name}/src/include",
+
+        "engine/src/include",
+
+        "engine/vendor/json/include",
+
+        "engine/vendor/sdl3/include",
+        "engine/vendor/sdl3-image/include"
+    }
+
+    libdirs {
+        "bin/" .. outputdir .. "/engine",
+        "vendor/lib/sdl3/x64"
+    }
+
+    links {
+        "engine",
+        "SDL3",
+        "SDL3_image"
+    }
+
+    dependson "engine"
+    
+    filter "system:windows"
+        cppdialect "C++17"
+        staticruntime "On"
+        systemversion "latest"
+
+        defines "GAME_PLATFORM_WINDOWS"
+
+        postbuildcommands {
+            ("{MKDIR} %{cfg.targetdir}"),
+    
+            ("{COPYDIR} config %{cfg.targetdir}/config"),
+            ("{COPYDIR} assets %{cfg.targetdir}/assets")
+        }
+
+    filter "system:linux"
+        cppdialect "C++17"
+        staticruntime "Off"
+        toolset "gcc"
+
+        defines "GAME_PLATFORM_LINUX"
+
+        postbuildcommands {
+            ("{MKDIR} %{cfg.targetdir}"),
+
+            ("{COPYDIR} config %{cfg.targetdir}/config"),
+            ("{COPYDIR} assets %{cfg.targetdir}/assets"),
+    
+            ("{COPY} ../../vendor/lib/sdl3/x64/" .. SDLlibname .. " %{cfg.targetdir}"),
+            ("{COPY} ../../vendor/lib/sdl3/x64/" .. SDLimagelibname .. " %{cfg.targetdir}"),
+        }
+        
+        linkoptions {
+            "-Wl,-rpath,'$$ORIGIN'",
+            "-Wl,-rpath-link,'$$ORIGIN'"
+        }
+    
+    filter "configurations:Debug"
+        defines "GAME_DEBUG"
+        symbols "On"
+
+    filter "configurations:Release"
+        defines "GAME_RELEASE"
+        optimize "On"
+
+    filter "configurations:Dist"
+        defines "GAME_DIST"
+        optimize "On"
+
+project "engine"
+    location "engine"
+    kind "StaticLib"
+    language "C++"
+
+    targetdir ("bin/" .. outputdir .. "/engine")
+    objdir ("bin-int/" .. outputdir .. "/engine")
 
     pchheader "pch.h"
     pchsource "%{prj.name}/src/pch/pch.cpp"
@@ -44,50 +190,37 @@ project "crimson"
         "%{prj.name}/vendor/sdl3-image/include"
     }
 
-    postbuildcommands {
-        ("{MKDIR} %{cfg.targetdir}"),
-
-        ("{COPY} ../vendor/lib/sdl3/x64/" .. SDLlibname .. " %{cfg.targetdir}"),
-        ("{COPY} ../vendor/lib/sdl3/x64/" .. SDLimagelibname .. " %{cfg.targetdir}"),
-
-        ("{COPYDIR} config %{cfg.targetdir}/config"),
-        ("{COPYDIR} assets %{cfg.targetdir}/assets")
-    }
+    libdirs "vendor/lib/sdl3/x64"
 
     links {
         "SDL3",
         "SDL3_image"
     }
     
-    libdirs "vendor/lib/sdl3/x64"
-    
     filter "system:windows"
         cppdialect "C++17"
         staticruntime "On"
         systemversion "latest"
 
-        defines "CRIMSON_PLATFORM_WINDOWS"
+        defines "ENGINE_PLATFORM_WINDOWS"
 
     filter "system:linux"
         cppdialect "C++17"
         staticruntime "Off"
         toolset "gcc"
 
-        defines "CRIMSON_PLATFORM_LINUX"
-        
-        linkoptions {
-            "-Wl,-rpath,'$$ORIGIN'",
-            "-Wl,-rpath-link,'$$ORIGIN'"
-        }
+        defines "ENGINE_PLATFORM_LINUX"
+
+        buildoptions { "-fPIC" }
     
     filter "configurations:Debug"
-        defines "CRIMSON_DEBUG"
+        defines "ENGINE_DEBUG"
         symbols "On"
 
     filter "configurations:Release"
-        defines "CRIMSON_RELEASE"
+        defines "ENGINE_RELEASE"
         optimize "On"
 
     filter "configurations:Dist"
-        defines "CRIMSON_DIST"
+        defines "ENGINE_DIST"
         optimize "On"
