@@ -1,25 +1,38 @@
 #include <pch.h>
 
-#include <Core.h>
-#include <Scene.h>
+#include <utils/math.h>
 
-using namespace std::chrono;
+#include <Scene.h>
+#include <Core.h>
+
+ENGINE_API void internalUpdate(std::function<void()> customUpdate) {
+    engine::Core::getInstance().run(customUpdate);
+}
 
 namespace engine {
     Core& Core::getInstance() {
-        static Core& instance = *new Core();
-        return instance;
+        try {
+            static Core& instance = *new Core();
+            return instance;
+        }
+
+        catch (const std::bad_alloc& e) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Memory allocation failed: %s", e.what());
+        }
+
+        static Core fallbackInstance;
+        return fallbackInstance;
     }
 
-    bool Core::init(const std::string& title, const int width, const int height, const bool fullscreen) {
+    const bool Core::init(const std::string& parentFolder, const std::string& title, const int width, const int height, const bool fullScreen) {
+        m_ParentFolder = parentFolder;
+
         if (!SDL_Init(SDL_INIT_VIDEO)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_Init failed: %s", SDL_GetError());
             return false;
         }
 
-        fullscreen ? m_FullscreenFlag = SDL_WINDOW_FULLSCREEN : SDL_WINDOW_RESIZABLE;
-
-        m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, m_FullscreenFlag), SDL_DestroyWindow);
+        m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, (int)fullScreen | SDL_WINDOW_RESIZABLE), SDL_DestroyWindow);
 
         if (!m_Window) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateWindow failed: %s", SDL_GetError());
@@ -39,21 +52,25 @@ namespace engine {
         }
 
         m_InputSystem = std::make_unique<InputSystem>();
-
         return true;
     }
 
-    void Core::run() {
+    void Core::run(std::function<void()> customUpdate) {
         while (processEvents()) {
-            SceneManager::getInstance().update();
-
             SDL_RenderClear(m_Renderer.get());
+
+            if (customUpdate) {
+                customUpdate();
+            }
+
+            SceneManager::getInstance().update();
             SceneManager::getInstance().render();
+
             SDL_RenderPresent(m_Renderer.get());
         }
     }
 
-    bool Core::processEvents() {
+    const bool Core::processEvents() {
         SDL_Event event;
 
         while (SDL_PollEvent(&event)) {
@@ -83,7 +100,7 @@ namespace engine {
 
     InputSystem* Core::getInputSystem() const {
         if (!m_InputSystem) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Renderer is not initialized yet!");
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Input system is not initialized yet!");
             return nullptr;
         }
 

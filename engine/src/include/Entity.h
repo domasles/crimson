@@ -1,8 +1,8 @@
 #pragma once
 
 #include <utils/math.h>
-#include <utils/image.h>
 
+#include <Texture.h>
 #include <Core.h>
 
 using namespace engine::utils::math;
@@ -10,6 +10,8 @@ using namespace engine::utils::math;
 namespace engine {
     class Entity {
         public:
+            virtual ~Entity() = default;
+
             virtual void init() = 0;
             virtual void update(const float deltaTime) = 0;
             virtual void render() = 0;
@@ -20,12 +22,11 @@ namespace engine {
             const Vector2& getPosition() const { return m_Position; }
 
         protected:
-            Entity() = default;
-            ~Entity() = default;
-
             Core& m_EngineCore = Core::getInstance();
 
+            Vector2 m_Size{ 100, 100 };
             Vector2 m_Position{ 0, 0 };
-            Vector2 m_Stretch{ 0, 0 };
+
+            std::shared_ptr<Texture> m_Texture;
     };
 }

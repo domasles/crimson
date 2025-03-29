@@ -2,9 +2,9 @@
 
 #include <entities/Player.h>
 
-#include <Core.h>
 #include <Scene.h>
 #include <Input.h>
+#include <Core.h>
 
 #include <sceneRegistrator.h>
 
@@ -19,10 +19,6 @@ constexpr bool FULLSCREEN = false;
 Core& engineCore = Core::getInstance();
 
 GAME_API void init() {
-    if (!engineCore.init("Crimson", WINDOW_WIDTH, WINDOW_HEIGHT, FULLSCREEN)) return;
+    if (!engineCore.init("crimson", "Crimson", WINDOW_WIDTH, WINDOW_HEIGHT, FULLSCREEN)) return;
     registrateScenes();
-}
-
-GAME_API void update() {
-    engineCore.run();
 }

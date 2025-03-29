@@ -1,22 +1,22 @@
 #include <pch.h>
 
-#include <levels/Test.h>
+#include <scenes/Level1.h>
 
 namespace crimson {
-    void TestScene::init() {
+    void Level1::init() {
         if (!m_Player) {
-            m_Player = std::make_unique<crimson::Player>();
+            m_Player = std::make_unique<Player>();
 
             m_Player->init();
             m_Player->setPosition({ 300, 300 });
         }
     }
 
-    void TestScene::update(const float deltaTime) {
+    void Level1::update(const float deltaTime) {
         m_Player->update(deltaTime);
     }
 
-    void TestScene::render() {
+    void Level1::render() {
         m_Player->render();
     }
 }

@@ -1,11 +1,11 @@
 #include <pch.h>
 
-#include <utils/libLoader.h>
+#include <utils/lib.h>
 #include <utils/filesystem.h>
 
 using namespace launcher::utils::filesystem;
 
-namespace launcher::utils::libLoader {
+namespace launcher::utils::lib {
     void* loadLibrary(const std::string& fileName) {
         const std::string& executableDir = getExecutableDirectory();
         const std::string& libraryPath = executableDir + "/" + fileName;

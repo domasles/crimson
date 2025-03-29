@@ -4,11 +4,20 @@
 
 namespace engine {
     SceneManager& SceneManager::getInstance() {
-        static SceneManager& instance = *new SceneManager();
-        return instance;
+        try {
+            static SceneManager& instance = *new SceneManager();
+            return instance;
+        }
+
+        catch (const std::bad_alloc& e) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Memory allocation failed: %s", e.what());
+        }
+
+        static SceneManager fallbackInstance;
+        return fallbackInstance;
     }
 
-    bool SceneManager::registerScene(const std::string& name, std::shared_ptr<Scene> scene) {
+    const bool SceneManager::registerScene(const std::string& name, std::shared_ptr<Scene> scene) {
         if (!scene) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Cannot register scene: Scene pointer is null!");
             return false;
@@ -20,11 +29,10 @@ namespace engine {
         }
 
         m_Scenes[name] = std::move(scene);
-        
         return true;
     }
 
-    bool SceneManager::changeScene(const std::string& name) {
+    const bool SceneManager::changeScene(const std::string& name) {
         auto sceneIt = m_Scenes.find(name);
 
         if (sceneIt == m_Scenes.end()) {
@@ -45,25 +53,37 @@ namespace engine {
         return true;
     }
 
-    void SceneManager::update() {
+    const bool SceneManager::update() {
         uint64_t currentTime = SDL_GetTicks();
 
         float deltaTime = (currentTime - m_LastFrameTime) / 1000.0f;
 
         m_LastFrameTime = currentTime;
 
-        if (m_CurrentScene) {
-            m_CurrentScene->update(deltaTime);
+        if (!m_CurrentScene) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "No current scene is found or selected!");
+            return false;
         }
+
+        m_CurrentScene->update(deltaTime);
+        return true;
     }
 
-    void SceneManager::render() {
-        if (m_CurrentScene) {
-            m_CurrentScene->render();
+    const bool SceneManager::render() {
+        if (!m_CurrentScene) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "No current scene is found or selected!");
+            return false;
         }
+
+        m_CurrentScene->render();
+        return true;
     }
 
-    std::string SceneManager::getCurrentSceneName() const {
-        return m_CurrentScene ? m_CurrentScene->getName() : "No active scene!";
+    const std::string& SceneManager::getCurrentSceneName() const {
+        if (m_CurrentScene) {
+            return m_CurrentScene->getName();
+        }
+
+        return "No active scene!";
     }
 }

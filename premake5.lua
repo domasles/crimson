@@ -114,6 +114,13 @@ project "crimson"
         "SDL3_image"
     }
 
+    postbuildcommands {
+        ("{MKDIR} %{cfg.targetdir}"),
+
+        ("{COPYDIR} config %{cfg.targetdir}/config"),
+        ("{COPYDIR} assets %{cfg.targetdir}/assets")
+    }
+
     dependson "engine"
     
     filter "system:windows"
@@ -123,33 +130,18 @@ project "crimson"
 
         defines "GAME_PLATFORM_WINDOWS"
 
-        postbuildcommands {
-            ("{MKDIR} %{cfg.targetdir}"),
-    
-            ("{COPYDIR} config %{cfg.targetdir}/config"),
-            ("{COPYDIR} assets %{cfg.targetdir}/assets")
-        }
-
     filter "system:linux"
         cppdialect "C++17"
         staticruntime "Off"
         toolset "gcc"
 
         defines "GAME_PLATFORM_LINUX"
-
-        postbuildcommands {
-            ("{MKDIR} %{cfg.targetdir}"),
-
-            ("{COPYDIR} config %{cfg.targetdir}/config"),
-            ("{COPYDIR} assets %{cfg.targetdir}/assets"),
-    
-            ("{COPY} ../../vendor/lib/sdl3/x64/" .. SDLlibname .. " %{cfg.targetdir}"),
-            ("{COPY} ../../vendor/lib/sdl3/x64/" .. SDLimagelibname .. " %{cfg.targetdir}"),
-        }
         
         linkoptions {
             "-Wl,-rpath,'$$ORIGIN'",
-            "-Wl,-rpath-link,'$$ORIGIN'"
+            "-Wl,-rpath-link,'$$ORIGIN'",
+            "-Wl,-rpath,'$$ORIGIN/../../'",  
+            "-Wl,-rpath-link,'$$ORIGIN/../../'" 
         }
     
     filter "configurations:Debug"

@@ -6,6 +6,12 @@
     #define GAME_API extern "C" __attribute__((visibility("default")))
 #endif
 
+#ifdef ENGINE_PLATFORM_WINDOWS
+    #define ENGINE_API extern "C" __declspec(dllexport)
+#elif ENGINE_PLATFORM_LINUX
+    #define ENGINE_API extern "C" __attribute__((visibility("default")))
+#endif
+
 #include <Input.h>
 
 namespace engine {
@@ -13,13 +19,15 @@ namespace engine {
         public:
             static Core& getInstance();
 
-            bool init(const std::string& title, const int width=800, const int height=600, const bool fullscreen=false);
+            const bool init(const std::string& parentFolder, const std::string& title, const int width=800, const int height=600, const bool fullScreen=false);
+            const bool processEvents();
 
-            bool processEvents();
-            void run();
-            
+            void run(std::function<void()> customUpdate);
+
             SDL_Renderer* getRenderer() const;
             InputSystem* getInputSystem() const;
+
+            const std::string& getName() const { return m_ParentFolder; }
 
         private:
             Core() : m_Window(nullptr, SDL_DestroyWindow), m_Renderer(nullptr, SDL_DestroyRenderer) {}
@@ -31,7 +39,8 @@ namespace engine {
             int m_FrameDelay = 0;
             int m_FrameTime = 0;
             int m_FrameStart = 0;
-            int m_FullscreenFlag = 0;
+
+            std::string m_ParentFolder;
 
             std::unique_ptr<SDL_Window, void(*)(SDL_Window*)> m_Window;
             std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)> m_Renderer;

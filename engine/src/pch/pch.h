@@ -12,5 +12,6 @@
 #include <fstream>
 #include <string>
 
+#include <functional>
 #include <chrono>
 #include <queue>

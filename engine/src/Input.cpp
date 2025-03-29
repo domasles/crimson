@@ -1,7 +1,11 @@
 #include <pch.h>
 
-#include <Input.h>
+#include <utils/filesystem.h>
 
+#include <Input.h>
+#include <Core.h>
+
+using namespace engine::utils::filesystem;
 using json = nlohmann::json;
 
 namespace engine {
@@ -25,13 +29,13 @@ namespace engine {
         m_Actions[name] = std::make_shared<SimpleInputAction>(key);
     }
 
-    void InputSystem::loadInputActions(const std::string& fileName) {
-        std::string filePath = std::string(SDL_GetBasePath()) + fileName;
+    const bool InputSystem::loadInputActions(const std::string& fileName) {
+        const std::string& filePath = getGamePath() + fileName;
         std::ifstream file(filePath);
 
-        if (!file) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to open %s!", fileName.c_str());
-            return;
+        if (!file.is_open()) {
+            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to open file: %s", filePath.c_str());
+            return false;
         }
 
         if (m_IsLoaded) {
@@ -42,17 +46,18 @@ namespace engine {
 
         try {
             json inputJson;
+
             file >> inputJson;
 
             if (!inputJson.contains("actions")) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Missing 'actions' field in JSON.");
-                return;
+                return false;
             }
 
             for (const auto& [name, data] : inputJson["actions"].items()) {
                 if (!data.contains("type") || !data.contains("key")) {
                     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Malformed action data: missing 'type' or 'key'.");
-                    continue;
+                    return false;
                 }
 
                 const std::string& type = data["type"];
@@ -61,13 +66,13 @@ namespace engine {
 
                 if (key == SDLK_UNKNOWN) {
                     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unknown key: %s", data["key"].get<std::string>().c_str());
-                    continue;
+                    return false;
                 }
 
                 if (type == "movement") {
                     if (!data.contains("vector") || data["vector"].size() < 2) {
                         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Malformed movement action: missing 'vector'.");
-                        continue;
+                        return false;
                     }
 
                     addMovementAction(name, key, { data["vector"][0], data["vector"][1] });
@@ -79,6 +84,7 @@ namespace engine {
 
                 else {
                     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unknown action type: %s", type.c_str());
+                    return false;
                 }
             }
         }
@@ -86,6 +92,8 @@ namespace engine {
         catch (const std::exception& e) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "JSON parsing error: %s", e.what());
         }
+
+        return false;
     }
 
     const bool InputSystem::isActionPressed(const std::string& actionName) const {

@@ -8,15 +8,15 @@
 using namespace engine;
 
 namespace crimson {
-    class TestScene : public Scene {
+    class Level1 : public Scene {
         public:
-            TestScene() { m_Name = "TestScene"; }
+            Level1() { m_Name = "Level1"; }
 
             void init() override;
             void update(const float deltaTime) override;
             void render() override;
 
         private:
-            std::unique_ptr<crimson::Player> m_Player;
+            std::unique_ptr<Player> m_Player;
     };
 }

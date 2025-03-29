@@ -17,9 +17,9 @@ namespace engine {
             const std::string& getName() const { return m_Name; }
 
         protected:
-            bool m_Initialized = false;
-
             Core& m_EngineCore = Core::getInstance();
+
+            bool m_Initialized = false;
 
             std::string m_Name;
     };
@@ -28,13 +28,13 @@ namespace engine {
         public:
             static SceneManager& getInstance();
 
-            bool registerScene(const std::string& name, std::shared_ptr<Scene> scene);
-            bool changeScene(const std::string& name);
+            const bool registerScene(const std::string& name, std::shared_ptr<Scene> scene);
+            const bool changeScene(const std::string& name);
 
-            void update();
-            void render();
+            const bool update();
+            const bool render();
 
-            std::string getCurrentSceneName() const;
+            const std::string& getCurrentSceneName() const;
 
         private:
             SceneManager() : m_LastFrameTime(SDL_GetTicksNS()) {}

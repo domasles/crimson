@@ -36,9 +36,10 @@ namespace engine {
         public:
             void addMovementAction(const std::string& name, const SDL_Keycode key, const Vector2& m_Direction);
             void addSimpleAction(const std::string& name, const SDL_Keycode key);
-            void loadInputActions(const std::string& fileName);
 
+            const bool loadInputActions(const std::string& fileName);
             const bool isActionPressed(const std::string& actionName) const;
+
             const Vector2 getMovementVector() const;
 
         private:

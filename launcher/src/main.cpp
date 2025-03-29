@@ -1,15 +1,10 @@
 #include <pch.h>
 
 #include <utils/filesystem.h>
-#include <utils/libLoader.h>
-
-#ifdef LAUNCHER_PLATFORM_WINDOWS
-    typedef void (*initGameFunc)();
-    typedef void (*updateGameFunc)();
-#endif
+#include <utils/lib.h>
 
 using namespace launcher::utils::filesystem;
-using namespace launcher::utils::libLoader;
+using namespace launcher::utils::lib;
 
 int main() {
     #ifdef LAUNCHER_PLATFORM_WINDOWS
@@ -23,10 +18,18 @@ int main() {
     if (!libraryHandle) return -1;
 
     auto init = reinterpret_cast<void(*)()>(getFunction(libraryHandle, "init"));
-    auto update = reinterpret_cast<void(*)()>(getFunction(libraryHandle, "update"));
+    auto customUpdate = reinterpret_cast<void(*)()>(getFunction(libraryHandle, "update"));
+    auto internalUpdate = reinterpret_cast<void(*)(std::function<void()> customUpdateFunc)>(getFunction(libraryHandle, "internalUpdate"));
 
     init();
-    update();
+
+    if (customUpdate) {
+        internalUpdate(customUpdate);
+    }
+
+    else {
+        internalUpdate(nullptr);
+    }
 
     unloadLibrary(libraryHandle);
 }
