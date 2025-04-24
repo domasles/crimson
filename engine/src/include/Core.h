@@ -19,15 +19,19 @@ namespace engine {
         public:
             static Core& getInstance();
 
-            const bool init(const std::string& parentFolder, const std::string& title, const int width=800, const int height=600, const bool fullScreen=false);
+            const bool init(const std::string& workingDir, const std::string& title, const int width=800, const int height=600, const bool resizable=false);
+            const bool init(const std::string& workingDir, const std::string& title, const bool fullScreen=false);
+
             const bool processEvents();
+            const std::string& getName() const { return m_ParentFolder; }
 
             void run(std::function<void()> customUpdate);
 
-            SDL_Renderer* getRenderer() const;
-            InputSystem* getInputSystem() const;
+            void setVectorScale(int targetWindowWidth, int targetWindowHeight);
+            void setVectorScale(bool useDefaultScale=true);
 
-            const std::string& getName() const { return m_ParentFolder; }
+            SDL_Renderer* getRenderer() const;
+            SDL_Window* getWindow() const;
 
         private:
             Core() : m_Window(nullptr, SDL_DestroyWindow), m_Renderer(nullptr, SDL_DestroyRenderer) {}
@@ -36,15 +40,26 @@ namespace engine {
             Core(const Core&) = delete;
             Core& operator=(const Core&) = delete;
 
+            void initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable);
+            void initFullScreenWindow(const std::string& title);
+            void initRenderer();
+
+            int m_TargetWindowWidth = 0;
+            int m_TargetWindowHeight = 0;
+
             int m_FrameDelay = 0;
             int m_FrameTime = 0;
             int m_FrameStart = 0;
+
+            int m_DefaultVectorScaleWidth = 1600;
+            int m_DefaultVectorScaleHeight = 900;
+
+            bool m_DefaultVectorScale = true;
 
             std::string m_ParentFolder;
 
             std::unique_ptr<SDL_Window, void(*)(SDL_Window*)> m_Window;
             std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)> m_Renderer;
-            std::unique_ptr<InputSystem> m_InputSystem = nullptr;
 
             std::queue<SDL_Event> m_EventQueue;
     };

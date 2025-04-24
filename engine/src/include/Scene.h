@@ -17,10 +17,7 @@ namespace engine {
             const std::string& getName() const { return m_Name; }
 
         protected:
-            Core& m_EngineCore = Core::getInstance();
-
             bool m_Initialized = false;
-
             std::string m_Name;
     };
 
@@ -29,6 +26,7 @@ namespace engine {
             static SceneManager& getInstance();
 
             const bool registerScene(const std::string& name, std::shared_ptr<Scene> scene);
+            const bool unregisterScene(const std::string& name);
             const bool changeScene(const std::string& name);
 
             const bool update();
@@ -45,8 +43,8 @@ namespace engine {
 
             std::unordered_map<std::string, std::shared_ptr<Scene>> m_Scenes;
 
-            std::shared_ptr<Scene> m_CurrentScene = nullptr;
-            std::shared_ptr<Scene> m_PreviousScene = nullptr;
+            std::shared_ptr<Scene> m_CurrentScene;
+            std::shared_ptr<Scene> m_PreviousScene;
 
             uint64_t m_LastFrameTime;
     };

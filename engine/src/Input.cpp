@@ -6,7 +6,6 @@
 #include <Core.h>
 
 using namespace engine::utils::filesystem;
-using json = nlohmann::json;
 
 namespace engine {
     const bool InputAction::isPressed() const {
@@ -30,13 +29,8 @@ namespace engine {
     }
 
     const bool InputSystem::loadInputActions(const std::string& fileName) {
-        const std::string& filePath = getGamePath() + fileName;
-        std::ifstream file(filePath);
-
-        if (!file.is_open()) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to open file: %s", filePath.c_str());
-            return false;
-        }
+        const std::string& filePath = getGamePath() + "/" + m_WorkingDir + "/" + fileName;
+        loadJSONFile(filePath, &m_JsonFile);
 
         if (m_IsLoaded) {
             m_Actions.clear();
@@ -45,16 +39,12 @@ namespace engine {
         m_IsLoaded = true;
 
         try {
-            json inputJson;
-
-            file >> inputJson;
-
-            if (!inputJson.contains("actions")) {
+            if (!m_JsonFile.contains("actions")) {
                 SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Missing 'actions' field in JSON.");
                 return false;
             }
 
-            for (const auto& [name, data] : inputJson["actions"].items()) {
+            for (const auto& [name, data] : m_JsonFile["actions"].items()) {
                 if (!data.contains("type") || !data.contains("key")) {
                     SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Malformed action data: missing 'type' or 'key'.");
                     return false;

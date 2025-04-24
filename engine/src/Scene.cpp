@@ -32,6 +32,18 @@ namespace engine {
         return true;
     }
 
+    const bool SceneManager::unregisterScene(const std::string& name) {
+        auto it = m_Scenes.find(name);
+
+        if (it == m_Scenes.end()) {
+            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Scene %s not found. Cannot unregister!", name.c_str());
+            return false;
+        }
+
+        m_Scenes.erase(it);
+        return true;
+    }
+
     const bool SceneManager::changeScene(const std::string& name) {
         auto sceneIt = m_Scenes.find(name);
 

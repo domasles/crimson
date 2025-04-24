@@ -4,6 +4,7 @@
 
 #include <Scene.h>
 #include <Input.h>
+#include <Map.h>
 
 using namespace engine;
 
@@ -18,5 +19,6 @@ namespace crimson {
 
         private:
             std::unique_ptr<Player> m_Player;
+            std::unique_ptr<Map> m_Map;
     };
 }

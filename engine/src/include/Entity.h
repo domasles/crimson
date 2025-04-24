@@ -22,10 +22,8 @@ namespace engine {
             const Vector2& getPosition() const { return m_Position; }
 
         protected:
-            Core& m_EngineCore = Core::getInstance();
-
-            Vector2 m_Size{ 100, 100 };
-            Vector2 m_Position{ 0, 0 };
+            Vector2 m_Size = { 100.0f, 100.0f };
+            Vector2 m_Position = { 0.0f, 0.0f };
 
             std::shared_ptr<Texture> m_Texture;
     };

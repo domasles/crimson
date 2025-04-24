@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Entity.h>
+#include <Input.h>
 
 using namespace engine;
 
@@ -13,5 +14,6 @@ namespace crimson {
 
         private:
             float m_Speed = 200;
+            std::unique_ptr<InputSystem> m_InputSystem;
     };
 }

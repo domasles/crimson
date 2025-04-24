@@ -3,6 +3,7 @@
 #include <utils/math.h>
 
 using namespace engine::utils::math;
+using json = nlohmann::json;
 
 namespace engine {
     class InputAction {
@@ -34,6 +35,9 @@ namespace engine {
 
     class InputSystem {
         public:
+            InputSystem(const std::string& workingDir) : m_WorkingDir(workingDir) {}
+            ~InputSystem() = default;
+
             void addMovementAction(const std::string& name, const SDL_Keycode key, const Vector2& m_Direction);
             void addSimpleAction(const std::string& name, const SDL_Keycode key);
 
@@ -44,6 +48,10 @@ namespace engine {
 
         private:
             bool m_IsLoaded = false;
+
+            json m_JsonFile;
+
+            std::string m_WorkingDir;
             std::unordered_map<std::string, std::shared_ptr<InputAction>> m_Actions;
     };
 }

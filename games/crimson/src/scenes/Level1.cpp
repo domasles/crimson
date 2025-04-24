@@ -6,9 +6,10 @@ namespace crimson {
     void Level1::init() {
         if (!m_Player) {
             m_Player = std::make_unique<Player>();
-
             m_Player->init();
-            m_Player->setPosition({ 300, 300 });
+
+            m_Map = std::make_unique<Map>("assets/maps");
+            m_Map->loadMap("TestMap.ldtk", { 100, 100 }, { 0, 0 });
         }
     }
 
@@ -17,6 +18,7 @@ namespace crimson {
     }
 
     void Level1::render() {
+        m_Map->render();
         m_Player->render();
     }
 }

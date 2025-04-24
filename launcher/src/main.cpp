@@ -17,18 +17,18 @@ int main() {
 
     if (!libraryHandle) return -1;
 
-    auto init = reinterpret_cast<void(*)()>(getFunction(libraryHandle, "init"));
+    auto init = reinterpret_cast<bool(*)()>(getFunction(libraryHandle, "init"));
     auto customUpdate = reinterpret_cast<void(*)()>(getFunction(libraryHandle, "update"));
     auto internalUpdate = reinterpret_cast<void(*)(std::function<void()> customUpdateFunc)>(getFunction(libraryHandle, "internalUpdate"));
 
-    init();
+    if (init()) {
+        if (customUpdate) {
+            internalUpdate(customUpdate);
+        }
 
-    if (customUpdate) {
-        internalUpdate(customUpdate);
-    }
-
-    else {
-        internalUpdate(nullptr);
+        else {
+            internalUpdate(nullptr);
+        }
     }
 
     unloadLibrary(libraryHandle);

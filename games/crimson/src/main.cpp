@@ -14,11 +14,11 @@ using namespace crimson;
 constexpr int WINDOW_WIDTH = 800;
 constexpr int WINDOW_HEIGHT = 600;
 
-constexpr bool FULLSCREEN = false;
+constexpr bool RESIZABLE = true;
 
 Core& engineCore = Core::getInstance();
 
-GAME_API void init() {
-    if (!engineCore.init("crimson", "Crimson", WINDOW_WIDTH, WINDOW_HEIGHT, FULLSCREEN)) return;
+GAME_API bool init() {
+    if (!engineCore.init("crimson", "Crimson", WINDOW_WIDTH, WINDOW_HEIGHT, RESIZABLE)) return false;
     registrateScenes();
 }
