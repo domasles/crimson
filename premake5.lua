@@ -40,6 +40,13 @@ project "launcher"
         "%{prj.name}/src/pch"
     }
 
+    postbuildcommands {
+        ("{MKDIR} %{cfg.targetdir}"),
+
+        ("{COPY} ../vendor/lib/sdl3/x64/" .. SDLlibname .. " %{cfg.targetdir}"),
+        ("{COPY} ../vendor/lib/sdl3/x64/" .. SDLimagelibname .. " %{cfg.targetdir}"),
+    }
+
     dependson "crimson"
     
     filter "system:windows"
@@ -48,13 +55,6 @@ project "launcher"
         systemversion "latest"
 
         defines "LAUNCHER_PLATFORM_WINDOWS"
-
-        postbuildcommands {
-            ("{MKDIR} %{cfg.targetdir}"),
-    
-            ("{COPY} ../vendor/lib/sdl3/x64/" .. SDLlibname .. " %{cfg.targetdir}"),
-            ("{COPY} ../vendor/lib/sdl3/x64/" .. SDLimagelibname .. " %{cfg.targetdir}"),
-        }
 
     filter "system:linux"
         cppdialect "C++17"
