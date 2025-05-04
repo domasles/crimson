@@ -1,28 +1,22 @@
 # Crimson
-A 2D top-down action game about saving the planet.
+A 2D top-down action game about saving the planet from a deadly virus that plagues both people and environment surrounding them, resulting in visual artifacts as you go along.
+This game comes with a simple to use and expand 2D game engine made using primarily [SDL3]("https://github.com/libsdl-org/SDL") and [LDTk]("https://github.com/deepnight/ldtk") as a level editor for extra moddability and simplicity creating new games in mind.
+The engine comes in a format of a ready to use C++ library and is still considered a WIP project.
 
 ## Installation:
 ### Clone the repository:
-Providing you have ```git``` installed, you can clone this repository through either **HTTPS**:
+Providing you have ```git``` installed, you can clone this repository through **HTTPS**:
 ```bash
 git clone --recursive https://github.com/domasles/crimson.git
 ```
-
-or **SSH**:
-```bash
-git clone --recursive git@github.com:domasles/crimson.git
-```
-
-Either way will clone everything you need, and you'll be able to build the game.
-
-**IMPORTANT**: This project relies on submodules, so in case you forgot the ```--recursive``` flag, you can run the following:
+**IMPORTANT**: This project relies on git's submodules, so in case you forgot the ```--recursive``` flag, you can run the following:
 ```bash
 git submodule update --init
 ```
-to re-download or update required libraries.
+to re-download or update required submodules.
 
 ## Building:
-Currently, this project *officially* supports only Windows and Linux on x86_64 processors, so any other platform might require additional tinkering as they're not guaranteed to work out of the box.
+Currently, this project *officially* supports only Windows and Linux on x86_64 processors, so any other platform or architecture might require additional tinkering as they're not guaranteed to work out of the box. This may include subtle changes in game's code and replacement of pre-compiled libraries coming alongside this engine to work. As this project grows, it will support more and more platforms and architectures, but for now you'll have to wait until it's in a state ready for game development.
 
 For project generation [Premake](https://premake.github.io) is being used, but editing the configuration isn't recommended unless you know what you're doing.
 
@@ -49,7 +43,7 @@ sudo apt install build-essential libasound2t64 libxss1 libpulse0 libdecor-0-0 li
 Lastly, navigate to the root of the project, run ```GenerateProjects-Linux.sh``` and ```make```.
 
 ## Finding the builds:
-All builds wll be under ```bin/configuration-platform-architecture```, where you'll find built binaries alongside with the game data and assets.
+All builds wll be under ```bin/configuration-platform-architecture```, where you'll find the built binary of the launcher alongside with the libraries copied over and both game data and assets in a separate directory under ```games/```. In the future this engine will support several different games to use the same launcher binary and a select screen, allowing to change installed games, making the possibility of addons for existing games and/or new ones using the same launcher and libraries to save space.
 
 ## Dependencies:
 [json](https://github.com/nlohmann/json)
