@@ -96,6 +96,6 @@ namespace engine {
             return m_CurrentScene->getName();
         }
 
-        return "No active scene!";
+        return m_FallbackCurrentSceneText;
     }
 }

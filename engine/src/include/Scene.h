@@ -46,6 +46,8 @@ namespace engine {
             std::shared_ptr<Scene> m_CurrentScene;
             std::shared_ptr<Scene> m_PreviousScene;
 
+            std::string m_FallbackCurrentSceneText = "No active scene!";
+
             uint64_t m_LastFrameTime;
     };
 }
