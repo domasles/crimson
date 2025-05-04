@@ -4,10 +4,7 @@
 
 namespace engine::utils::rendering {
     void TileRenderQueue::add(const std::shared_ptr<Texture>& texture, const Vector2& size, const Vector2& position) {
-        std::array<float, 2> rawSize{ size.getRawX(), size.getRawY() };
-        std::array<float, 2> rawPosition{ position.getRawX(), position.getRawY() };
-
-        TileRenderQueueItem queue{ texture, rawSize, rawPosition, {}, {} };
+        TileRenderQueueItem queue{ texture, size, position, {}, {} };
 
         if (m_Direction == Normal) {
             m_Items.push_back(queue);
@@ -19,10 +16,7 @@ namespace engine::utils::rendering {
     }
 
     void TileRenderQueue::add(const std::shared_ptr<Texture>& texture, const Vector2& size, const Vector2& position, const Vector2& cropSize, const Vector2& cropPosition) {
-        std::array<float, 2> rawSize{ size.getRawX(), size.getRawY() };
-        std::array<float, 2> rawPosition{ position.getRawX(), position.getRawY() };
-
-        TileRenderQueueItem queue{ texture, rawSize, rawPosition, cropSize, cropPosition };
+        TileRenderQueueItem queue{ texture, size, position, cropSize, cropPosition };
 
         if (m_Direction == Normal) {
             m_Items.push_back(queue);
@@ -49,8 +43,8 @@ namespace engine::utils::rendering {
 
     void RenderQueueManager::render(const std::shared_ptr<TileRenderQueue>& queue) {
         for (const auto& item : queue->getItems()) {
-            Vector2 size{ item.size[0], item.size[1] };
-            Vector2 position{ item.position[0], item.position[1] };
+            Vector2 size = item.size.getRawVector();
+            Vector2 position = item.position.getRawVector();
 
             item.texture->render(size, position, item.cropSize, item.cropPosition);
         }

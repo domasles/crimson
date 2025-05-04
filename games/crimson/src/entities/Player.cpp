@@ -21,8 +21,8 @@ namespace crimson {
     }
 
     void Player::render() {
-        Vector2 cRegion { 0, 0 };
-        Vector2 cSize { 16, 16 };
+        Vector2 cRegion{ 0, 0 };
+        Vector2 cSize{ 16, 16 };
 
         if (!m_Texture->render(m_Size, m_Position, cSize, cRegion)) return;
     }

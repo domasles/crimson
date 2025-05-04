@@ -18,9 +18,8 @@ namespace engine::utils::rendering {
         struct TileRenderQueueItem {
             std::shared_ptr<Texture> texture = nullptr;
 
-            std::array<float, 2> size{};
-            std::array<float, 2> position{};
-
+            Vector2 size{ 0.0f, 0.0f };
+            Vector2 position{ 0.0f, 0.0f };
             Vector2 cropSize{ 0.0f, 0.0f };
             Vector2 cropPosition{ 0.0f, 0.0f };
         };
