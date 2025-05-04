@@ -10,6 +10,7 @@ namespace engine {
             Texture(const std::string& workingDir) : m_Texture(nullptr, SDL_DestroyTexture), m_WorkingDir(workingDir) {}
 
             const bool loadImage(const std::string& fileName, SDL_ScaleMode scaleMode=SDL_SCALEMODE_NEAREST);
+
             const bool render(const Vector2& size, const Vector2& position);
             const bool render(const Vector2& size, const Vector2& position, const Vector2& cropSize, const Vector2& cropPosition);
 

@@ -36,8 +36,8 @@ namespace engine {
 
         initWindowedWindow(title, width, height, resizable);
 
-        m_TargetWindowWidth = width;
-        m_TargetWindowHeight = height;
+        m_WindowWidth = m_TargetWindowWidth = width;
+        m_WindowHeight = m_TargetWindowHeight = height;
 
         initRenderer();
 
@@ -58,8 +58,11 @@ namespace engine {
         }
 
         initFullScreenWindow(title);
-        SDL_GetWindowSize(getWindow(), &m_TargetWindowWidth, &m_TargetWindowHeight);
+        SDL_GetWindowSize(getWindow(), &m_WindowWidth, &m_WindowHeight);
         initRenderer();
+
+        m_TargetWindowWidth = m_WindowWidth;
+        m_TargetWindowHeight = m_WindowHeight;
 
         return true;
     }
@@ -84,50 +87,9 @@ namespace engine {
     }
 
     void Core::run(std::function<void()> customUpdate) {
-        int prevWidth = 0;
-        int prevHeight = 0;
-
-        SDL_GetCurrentRenderOutputSize(getRenderer(), &prevWidth, &prevHeight);
-
-        float baseWidth = 0;
-        float baseHeight = 0;
-
-        if (m_DefaultVectorScale) {
-            baseWidth = m_DefaultVectorScaleWidth;
-            baseHeight = m_DefaultVectorScaleHeight;
-        }
-
-        else {
-            baseWidth = m_TargetWindowWidth;
-            baseHeight = m_TargetWindowHeight;
-        }
-
-        float initialScaleX = prevWidth / baseWidth;
-        float initialScaleY = prevHeight / baseHeight;
-        float initialUniformScale = std::min(initialScaleX, initialScaleY);
-
-        utils::math::Vector2::setGlobalScale(initialUniformScale, initialUniformScale);
-        utils::math::Vector2::updateAll();
-
         while (processEvents()) {
             SDL_RenderClear(getRenderer());
-
-            int currentWidth, currentHeight;
-
-            SDL_GetCurrentRenderOutputSize(getRenderer(), &currentWidth, &currentHeight);
-
-            if (currentWidth != prevWidth || currentHeight != prevHeight) {
-                float scaleX = currentWidth / baseWidth;
-                float scaleY = currentHeight / baseHeight;
-
-                float uniformScale = std::min(scaleX, scaleY);
-
-                utils::math::Vector2::setGlobalScale(uniformScale, uniformScale);
-                utils::math::Vector2::updateAll();
-
-                prevWidth = currentWidth;
-                prevHeight = currentHeight;
-            }
+            updateVectorScale();
 
             if (customUpdate) {
                 customUpdate();
@@ -193,5 +155,49 @@ namespace engine {
         if (!SDL_SetRenderVSync(getRenderer(), true)) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_SetRenderVSync failed: %s", SDL_GetError());
         }
+    }
+
+    void Core::updateVectorScale() {
+        int prevWidth = 0;
+        int prevHeight = 0;
+
+        SDL_GetCurrentRenderOutputSize(getRenderer(), &prevWidth, &prevHeight);
+
+        float baseWidth = 0.0f;
+        float baseHeight = 0.0f;
+
+        if (m_DefaultVectorScale) {
+            baseWidth = static_cast<float>(m_DefaultVectorScaleWidth);
+            baseHeight = static_cast<float>(m_DefaultVectorScaleHeight);
+        }
+
+        else {
+            baseWidth = static_cast<float>(m_TargetWindowWidth);
+            baseHeight = static_cast<float>(m_TargetWindowHeight);
+        }
+
+        float initialScale = calculateUniformScale(prevWidth, prevHeight, baseWidth, baseHeight);
+
+        Vector2::setGlobalScale(initialScale, initialScale);
+        Vector2::updateAll();
+
+        int currentWidth = 0;
+        int currentHeight = 0;
+
+        SDL_GetCurrentRenderOutputSize(getRenderer(), &currentWidth, &currentHeight);
+
+        if (currentWidth != prevWidth || currentHeight != prevHeight) {
+            float updatedScale = calculateUniformScale(currentWidth, currentHeight, baseWidth, baseHeight);
+
+            Vector2::setGlobalScale(updatedScale, updatedScale);
+            Vector2::updateAll();
+        }
+    }
+
+    float Core::calculateUniformScale(int width, int height, float baseWidth, float baseHeight) {
+        float scaleX = static_cast<float>(width) / baseWidth;
+        float scaleY = static_cast<float>(height) / baseHeight;
+
+        return std::min(scaleX, scaleY);
     }
 }

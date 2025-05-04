@@ -2,7 +2,6 @@
 
 #include <utils/filesystem.h>
 
-#include <Texture.h>
 #include <Core.h>
 #include <Map.h>
 
@@ -18,9 +17,10 @@ namespace engine {
 
         loadJSONFile(filePath, &m_JsonFile);
         loadTilesets();
+        loadTiles();
     }
 
-    void Map::render() {
+    void Map::loadTiles() {
         const std::string& filePath = std::string(SDL_GetBasePath()) + "games/" + Core::getInstance().getName() + "/" + m_WorkingDir + "/" + m_FileName;
         std::ifstream file(filePath);
 
@@ -35,9 +35,15 @@ namespace engine {
                 return;
             }
 
+            textureQueue = std::make_shared<TileRenderQueue>();
+            textureQueue->setDirection(Reversed);
+
             for (const auto& level : m_JsonFile["levels"]) {
                 if (!level.contains("layerInstances")) {
-                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Missing 'layerInstances' field in level.");
+                    std::string id = level["identifier"];
+
+                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Missing 'layerInstances' field in level: %s.", id.c_str());
+
                     continue;
                 }
 
@@ -60,18 +66,18 @@ namespace engine {
                         const float posX = tile["px"][0];
                         const float posY = tile["px"][1];
 
-                        const float srcX = tile["src"][0];
-                        const float srcY = tile["src"][1];
+                        const float cropX = tile["src"][0];
+                        const float cropY = tile["src"][1];
 
                         m_TilePosition = { posX, posY };
                         m_TilePosition *= m_DesiredTileSize / m_MinTileSize;
 
                         m_TileSize = m_DesiredTileSize / (m_MinTileSize / tileset.tileSize);
 
-                        m_CropRegion = { srcX, srcY };
+                        m_CropRegion = { cropX, cropY };
                         m_CropSize = { tileset.tileSize, tileset.tileSize };
 
-                        tileset.texture->render(m_TileSize, m_TilePosition += m_Origin, m_CropSize, m_CropRegion);
+                        textureQueue->add(tileset.texture, m_TileSize, m_TilePosition + m_Origin, m_CropSize, m_CropRegion);
                     }
                 }
             }
@@ -80,6 +86,10 @@ namespace engine {
         catch (const std::exception& e) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "JSON parsing error: %s", e.what());
         }
+    }
+
+    void Map::render() {
+        RenderQueueManager::getInstance().render(textureQueue);
     }
 
     const bool Map::loadTilesets() {
@@ -113,7 +123,7 @@ namespace engine {
                 const float spacing = tileset["spacing"];
                 const float padding = tileset["padding"];
 
-                std::unique_ptr<Texture> tilesetTexture = std::make_unique<Texture>(relPath);
+                std::shared_ptr<Texture> tilesetTexture = std::make_shared<Texture>(relPath);
 
                 m_Tilesets[fileName] = Tileset{};
 

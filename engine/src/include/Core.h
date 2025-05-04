@@ -33,6 +33,8 @@ namespace engine {
             SDL_Renderer* getRenderer() const;
             SDL_Window* getWindow() const;
 
+            Vector2 getWindowSize() const { return Vector2{ static_cast<float>(m_WindowWidth), static_cast<float>(m_WindowHeight) }; }
+
         private:
             Core() : m_Window(nullptr, SDL_DestroyWindow), m_Renderer(nullptr, SDL_DestroyRenderer) {}
             ~Core() { SDL_Quit(); }
@@ -42,7 +44,14 @@ namespace engine {
 
             void initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable);
             void initFullScreenWindow(const std::string& title);
+
             void initRenderer();
+            void updateVectorScale();
+
+            float calculateUniformScale(int width, int height, float baseWidth, float baseHeight);
+
+            int m_WindowWidth = 0;
+            int m_WindowHeight = 0;
 
             int m_TargetWindowWidth = 0;
             int m_TargetWindowHeight = 0;

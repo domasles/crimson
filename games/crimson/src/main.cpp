@@ -19,6 +19,10 @@ constexpr bool RESIZABLE = true;
 Core& engineCore = Core::getInstance();
 
 GAME_API bool init() {
-    if (!engineCore.init("crimson", "Crimson", WINDOW_WIDTH, WINDOW_HEIGHT, RESIZABLE)) return false;
+    if (!engineCore.init("crimson", "Crimson", WINDOW_WIDTH, WINDOW_HEIGHT, RESIZABLE)) {
+        return false;
+    }
+
     registrateScenes();
+    return true;
 }

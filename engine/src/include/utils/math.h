@@ -1,6 +1,4 @@
 #pragma once
-#include <vector>
-#include <cmath>
 
 namespace engine::utils::math {
     class Vector2 {
@@ -16,27 +14,29 @@ namespace engine::utils::math {
             Vector2& operator*=(float scalar);
             Vector2& operator/=(float scalar);
 
-            Vector2 operator+(const Vector2& other) const { return Vector2(m_X + other.m_X, m_Y + other.m_Y); }
-            Vector2 operator-(const Vector2& other) const { return Vector2(m_X - other.m_X, m_Y - other.m_Y); }
-            Vector2 operator*(const Vector2& other) const { return Vector2(m_X * other.m_X, m_Y * other.m_Y); }
-            Vector2 operator/(const Vector2& other) const { return Vector2(m_X / other.m_X, m_Y / other.m_Y); }
+            Vector2 operator+(const Vector2& other) const { return Vector2{ m_X + other.m_X, m_Y + other.m_Y }; }
+            Vector2 operator-(const Vector2& other) const { return Vector2{ m_X - other.m_X, m_Y - other.m_Y }; }
+            Vector2 operator*(const Vector2& other) const { return Vector2{ m_X * other.m_X, m_Y * other.m_Y }; }
+            Vector2 operator/(const Vector2& other) const { return Vector2{ m_X / other.m_X, m_Y / other.m_Y }; }
 
-            Vector2 operator*(float scalar) const { return Vector2(m_X * scalar, m_Y * scalar); }
-            Vector2 operator/(float scalar) const { return Vector2(m_X / scalar, m_Y / scalar); }
+            Vector2 operator*(float scalar) const { return Vector2{ m_X * scalar, m_Y * scalar }; }
+            Vector2 operator/(float scalar) const { return Vector2{ m_X / scalar, m_Y / scalar }; }
 
-            Vector2 normalize() const;
+            bool operator==(const Vector2& other) const { return m_X == other.m_X && m_Y == other.m_Y; }
 
-            float x() const { return m_ScaledX; }
-            float y() const { return m_ScaledY; }
+            const float getX() const { return m_ScaledX; }
+            const float getY() const { return m_ScaledY; }
 
-            float rawX() const { return m_X; }
-            float rawY() const { return m_Y; }
+            const float getRawX() const { return m_X; }
+            const float getRawY() const { return m_Y; }
 
             void set(float x, float y);
             void update();
 
             static void setGlobalScale(float scaleX, float scaleY);
             static void updateAll();
+
+            Vector2 normalize() const;
 
         private:
             float m_X = 0.0f;

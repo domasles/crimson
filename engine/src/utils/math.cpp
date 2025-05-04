@@ -70,9 +70,11 @@ namespace engine::utils::math {
         return *this;
     }
 
-    Vector2 Vector2::normalize() const {
-        float len = std::sqrt(m_X * m_X + m_Y * m_Y);
-        return len > 0 ? Vector2(m_X / len, m_Y / len) : Vector2();
+    void Vector2::set(float x, float y) {
+        m_X = x;
+        m_Y = y;
+
+        update();
     }
 
     void Vector2::update() {
@@ -91,10 +93,15 @@ namespace engine::utils::math {
         }
     }
 
-    void Vector2::set(float x, float y) {
-        m_X = x;
-        m_Y = y;
+    Vector2 Vector2::normalize() const {
+        float len = std::sqrt(m_X * m_X + m_Y * m_Y);
 
-        update();
+        if (len > 0) {
+            return Vector2{ m_X / len, m_Y / len };
+        }
+
+        else {
+            return Vector2{ 0.0f, 0.0f };
+        }
     }
 }
