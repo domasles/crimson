@@ -2,9 +2,7 @@
 
 #include <entities/Player.h>
 
-#include <Scene.h>
-#include <Input.h>
-#include <Core.h>
+#include <Engine.h>
 
 #include <sceneRegistrator.h>
 

@@ -2,9 +2,7 @@
 
 #include <entities/Player.h>
 
-#include <Scene.h>
-#include <Input.h>
-#include <Map.h>
+#include <Engine.h>
 
 using namespace engine;
 

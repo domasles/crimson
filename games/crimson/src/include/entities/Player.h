@@ -1,7 +1,6 @@
 #pragma once
 
-#include <Entity.h>
-#include <Input.h>
+#include <Engine.h>
 
 using namespace engine;
 

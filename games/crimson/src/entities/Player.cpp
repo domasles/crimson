@@ -2,8 +2,6 @@
 
 #include <entities/Player.h>
 
-#include <Core.h>
-
 namespace crimson {
     void Player::init() {
         m_InputSystem = std::make_unique<InputSystem>("config");
