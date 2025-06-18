@@ -15,21 +15,43 @@ int main() {
 
     void* libraryHandle = loadLibrary(fileName);
 
-    if (!libraryHandle) return -1;
+    if (!libraryHandle) {
+        return -1;
+    }
+    
+    auto awakeFunc = reinterpret_cast<bool(*)()>(getFunction(libraryHandle, "awake"));
+    auto startFunc = reinterpret_cast<bool(*)()>(getFunction(libraryHandle, "start"));
 
-    auto init = reinterpret_cast<bool(*)()>(getFunction(libraryHandle, "init"));
-    auto customUpdate = reinterpret_cast<void(*)()>(getFunction(libraryHandle, "update"));
-    auto internalUpdate = reinterpret_cast<void(*)(std::function<void()> customUpdateFunc)>(getFunction(libraryHandle, "internalUpdate"));
+    auto customUpdateFunc = reinterpret_cast<void(*)()>(getFunction(libraryHandle, "update"));
+    auto internalUpdateFunc = reinterpret_cast<void(*)(std::function<void()> customUpdateFunc)>(getFunction(libraryHandle, "internalUpdate"));
 
-    if (init()) {
-        if (customUpdate) {
-            internalUpdate(customUpdate);
-        }
-
-        else {
-            internalUpdate(nullptr);
-        }
+    if (!internalUpdateFunc) {
+        std::cerr << "Failed to load internalUpdate function from game library" << std::endl;
+        unloadLibrary(libraryHandle);
+        return -1;
     }
 
+    if (awakeFunc && !awakeFunc()) {
+        std::cerr << "Game awake failed" << std::endl;
+        unloadLibrary(libraryHandle);
+        return -1;
+    }
+
+    if (!startFunc) {
+        std::cerr << "Game entry point 'start' not found." << std::endl;
+        unloadLibrary(libraryHandle);
+        return -1;
+    }
+
+    if (!startFunc()) {
+        std::cerr << "Game start failed" << std::endl;
+        unloadLibrary(libraryHandle);
+        return -1;
+    }
+
+    internalUpdateFunc(customUpdateFunc);
+
     unloadLibrary(libraryHandle);
+
+    return 0;
 }

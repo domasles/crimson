@@ -37,7 +37,9 @@ project "launcher"
 
     includedirs {
         "%{prj.name}/src/include",
-        "%{prj.name}/src/pch"
+        "%{prj.name}/src/pch",
+
+        "engine/src/include"
     }
 
     postbuildcommands {
