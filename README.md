@@ -1,6 +1,6 @@
 # Crimson
 A 2D top-down action game about saving the planet from a deadly virus that plagues both people and environment surrounding them, resulting in visual artifacts as you go along.
-This game comes with a simple to use and expand 2D game engine made using primarily [SDL3]("https://github.com/libsdl-org/SDL") and [LDTk]("https://github.com/deepnight/ldtk") as a level editor for extra moddability and simplicity creating new games in mind.
+This game comes with a simple to use and expand 2D game engine made using primarily [SDL3](https://github.com/libsdl-org/SDL) and [LDtk](https://github.com/deepnight/ldtk) as a level editor for extra moddability and simplicity creating new games in mind.
 The engine comes in a format of a ready to use C++ library and is still considered a WIP project.
 
 ## Installation:
@@ -18,7 +18,7 @@ to re-download or update required submodules.
 ## Building:
 Currently, this project *officially* supports only Windows and Linux on x86_64 processors, so any other platform or architecture might require additional tinkering as they're not guaranteed to work out of the box. This may include subtle changes in game's code and replacement of pre-compiled libraries coming alongside this engine to work. As this project grows, it will support more and more platforms and architectures, but for now you'll have to wait until it's in a state ready for game development.
 
-For project generation [Premake](https://premake.github.io) is being used, but editing the configuration isn't recommended unless you know what you're doing.
+For project generation [Premake](https://github.com/premake/premake-core) is being used, but editing the configuration isn't recommended unless you know what you're doing.
 
 ### Windows:
 This Project is under active development using [Visual Studio 2022](https://visualstudio.microsoft.com). Other versions aren't tested, so proceed at your own risk. Some of the modern ```C++``` features may not be available using older compilers with a different set of the standard library.
