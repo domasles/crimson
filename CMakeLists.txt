@@ -7,11 +7,7 @@ project(Crimson
 )
 
 # ===== GLOBAL SETTINGS =====
-set(CMAKE_CXX_STANDARD 1                  "\${workspaceFolder}/vendor/sdl3/include",
-                "\${workspaceFolder}/vendor/sdl3-image/include",
-                "\${workspaceFolder}/vendor/json/include"           "\${workspaceFolder}/vendor/sdl3/include",
-                "\${workspaceFolder}/vendor/sdl3-image/include",
-                "\${workspaceFolder}/vendor/json/include"
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
