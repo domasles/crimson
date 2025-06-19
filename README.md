@@ -64,7 +64,7 @@ crimson/
 │   │   ├── pch/              # Precompiled headers
 │   │   ├── utils/            # Utility functions (math, rendering, fs)
 │   │   └── *.cpp             # Core engine implementation
-├── vendor/                   # 📦 Third-party dependencies
+├── vendor/                   # Third-party dependencies
 │   ├── sdl3/                 # SDL3 (built from source)
 │   ├── sdl3-image/           # SDL3_image (built from source)
 │   └── json/                 # nlohmann/json (header-only)
