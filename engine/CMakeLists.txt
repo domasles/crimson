@@ -45,7 +45,7 @@ set_target_properties(engine PROPERTIES
 target_include_directories(engine
     PUBLIC
         src/include
-        vendor/json/include
+        ${CMAKE_SOURCE_DIR}/vendor/json/include
     PRIVATE
         src/pch
 )

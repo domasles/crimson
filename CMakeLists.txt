@@ -7,7 +7,11 @@ project(Crimson
 )
 
 # ===== GLOBAL SETTINGS =====
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 1                  "\${workspaceFolder}/vendor/sdl3/include",
+                "\${workspaceFolder}/vendor/sdl3-image/include",
+                "\${workspaceFolder}/vendor/json/include"           "\${workspaceFolder}/vendor/sdl3/include",
+                "\${workspaceFolder}/vendor/sdl3-image/include",
+                "\${workspaceFolder}/vendor/json/include"
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -266,8 +270,8 @@ set(SDLIMAGE_BACKEND_STB ON CACHE BOOL "Use stb_image for loading JPEG and PNG f
 set(BUILD_SHARED_LIBS ON)
 
 # ===== DEPENDENCIES =====
-add_subdirectory(engine/vendor/sdl3)
-add_subdirectory(engine/vendor/sdl3-image)
+add_subdirectory(vendor/sdl3)
+add_subdirectory(vendor/sdl3-image)
 
 # ===== PROJECT MODULES =====
 add_subdirectory(engine)

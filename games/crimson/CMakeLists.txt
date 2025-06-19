@@ -58,10 +58,9 @@ target_include_directories(crimson
     PRIVATE
         src/pch
         src/include
-        ../../engine/src/include
-        ../../engine/vendor/json/include
-        ../../engine/vendor/sdl3/include
-        ../../engine/vendor/sdl3-image/include
+        ../../engine/src/include        ../../vendor/json/include
+        ../../vendor/sdl3/include
+        ../../vendor/sdl3-image/include
 )
 
 # ===== LINK LIBRARIES =====
