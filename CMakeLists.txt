@@ -193,17 +193,21 @@ function(generate_vscode_config)
             \"name\": \"Win32\",
             \"includePath\": [
                 \"\${workspaceFolder}/**\",
-                \"\${workspaceFolder}/engine/src/include\",
-                \"\${workspaceFolder}/vendor/sdl3/include\",
-                \"\${workspaceFolder}/vendor/sdl3-image/include\",
-                \"\${workspaceFolder}/vendor/json/include\"
+                \"\${workspaceFolder}/engine/src/include/**\",
+                \"\${workspaceFolder}/launcher/src/include/**\",
+                \"\${workspaceFolder}/vendor/sdl3/include/**\",
+                \"\${workspaceFolder}/vendor/sdl3-image/include/**\",
+                \"\${workspaceFolder}/vendor/json/include/**\"
             ],
             \"defines\": [
                 \"_DEBUG\",
                 \"UNICODE\",
                 \"_UNICODE\",
                 \"WIN32\",
-                \"_WIN32\"
+                \"_WIN32\",
+                \"ENGINE_PLATFORM_WINDOWS\",
+                \"GAME_PLATFORM_WINDOWS\",
+                \"LAUNCHER_PLATFORM_WINDOWS\"
             ],
             \"compilerPath\": \"${COMPILER_PATH}\",
             \"cStandard\": \"c17\",
@@ -221,13 +225,17 @@ function(generate_vscode_config)
             \"name\": \"Linux\",
             \"includePath\": [
                 \"\${workspaceFolder}/**\",
-                \"\${workspaceFolder}/engine/src/include\",
-                \"\${workspaceFolder}/engine/vendor/sdl3/include\",
-                \"\${workspaceFolder}/engine/vendor/sdl3-image/include\",
-                \"\${workspaceFolder}/engine/vendor/json/include\"
+                \"\${workspaceFolder}/engine/src/include/**\",
+                \"\${workspaceFolder}/launcher/src/include/**\",
+                \"\${workspaceFolder}/vendor/sdl3/include/**\",
+                \"\${workspaceFolder}/vendor/sdl3-image/include/**\",
+                \"\${workspaceFolder}/vendor/json/include/**\"
             ],
             \"defines\": [
-                \"_DEBUG\"
+                \"_DEBUG\",
+                \"ENGINE_PLATFORM_LINUX\",
+                \"GAME_PLATFORM_LINUX\",
+                \"LAUNCHER_PLATFORM_LINUX\"
             ],
             \"compilerPath\": \"/usr/bin/gcc\",
             \"cStandard\": \"c17\",
