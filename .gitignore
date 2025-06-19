@@ -1,7 +1,9 @@
 # Directories
-/build
 /.vs
 /.vscode
+
+/out
+/build
 
 # User files
 *.user
