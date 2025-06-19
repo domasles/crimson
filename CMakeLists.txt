@@ -194,9 +194,9 @@ function(generate_vscode_config)
             \"includePath\": [
                 \"\${workspaceFolder}/**\",
                 \"\${workspaceFolder}/engine/src/include\",
-                \"\${workspaceFolder}/engine/vendor/sdl3/include\",
-                \"\${workspaceFolder}/engine/vendor/sdl3-image/include\",
-                \"\${workspaceFolder}/engine/vendor/json/include\"
+                \"\${workspaceFolder}/vendor/sdl3/include\",
+                \"\${workspaceFolder}/vendor/sdl3-image/include\",
+                \"\${workspaceFolder}/vendor/json/include\"
             ],
             \"defines\": [
                 \"_DEBUG\",
