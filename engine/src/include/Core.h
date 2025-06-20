@@ -42,10 +42,10 @@ namespace engine {
             Core(const Core&) = delete;
             Core& operator=(const Core&) = delete;
 
-            void initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable);
-            void initFullScreenWindow(const std::string& title);
-
-            void initRenderer();
+            bool initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable);
+            bool initFullScreenWindow(const std::string& title);
+            bool initRenderer();
+            
             void updateVectorScale();
 
             float calculateUniformScale(int width, int height, float baseWidth, float baseHeight);

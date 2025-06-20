@@ -1,11 +1,13 @@
 #include <pch.h>
 
 #include <utils/filesystem.h>
+#include <utils/logger.h>
 
 #include <Input.h>
 #include <Core.h>
 
 using namespace engine::utils::filesystem;
+using namespace engine::utils::logger;
 
 namespace engine {
     const bool InputAction::isPressed() const {
@@ -14,6 +16,7 @@ namespace engine {
         SDL_Scancode scancode = SDL_GetScancodeFromKey(m_Key, nullptr);
 
         if (scancode == SDL_SCANCODE_UNKNOWN) {
+            Logger::error("Unknown scancode for key: %d", m_Key);
             return false;
         }
 
@@ -40,13 +43,13 @@ namespace engine {
 
         try {
             if (!m_JsonFile.contains("actions")) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Missing 'actions' field in JSON.");
+                Logger::error("Missing 'actions' field in JSON.");
                 return false;
             }
 
             for (const auto& [name, data] : m_JsonFile["actions"].items()) {
                 if (!data.contains("type") || !data.contains("key")) {
-                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Malformed action data: missing 'type' or 'key'.");
+                    Logger::error("Malformed action data: missing 'type' or 'key'.");
                     return false;
                 }
 
@@ -55,13 +58,13 @@ namespace engine {
                 SDL_Keycode key = SDL_GetKeyFromName(data["key"].get<std::string>().c_str());
 
                 if (key == SDLK_UNKNOWN) {
-                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unknown key: %s", data["key"].get<std::string>().c_str());
+                    Logger::error("Unknown key: %s", data["key"].get<std::string>().c_str());
                     return false;
                 }
 
                 if (type == "movement") {
                     if (!data.contains("vector") || data["vector"].size() < 2) {
-                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Malformed movement action: missing 'vector'.");
+                        Logger::error("Malformed movement action: missing 'vector'.");
                         return false;
                     }
 
@@ -73,14 +76,14 @@ namespace engine {
                 }
 
                 else {
-                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Unknown action type: %s", type.c_str());
+                    Logger::error("Unknown action type: %s", type.c_str());
                     return false;
                 }
             }
         }
 
         catch (const std::exception& e) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "JSON parsing error: %s", e.what());
+            Logger::error("JSON parsing error: %s", e.what());
         }
 
         return false;

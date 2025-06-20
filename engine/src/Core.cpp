@@ -36,12 +36,18 @@ namespace engine {
             return false;
         }
 
-        initWindowedWindow(title, width, height, resizable);
+        if (!initWindowedWindow(title, width, height, resizable)) {
+            Logger::error("initWindowedWindow failed");
+            return false;
+        }
 
         m_WindowWidth = m_TargetWindowWidth = width;
         m_WindowHeight = m_TargetWindowHeight = height;
 
-        initRenderer();
+        if (!initRenderer()) {
+            Logger::error("initRenderer failed");
+            return false;
+        }
 
         return true;
     }
@@ -59,9 +65,17 @@ namespace engine {
             return false;
         }
 
-        initFullScreenWindow(title);
+        if (!initFullScreenWindow(title)) {
+            Logger::error("initFullScreenWindow failed");
+            return false;
+        }
+        
         SDL_GetWindowSize(getWindow(), &m_WindowWidth, &m_WindowHeight);
-        initRenderer();
+
+        if (!initRenderer()) {
+            Logger::error("initRenderer failed");
+            return false;
+        }
 
         m_TargetWindowWidth = m_WindowWidth;
         m_TargetWindowHeight = m_WindowHeight;
@@ -90,7 +104,10 @@ namespace engine {
 
     void Core::run(std::function<void()> customUpdate) {
         while (processEvents()) {
-            SDL_RenderClear(getRenderer());
+            if (!SDL_RenderClear(getRenderer())) {
+                Logger::error("SDL_RenderClear failed: %s", SDL_GetError());
+            }
+            
             updateVectorScale();
 
             if (customUpdate) {
@@ -131,32 +148,41 @@ namespace engine {
         return m_Window.get();
     }
 
-    void Core::initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable) {
+    bool Core::initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable) {
         m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, resizable ? SDL_WINDOW_RESIZABLE : SDL_WINDOW_EXTERNAL), SDL_DestroyWindow);
 
         if (!m_Window) {
             Logger::error("SDL_CreateWindow failed: %s", SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    void Core::initFullScreenWindow(const std::string& title) {
+    bool Core::initFullScreenWindow(const std::string& title) {
         m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), 0, 0, true), SDL_DestroyWindow);
-
+      
         if (!m_Window) {
             Logger::error("SDL_CreateWindow failed: %s", SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    void Core::initRenderer() {
+    bool Core::initRenderer() {
         m_Renderer = std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)>(SDL_CreateRenderer(m_Window.get(), nullptr), SDL_DestroyRenderer);
-
+      
         if (!m_Renderer) {
             Logger::error("SDL_CreateRenderer failed: %s", SDL_GetError());
+            return false;
         }
-
+        
         if (!SDL_SetRenderVSync(getRenderer(), true)) {
             Logger::error("SDL_SetRenderVSync failed: %s", SDL_GetError());
         }
+        
+        return true;
     }
 
     void Core::updateVectorScale() {

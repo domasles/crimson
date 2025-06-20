@@ -1,15 +1,18 @@
 #include <pch.h>
 
 #include <utils/filesystem.h>
+#include <utils/logger.h>
 
 #include <Core.h>
+
+using namespace engine::utils::logger;
 
 namespace engine::utils::filesystem {
     const bool loadJSONFile(const std::string& filePath, json* jsonPtr) {
         std::ifstream file(filePath);
 
         if (!file.is_open()) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to open file: %s", filePath.c_str());
+            Logger::error("Failed to open file: %s", filePath.c_str());
             return false;
         }
 
@@ -19,7 +22,7 @@ namespace engine::utils::filesystem {
         }
 
         catch (const std::exception& e) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "JSON parsing error: %s", e.what());
+            Logger::error("JSON parsing error: %s", e.what());
             return false;
         }
     }
