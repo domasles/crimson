@@ -2,36 +2,10 @@ cmake_minimum_required(VERSION 3.16)
 project(Crimson LANGUAGES CXX)
 
 # ===== SOURCE FILES =====
-set(CRIMSON_SOURCES
-    src/main.cpp
-    src/sceneRegistrator.cpp
+file(GLOB_RECURSE CRIMSON_SOURCES
+    src/*.cpp
+    src/*.h
 )
-
-# Get all files from entities and scenes directories
-file(GLOB_RECURSE CRIMSON_ENTITY_FILES CONFIGURE_DEPENDS
-    src/entities/*.cpp
-    src/entities/*.h
-    src/entities/*.hpp
-)
-
-file(GLOB_RECURSE CRIMSON_SCENE_FILES CONFIGURE_DEPENDS
-    src/scenes/*.cpp
-    src/scenes/*.h
-    src/scenes/*.hpp
-)
-
-file(GLOB_RECURSE CRIMSON_INCLUDE_FILES CONFIGURE_DEPENDS
-    src/include/*.h
-    src/include/*.hpp
-)
-
-set(CRIMSON_PCH_FILES
-    src/pch/pch.cpp
-    src/pch/pch.h
-)
-
-# Combine all sources
-list(APPEND CRIMSON_SOURCES ${CRIMSON_ENTITY_FILES} ${CRIMSON_SCENE_FILES} ${CRIMSON_INCLUDE_FILES} ${CRIMSON_PCH_FILES})
 
 # ===== CREATE LIBRARY =====
 add_library(crimson SHARED ${CRIMSON_SOURCES})
@@ -58,7 +32,8 @@ target_include_directories(crimson
     PRIVATE
         src/pch
         src/include
-        ../../engine/src/include        ../../vendor/json/include
+        ../../engine/src/include
+        ../../vendor/json/include
         ../../vendor/sdl3/include
         ../../vendor/sdl3-image/include
 )

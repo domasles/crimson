@@ -2,38 +2,13 @@ cmake_minimum_required(VERSION 3.16)
 project(Engine LANGUAGES CXX)
 
 # ===== SOURCE FILES =====
-set(ENGINE_SOURCES
-    src/Core.cpp
-    src/Input.cpp
-    src/Map.cpp
-    src/Scene.cpp
-    src/Texture.cpp
-    src/utils/filesystem.cpp
-    src/utils/math.cpp
-    src/utils/rendering.cpp
-)
-
-set(ENGINE_HEADERS
-    src/include/Core.h
-    src/include/Engine.h
-    src/include/Entity.h
-    src/include/Input.h
-    src/include/Map.h
-    src/include/Scene.h
-    src/include/Texture.h
-    src/include/utils/filesystem.h
-    src/include/utils/math.h
-    src/include/utils/rendering.h
-    src/include/utils/tileset.h
-)
-
-set(ENGINE_PCH_FILES
-    src/pch/pch.cpp
-    src/pch/pch.h
+file(GLOB_RECURSE ENGINE_SOURCES
+    src/*.cpp
+    src/*.h
 )
 
 # ===== CREATE LIBRARY =====
-add_library(engine STATIC ${ENGINE_SOURCES} ${ENGINE_HEADERS} ${ENGINE_PCH_FILES})
+add_library(engine STATIC ${ENGINE_SOURCES})
 
 # ===== PROPERTIES =====
 set_target_properties(engine PROPERTIES

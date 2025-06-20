@@ -164,7 +164,6 @@ The project includes **auto-generated VS Code configuration**:
 - **SDL3 and SDL3_image build from source as shared libraries**  
 - **Cross-platform support** (Windows/Linux)  
 - **Full VS Code integration** with F5 debugging  
-- **Visual Studio Solution Explorer** shows real folder hierarchy  
 - **Standard CMake workflow** with solution in `build\Crimson.sln`  
 - **Optimized build times** with shared libraries and parallel builds  
 - **Auto-generated .vscode files** with platform-specific settings  

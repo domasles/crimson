@@ -1,6 +1,9 @@
 #include <pch.h>
 
 #include <utils/rendering.h>
+#include <utils/logger.h>
+
+using namespace engine::utils::logger;
 
 namespace engine::utils::rendering {
     void TileRenderQueue::add(const std::shared_ptr<Texture>& texture, const Vector2& size, const Vector2& position) {
@@ -34,7 +37,7 @@ namespace engine::utils::rendering {
         }
 
         catch (const std::bad_alloc& e) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Memory allocation failed: %s", e.what());
+            Logger::error("Memory allocation failed: %s", e.what());
         }
 
         static RenderQueueManager fallbackInstance;

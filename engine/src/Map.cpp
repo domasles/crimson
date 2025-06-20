@@ -1,11 +1,13 @@
 #include <pch.h>
 
 #include <utils/filesystem.h>
+#include <utils/logger.h>
 
 #include <Core.h>
 #include <Map.h>
 
 using namespace engine::utils::filesystem;
+using namespace engine::utils::logger;
 
 namespace engine {
     void Map::loadMap(const std::string& fileName, const Vector2& minTileSize, const Vector2& mapOrigin) {
@@ -25,13 +27,13 @@ namespace engine {
         std::ifstream file(filePath);
 
         if (!file.is_open()) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to open file: %s", filePath.c_str());
+            Logger::error("Failed to open file: %s", filePath.c_str());
             return;
         }
 
         try {
             if (!m_JsonFile.contains("levels")) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Missing 'levels' field in JSON.");
+                Logger::error("Missing 'levels' field in JSON.");
                 return;
             }
 
@@ -42,7 +44,7 @@ namespace engine {
                 if (!level.contains("layerInstances")) {
                     std::string id = level["identifier"];
 
-                    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Missing 'layerInstances' field in level: %s.", id.c_str());
+                    Logger::error("Missing 'layerInstances' field in level: %s.", id.c_str());
 
                     continue;
                 }
@@ -56,7 +58,7 @@ namespace engine {
                     const std::string& tilesetKey = getFileName(tilesetRelPath);
 
                     if (m_Tilesets.find(tilesetKey) == m_Tilesets.end()) {
-                        SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Tileset not found: %s", tilesetKey.c_str());
+                        Logger::error("Tileset not found: %s", tilesetKey.c_str());
                         continue;
                     }
 
@@ -84,7 +86,7 @@ namespace engine {
         }
 
         catch (const std::exception& e) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "JSON parsing error: %s", e.what());
+            Logger::error("JSON parsing error: %s", e.what());
         }
     }
 
@@ -95,17 +97,17 @@ namespace engine {
     const bool Map::loadTilesets() {
         try {
             if (!m_JsonFile.contains("__header__")) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Missing '__header__' field in JSON.");
+                Logger::error("Missing '__header__' field in JSON.");
                 return false;
             }
 
             if (!m_JsonFile.contains("defs")) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Missing 'defs' field in JSON.");
+                Logger::error("Missing 'defs' field in JSON.");
                 return false;
             }
 
             if (!m_JsonFile["defs"].contains("tilesets")) {
-                SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "No 'tilesets' definition found.");
+                Logger::error("No 'tilesets' definition found.");
                 return false;
             }
 
@@ -143,7 +145,7 @@ namespace engine {
         }
 
         catch (const std::exception& e) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "JSON parsing error: %s", e.what());
+            Logger::error("JSON parsing error: %s", e.what());
         }
 
         return false;

@@ -1,6 +1,10 @@
 #include <pch.h>
 
+#include <utils/logger.h>
+
 #include <Scene.h>
+
+using namespace engine::utils::logger;
 
 namespace engine {
     SceneManager& SceneManager::getInstance() {
@@ -10,7 +14,7 @@ namespace engine {
         }
 
         catch (const std::bad_alloc& e) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Memory allocation failed: %s", e.what());
+            Logger::error("Memory allocation failed: %s", e.what());
         }
 
         static SceneManager fallbackInstance;
@@ -19,12 +23,12 @@ namespace engine {
 
     const bool SceneManager::registerScene(const std::string& name, std::shared_ptr<Scene> scene) {
         if (!scene) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Cannot register scene: Scene pointer is null!");
+            Logger::error("Cannot register scene: Scene pointer is null!");
             return false;
         }
 
         if (m_Scenes.find(name) != m_Scenes.end()) {
-            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Scene %s is already registered!", name.c_str());
+            Logger::warn("Scene %s is already registered!", name.c_str());
             return false;
         }
 
@@ -36,7 +40,7 @@ namespace engine {
         auto it = m_Scenes.find(name);
 
         if (it == m_Scenes.end()) {
-            SDL_LogWarn(SDL_LOG_CATEGORY_APPLICATION, "Scene %s not found. Cannot unregister!", name.c_str());
+            Logger::warn("Scene %s not found. Cannot unregister!", name.c_str());
             return false;
         }
 
@@ -48,7 +52,7 @@ namespace engine {
         auto sceneIt = m_Scenes.find(name);
 
         if (sceneIt == m_Scenes.end()) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Scene %s not found!", name.c_str());
+            Logger::error("Scene %s not found!", name.c_str());
             return false;
         }
 
@@ -73,7 +77,7 @@ namespace engine {
         m_LastFrameTime = currentTime;
 
         if (!m_CurrentScene) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "No current scene is found or selected!");
+            Logger::error("No current scene is found or selected!");
             return false;
         }
 
@@ -83,7 +87,7 @@ namespace engine {
 
     const bool SceneManager::render() {
         if (!m_CurrentScene) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "No current scene is found or selected!");
+            Logger::error("No current scene is found or selected!");
             return false;
         }
 

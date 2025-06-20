@@ -1,10 +1,12 @@
 #include <pch.h>
 
+#include <utils/logger.h>
 #include <utils/math.h>
 
 #include <Scene.h>
 #include <Core.h>
 
+using namespace engine::utils::logger;
 using namespace engine::utils::math;
 
 ENGINE_API void internalUpdate(std::function<void()> customUpdate) {
@@ -19,7 +21,7 @@ namespace engine {
         }
 
         catch (const std::bad_alloc& e) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Memory allocation failed: %s", e.what());
+            Logger::error("Memory allocation failed: %s", e.what());
         }
 
         static Core fallbackInstance;
@@ -30,7 +32,7 @@ namespace engine {
         m_ParentFolder = workingDir;
 
         if (!SDL_Init(SDL_INIT_VIDEO)) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_Init failed: %s", SDL_GetError());
+            Logger::error("SDL_Init failed: %s", SDL_GetError());
             return false;
         }
 
@@ -46,14 +48,14 @@ namespace engine {
 
     const bool Core::init(const std::string& workingDir, const std::string& title, const bool fullScreen) {
         if (!fullScreen) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Flag 'fullscreen' must be set to true!");
+            Logger::error("Flag 'fullscreen' must be set to true!");
             return false;
         }
 
         m_ParentFolder = workingDir;
 
         if (!SDL_Init(SDL_INIT_VIDEO)) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_Init failed: %s", SDL_GetError());
+            Logger::error("SDL_Init failed: %s", SDL_GetError());
             return false;
         }
 
@@ -113,7 +115,7 @@ namespace engine {
 
     SDL_Renderer* Core::getRenderer() const {
         if (!m_Renderer) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Renderer is not initialized yet!");
+            Logger::error("Renderer is not initialized yet!");
             return nullptr;
         }
 
@@ -122,7 +124,7 @@ namespace engine {
 
     SDL_Window* Core::getWindow() const {
         if (!m_Window) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Window is not initialized yet!");
+            Logger::error("Window is not initialized yet!");
             return nullptr;
         }
 
@@ -133,7 +135,7 @@ namespace engine {
         m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, resizable ? SDL_WINDOW_RESIZABLE : SDL_WINDOW_EXTERNAL), SDL_DestroyWindow);
 
         if (!m_Window) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateWindow failed: %s", SDL_GetError());
+            Logger::error("SDL_CreateWindow failed: %s", SDL_GetError());
         }
     }
 
@@ -141,7 +143,7 @@ namespace engine {
         m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), 0, 0, true), SDL_DestroyWindow);
 
         if (!m_Window) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateWindow failed: %s", SDL_GetError());
+            Logger::error("SDL_CreateWindow failed: %s", SDL_GetError());
         }
     }
 
@@ -149,11 +151,11 @@ namespace engine {
         m_Renderer = std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)>(SDL_CreateRenderer(m_Window.get(), nullptr), SDL_DestroyRenderer);
 
         if (!m_Renderer) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_CreateRenderer failed: %s", SDL_GetError());
+            Logger::error("SDL_CreateRenderer failed: %s", SDL_GetError());
         }
 
         if (!SDL_SetRenderVSync(getRenderer(), true)) {
-            SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "SDL_SetRenderVSync failed: %s", SDL_GetError());
+            Logger::error("SDL_SetRenderVSync failed: %s", SDL_GetError());
         }
     }
 
@@ -177,7 +179,6 @@ namespace engine {
         }
 
         float initialScale = calculateUniformScale(prevWidth, prevHeight, baseWidth, baseHeight);
-
         Vector2::setGlobalScale(initialScale, initialScale);
         Vector2::updateAll();
 

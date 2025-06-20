@@ -2,24 +2,13 @@ cmake_minimum_required(VERSION 3.16)
 project(Launcher LANGUAGES CXX)
 
 # ===== SOURCE FILES =====
-set(LAUNCHER_SOURCES
-    src/main.cpp
-    src/utils/filesystem.cpp
-    src/utils/lib.cpp
-)
-
-set(LAUNCHER_HEADERS
-    src/include/utils/filesystem.h
-    src/include/utils/lib.h
-)
-
-set(LAUNCHER_PCH_FILES
-    src/pch/pch.cpp
-    src/pch/pch.h
+file(GLOB_RECURSE LAUNCHER_SOURCES
+    src/*.cpp
+    src/*.h
 )
 
 # ===== CREATE EXECUTABLE =====
-add_executable(launcher ${LAUNCHER_SOURCES} ${LAUNCHER_HEADERS} ${LAUNCHER_PCH_FILES})
+add_executable(launcher ${LAUNCHER_SOURCES})
 
 # ===== PROPERTIES =====
 set_target_properties(launcher PROPERTIES

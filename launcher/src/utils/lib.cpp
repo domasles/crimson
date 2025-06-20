@@ -18,13 +18,11 @@ namespace launcher::utils::lib {
                 return nullptr;
             }
 
-            wchar_t* wideFileName = new wchar_t[bufferSize];
+            std::vector<wchar_t> wideFileName(bufferSize);
 
-            MultiByteToWideChar(CP_UTF8, 0, libraryPath.c_str(), -1, wideFileName, bufferSize);
+            MultiByteToWideChar(CP_UTF8, 0, libraryPath.c_str(), -1, wideFileName.data(), bufferSize);
 
-            HMODULE hLib = LoadLibraryW(wideFileName);
-
-            delete[] wideFileName;
+            HMODULE hLib = LoadLibraryW(wideFileName.data());
 
             if (hLib == nullptr) {
                 std::cerr << "Failed to load the library!" << std::endl;

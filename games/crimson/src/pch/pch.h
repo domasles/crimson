@@ -10,6 +10,7 @@
 #include <mutex>
 
 #include <iostream>
+#include <cstdarg>
 #include <fstream>
 #include <string>
 
