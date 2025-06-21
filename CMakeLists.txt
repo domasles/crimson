@@ -279,8 +279,15 @@ add_subdirectory(vendor/sdl3-image)
 
 # ===== PROJECT MODULES =====
 add_subdirectory(engine)
-add_subdirectory(games/crimson)
 add_subdirectory(launcher)
+
+file(GLOB children RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/games" "${CMAKE_CURRENT_SOURCE_DIR}/games/*")
+
+foreach(child ${children})
+    if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/games/${child}")
+        add_subdirectory("games/${child}")
+    endif()
+endforeach()
 
 # ===== IDE CONFIGURATION =====
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT launcher)
