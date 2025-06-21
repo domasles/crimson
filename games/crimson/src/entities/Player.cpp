@@ -10,7 +10,15 @@ namespace crimson {
         m_Texture = std::make_shared<Texture>("assets/tilesets");
         m_Texture->loadImage("TX Tileset Ground.png");
 
-        setPosition({ 300, 300 });
+        m_Map = std::make_unique<Map>("assets/maps");
+        m_Map->loadMap("TestMap.ldtk", { 100, 100 }, { 0, 0 });
+
+        for (const auto& entity : m_Map->getEntitiesPositions()) {
+            if (entity.first == "Player") {
+                setPosition(entity.second);
+                break;
+            }
+        }
     }
 
     void Player::update(float deltaTime) {

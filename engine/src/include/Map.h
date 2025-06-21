@@ -15,14 +15,16 @@ namespace engine {
         public:
             Map(const std::string& workingDir) : m_WorkingDir(workingDir) {}
             ~Map() = default;
-
+            
             void loadMap(const std::string& fileName, const Vector2& minTileSize, const Vector2& mapOrigin);
             void loadTiles();
-
             void render();
 
+            std::vector<std::pair<std::string, Vector2>> getEntitiesPositions() const;
+        
         private:
             const bool loadTilesets();
+            const bool validateMapStructure() const;
 
             float m_MinTileSize = 0.0f;
 

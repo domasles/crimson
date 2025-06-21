@@ -13,6 +13,8 @@ namespace crimson {
 
         private:
             float m_Speed = 200;
+
             std::unique_ptr<InputSystem> m_InputSystem;
+            std::unique_ptr<Map> m_Map;
     };
 }
