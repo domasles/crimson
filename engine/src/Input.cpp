@@ -16,7 +16,7 @@ namespace engine {
         SDL_Scancode scancode = SDL_GetScancodeFromKey(m_Key, nullptr);
 
         if (scancode == SDL_SCANCODE_UNKNOWN) {
-            Logger::error("Unknown scancode for key: %d", m_Key);
+            Logger::engine_error("Unknown scancode for key: %d", m_Key);
             return false;
         }
 
@@ -43,13 +43,13 @@ namespace engine {
 
         try {
             if (!m_JsonFile.contains("actions")) {
-                Logger::error("Missing 'actions' field in JSON.");
+                Logger::engine_error("Missing 'actions' field in JSON.");
                 return false;
             }
 
             for (const auto& [name, data] : m_JsonFile["actions"].items()) {
                 if (!data.contains("type") || !data.contains("key")) {
-                    Logger::error("Malformed action data: missing 'type' or 'key'.");
+                    Logger::engine_error("Malformed action data: missing 'type' or 'key'.");
                     return false;
                 }
 
@@ -58,13 +58,13 @@ namespace engine {
                 SDL_Keycode key = SDL_GetKeyFromName(data["key"].get<std::string>().c_str());
 
                 if (key == SDLK_UNKNOWN) {
-                    Logger::error("Unknown key: %s", data["key"].get<std::string>().c_str());
+                    Logger::engine_error("Unknown key: %s", data["key"].get<std::string>().c_str());
                     return false;
                 }
 
                 if (type == "movement") {
                     if (!data.contains("vector") || data["vector"].size() < 2) {
-                        Logger::error("Malformed movement action: missing 'vector'.");
+                        Logger::engine_error("Malformed movement action: missing 'vector'.");
                         return false;
                     }
 
@@ -76,17 +76,18 @@ namespace engine {
                 }
 
                 else {
-                    Logger::error("Unknown action type: %s", type.c_str());
+                    Logger::engine_error("Unknown action type: %s", type.c_str());
                     return false;
                 }
-            }
-        }
+            }        }
 
         catch (const std::exception& e) {
-            Logger::error("JSON parsing error: %s", e.what());
+            Logger::engine_error("JSON parsing error: %s", e.what());
+            return false;
         }
 
-        return false;
+        ENGINE_LOG_INIT(("Input Config: " + fileName).c_str());
+        return true;
     }
 
     const bool InputSystem::isActionPressed(const std::string& actionName) const {

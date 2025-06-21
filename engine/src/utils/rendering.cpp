@@ -37,7 +37,7 @@ namespace engine::utils::rendering {
         }
 
         catch (const std::bad_alloc& e) {
-            Logger::error("Memory allocation failed: %s", e.what());
+            Logger::engine_error("Memory allocation failed: %s", e.what());
         }
 
         static RenderQueueManager fallbackInstance;

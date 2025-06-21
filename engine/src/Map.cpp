@@ -27,13 +27,13 @@ namespace engine {
         std::ifstream file(filePath);
 
         if (!file.is_open()) {
-            Logger::error("Failed to open file: %s", filePath.c_str());
+            Logger::engine_error("Failed to open file: %s", filePath.c_str());
             return;
         }
 
         try {
             if (!m_JsonFile.contains("levels")) {
-                Logger::error("Missing 'levels' field in JSON.");
+                Logger::engine_error("Missing 'levels' field in JSON.");
                 return;
             }
 
@@ -44,7 +44,7 @@ namespace engine {
                 if (!level.contains("layerInstances")) {
                     std::string id = level["identifier"];
 
-                    Logger::error("Missing 'layerInstances' field in level: %s.", id.c_str());
+                    Logger::engine_error("Missing 'layerInstances' field in level: %s.", id.c_str());
 
                     continue;
                 }
@@ -58,7 +58,7 @@ namespace engine {
                     const std::string& tilesetKey = getFileName(tilesetRelPath);
 
                     if (m_Tilesets.find(tilesetKey) == m_Tilesets.end()) {
-                        Logger::error("Tileset not found: %s", tilesetKey.c_str());
+                        Logger::engine_error("Tileset not found: %s", tilesetKey.c_str());
                         continue;
                     }
 
@@ -82,12 +82,20 @@ namespace engine {
                         textureQueue->add(tileset.texture, m_TileSize, m_TilePosition + m_Origin, m_CropSize, m_CropRegion);
                     }
                 }
-            }
-        }
+            }        }
 
         catch (const std::exception& e) {
-            Logger::error("JSON parsing error: %s", e.what());
+            Logger::engine_error("JSON parsing error: %s", e.what());
+            return;
         }
+
+        std::string relativePath = m_WorkingDir + "/" + m_FileName;
+
+        if (relativePath.find("assets/") == 0) {
+            relativePath = relativePath.substr(7);
+        }
+        
+        ENGINE_LOG_INIT(("Map: " + relativePath).c_str());
     }
 
     void Map::render() {
@@ -97,17 +105,17 @@ namespace engine {
     const bool Map::loadTilesets() {
         try {
             if (!m_JsonFile.contains("__header__")) {
-                Logger::error("Missing '__header__' field in JSON.");
+                Logger::engine_error("Missing '__header__' field in JSON.");
                 return false;
             }
 
             if (!m_JsonFile.contains("defs")) {
-                Logger::error("Missing 'defs' field in JSON.");
+                Logger::engine_error("Missing 'defs' field in JSON.");
                 return false;
             }
 
             if (!m_JsonFile["defs"].contains("tilesets")) {
-                Logger::error("No 'tilesets' definition found.");
+                Logger::engine_error("No 'tilesets' definition found.");
                 return false;
             }
 
@@ -145,7 +153,7 @@ namespace engine {
         }
 
         catch (const std::exception& e) {
-            Logger::error("JSON parsing error: %s", e.what());
+            Logger::engine_error("JSON parsing error: %s", e.what());
         }
 
         return false;

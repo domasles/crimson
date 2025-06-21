@@ -14,7 +14,7 @@ namespace engine {
         SDL_FRect destRect{ position.getX(), position.getY(), size.getX(), size.getY() };
 
         if (!SDL_RenderTexture(Core::getInstance().getRenderer(), getTexture(), nullptr, &destRect)) {
-            Logger::error("SDL_RenderTexture Error: %s", SDL_GetError());
+            Logger::engine_error("SDL_RenderTexture Error: %s", SDL_GetError());
             return false;
         }
 
@@ -31,7 +31,7 @@ namespace engine {
         SDL_FRect cropRect{ cropPosition.getRawX(), cropPosition.getRawY(), cropSize.getRawX(), cropSize.getRawY() };
 
         if (!SDL_RenderTexture(Core::getInstance().getRenderer(), getTexture(), &cropRect, &destRect)) {
-            Logger::error("SDL_RenderTexture (cropped) Error: %s", SDL_GetError());
+            Logger::engine_error("SDL_RenderTexture (cropped) Error: %s", SDL_GetError());
             return false;
         }
 
@@ -40,7 +40,7 @@ namespace engine {
 
     SDL_Texture* Texture::getTexture() const {
         if (!m_Texture) {
-            Logger::error("Texture is not initialized yet!");
+            Logger::engine_error("Texture is not initialized yet!");
             return nullptr;
         }
 
@@ -53,13 +53,19 @@ namespace engine {
         SDL_Texture* texture = IMG_LoadTexture(Core::getInstance().getRenderer(), filePath.c_str());
 
         if (!texture) {
-            Logger::error("IMG_LoadTexture Error: %s", SDL_GetError());
+            Logger::engine_error("IMG_LoadTexture Error: %s", SDL_GetError());
             return false;
-        }
-
-        SDL_SetTextureScaleMode(texture, scaleMode);
+        }        SDL_SetTextureScaleMode(texture, scaleMode);
 
         m_Texture = std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)>(texture, SDL_DestroyTexture);
+
+        std::string relativePath = m_WorkingDir + "/" + fileName;
+
+        if (relativePath.find("assets/") == 0) {
+            relativePath = relativePath.substr(7);
+        }
+
+        ENGINE_LOG_INIT(("Texture: " + relativePath).c_str());
         return true;
     }
 }

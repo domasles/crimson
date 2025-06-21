@@ -12,7 +12,7 @@ namespace engine::utils::filesystem {
         std::ifstream file(filePath);
 
         if (!file.is_open()) {
-            Logger::error("Failed to open file: %s", filePath.c_str());
+            Logger::engine_error("Failed to open file: %s", filePath.c_str());
             return false;
         }
 
@@ -22,7 +22,7 @@ namespace engine::utils::filesystem {
         }
 
         catch (const std::exception& e) {
-            Logger::error("JSON parsing error: %s", e.what());
+            Logger::engine_error("JSON parsing error: %s", e.what());
             return false;
         }
     }

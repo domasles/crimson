@@ -21,7 +21,7 @@ namespace engine {
         }
 
         catch (const std::bad_alloc& e) {
-            Logger::error("Memory allocation failed: %s", e.what());
+            Logger::engine_error("Memory allocation failed: %s", e.what());
         }
 
         static Core fallbackInstance;
@@ -30,52 +30,66 @@ namespace engine {
 
     const bool Core::init(const std::string& workingDir, const std::string& title, const int width, const int height, const bool resizable) {
         m_ParentFolder = workingDir;
-
+        SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
+        
         if (!SDL_Init(SDL_INIT_VIDEO)) {
-            Logger::error("SDL_Init failed: %s", SDL_GetError());
+            Logger::engine_error("SDL_Init failed: %s", SDL_GetError());
             return false;
         }
+
+        ENGINE_LOG_INIT("SDL");
 
         if (!initWindowedWindow(title, width, height, resizable)) {
-            Logger::error("initWindowedWindow failed");
+            Logger::engine_error("initWindowedWindow failed");
             return false;
         }
+
+        ENGINE_LOG_INIT("Windowed Window");
 
         m_WindowWidth = m_TargetWindowWidth = width;
         m_WindowHeight = m_TargetWindowHeight = height;
 
         if (!initRenderer()) {
-            Logger::error("initRenderer failed");
+            Logger::engine_error("initRenderer failed");
             return false;
         }
+
+        ENGINE_LOG_INIT("Renderer");
 
         return true;
     }
 
     const bool Core::init(const std::string& workingDir, const std::string& title, const bool fullScreen) {
         if (!fullScreen) {
-            Logger::error("Flag 'fullscreen' must be set to true!");
+            Logger::engine_error("Flag 'fullscreen' must be set to true!");
             return false;
         }
 
         m_ParentFolder = workingDir;
-
+        SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
+        
         if (!SDL_Init(SDL_INIT_VIDEO)) {
-            Logger::error("SDL_Init failed: %s", SDL_GetError());
+            Logger::engine_error("SDL_Init failed: %s", SDL_GetError());
             return false;
         }
+
+        ENGINE_LOG_INIT("SDL");
 
         if (!initFullScreenWindow(title)) {
-            Logger::error("initFullScreenWindow failed");
+            Logger::engine_error("initFullScreenWindow failed");
             return false;
         }
+
+        ENGINE_LOG_INIT("Fullscreen Window");
         
         SDL_GetWindowSize(getWindow(), &m_WindowWidth, &m_WindowHeight);
 
         if (!initRenderer()) {
-            Logger::error("initRenderer failed");
+            Logger::engine_error("initRenderer failed");
             return false;
         }
+
+        ENGINE_LOG_INIT("Renderer");
 
         m_TargetWindowWidth = m_WindowWidth;
         m_TargetWindowHeight = m_WindowHeight;
@@ -105,7 +119,7 @@ namespace engine {
     void Core::run(std::function<void()> customUpdate) {
         while (processEvents()) {
             if (!SDL_RenderClear(getRenderer())) {
-                Logger::error("SDL_RenderClear failed: %s", SDL_GetError());
+                Logger::engine_error("SDL_RenderClear failed: %s", SDL_GetError());
             }
             
             updateVectorScale();
@@ -132,7 +146,7 @@ namespace engine {
 
     SDL_Renderer* Core::getRenderer() const {
         if (!m_Renderer) {
-            Logger::error("Renderer is not initialized yet!");
+            Logger::engine_error("Renderer is not initialized yet!");
             return nullptr;
         }
 
@@ -141,7 +155,7 @@ namespace engine {
 
     SDL_Window* Core::getWindow() const {
         if (!m_Window) {
-            Logger::error("Window is not initialized yet!");
+            Logger::engine_error("Window is not initialized yet!");
             return nullptr;
         }
 
@@ -152,7 +166,7 @@ namespace engine {
         m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, resizable ? SDL_WINDOW_RESIZABLE : SDL_WINDOW_EXTERNAL), SDL_DestroyWindow);
 
         if (!m_Window) {
-            Logger::error("SDL_CreateWindow failed: %s", SDL_GetError());
+            Logger::engine_error("SDL_CreateWindow failed: %s", SDL_GetError());
             return false;
         }
 
@@ -163,7 +177,7 @@ namespace engine {
         m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), 0, 0, true), SDL_DestroyWindow);
       
         if (!m_Window) {
-            Logger::error("SDL_CreateWindow failed: %s", SDL_GetError());
+            Logger::engine_error("SDL_CreateWindow failed: %s", SDL_GetError());
             return false;
         }
 
@@ -174,12 +188,12 @@ namespace engine {
         m_Renderer = std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)>(SDL_CreateRenderer(m_Window.get(), nullptr), SDL_DestroyRenderer);
       
         if (!m_Renderer) {
-            Logger::error("SDL_CreateRenderer failed: %s", SDL_GetError());
+            Logger::engine_error("SDL_CreateRenderer failed: %s", SDL_GetError());
             return false;
         }
         
         if (!SDL_SetRenderVSync(getRenderer(), true)) {
-            Logger::error("SDL_SetRenderVSync failed: %s", SDL_GetError());
+            Logger::engine_error("SDL_SetRenderVSync failed: %s", SDL_GetError());
         }
         
         return true;
@@ -205,6 +219,7 @@ namespace engine {
         }
 
         float initialScale = calculateUniformScale(prevWidth, prevHeight, baseWidth, baseHeight);
+        
         Vector2::setGlobalScale(initialScale, initialScale);
         Vector2::updateAll();
 
