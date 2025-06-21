@@ -1,3 +1,5 @@
+![Crimson Logo](./CrimsonLogo.svg)
+
 # Crimson
 A 2D top-down action game about saving the planet from a deadly virus that plagues both people and environment surrounding them, resulting in visual artifacts as you go along.
 This game comes with a simple to use and expand 2D game engine made using primarily [SDL3](https://github.com/libsdl-org/SDL) and [LDtk](https://github.com/deepnight/ldtk) as a level editor for extra moddability and simplicity creating new games in mind.
