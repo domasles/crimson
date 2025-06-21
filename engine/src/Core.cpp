@@ -19,21 +19,21 @@ namespace engine {
             static Core& instance = *new Core();
             return instance;
         }
-
+        
         catch (const std::bad_alloc& e) {
-            Logger::engine_error("Memory allocation failed: %s", e.what());
+            Logger::engine_error("Memory allocation failed: {}", e.what());
         }
 
         static Core fallbackInstance;
         return fallbackInstance;
     }
-
+    
     const bool Core::init(const std::string& workingDir, const std::string& title, const int width, const int height, const bool resizable) {
         m_ParentFolder = workingDir;
         SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
         
         if (!SDL_Init(SDL_INIT_VIDEO)) {
-            Logger::engine_error("SDL_Init failed: %s", SDL_GetError());
+            Logger::engine_error("SDL_Init failed: {}", SDL_GetError());
             return false;
         }
 
@@ -55,7 +55,6 @@ namespace engine {
         }
 
         ENGINE_LOG_INIT("Renderer");
-
         return true;
     }
 
@@ -69,7 +68,7 @@ namespace engine {
         SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
         
         if (!SDL_Init(SDL_INIT_VIDEO)) {
-            Logger::engine_error("SDL_Init failed: %s", SDL_GetError());
+            Logger::engine_error("SDL_Init failed: {}", SDL_GetError());
             return false;
         }
 
@@ -119,7 +118,7 @@ namespace engine {
     void Core::run(std::function<void()> customUpdate) {
         while (processEvents()) {
             if (!SDL_RenderClear(getRenderer())) {
-                Logger::engine_error("SDL_RenderClear failed: %s", SDL_GetError());
+                Logger::engine_error("SDL_RenderClear failed: {}", SDL_GetError());
             }
             
             updateVectorScale();
@@ -161,12 +160,12 @@ namespace engine {
 
         return m_Window.get();
     }
-
+    
     bool Core::initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable) {
         m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, resizable ? SDL_WINDOW_RESIZABLE : SDL_WINDOW_EXTERNAL), SDL_DestroyWindow);
 
         if (!m_Window) {
-            Logger::engine_error("SDL_CreateWindow failed: %s", SDL_GetError());
+            Logger::engine_error("SDL_CreateWindow failed: {}", SDL_GetError());
             return false;
         }
 
@@ -177,7 +176,7 @@ namespace engine {
         m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), 0, 0, true), SDL_DestroyWindow);
       
         if (!m_Window) {
-            Logger::engine_error("SDL_CreateWindow failed: %s", SDL_GetError());
+            Logger::engine_error("SDL_CreateWindow failed: {}", SDL_GetError());
             return false;
         }
 
@@ -186,14 +185,14 @@ namespace engine {
 
     bool Core::initRenderer() {
         m_Renderer = std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)>(SDL_CreateRenderer(m_Window.get(), nullptr), SDL_DestroyRenderer);
-      
+
         if (!m_Renderer) {
-            Logger::engine_error("SDL_CreateRenderer failed: %s", SDL_GetError());
+            Logger::engine_error("SDL_CreateRenderer failed: {}", SDL_GetError());
             return false;
         }
         
         if (!SDL_SetRenderVSync(getRenderer(), true)) {
-            Logger::engine_error("SDL_SetRenderVSync failed: %s", SDL_GetError());
+            Logger::engine_error("SDL_SetRenderVSync failed: {}", SDL_GetError());
         }
         
         return true;

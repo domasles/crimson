@@ -7,7 +7,7 @@ project(Crimson
 )
 
 # ===== GLOBAL SETTINGS =====
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -211,7 +211,7 @@ function(generate_vscode_config)
             ],
             \"compilerPath\": \"${COMPILER_PATH}\",
             \"cStandard\": \"c17\",
-            \"cppStandard\": \"c++17\",
+            \"cppStandard\": \"c++20\",
             \"intelliSenseMode\": \"windows-msvc-x64\",
             \"configurationProvider\": \"ms-vscode.cmake-tools\"
         }

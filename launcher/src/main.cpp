@@ -50,7 +50,6 @@ int main() {
     }
 
     internalUpdateFunc(customUpdateFunc);
-
     unloadLibrary(libraryHandle);
 
     return 0;

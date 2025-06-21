@@ -10,9 +10,9 @@ using namespace engine::utils::logger;
 namespace engine::utils::filesystem {
     const bool loadJSONFile(const std::string& filePath, json* jsonPtr) {
         std::ifstream file(filePath);
-
+        
         if (!file.is_open()) {
-            Logger::engine_error("Failed to open file: %s", filePath.c_str());
+            Logger::engine_error("Failed to open file: {}", filePath);
             return false;
         }
 
@@ -22,7 +22,7 @@ namespace engine::utils::filesystem {
         }
 
         catch (const std::exception& e) {
-            Logger::engine_error("JSON parsing error: %s", e.what());
+            Logger::engine_error("JSON parsing error: {}", e.what());
             return false;
         }
     }
@@ -31,23 +31,17 @@ namespace engine::utils::filesystem {
         static std::string basePath = SDL_GetBasePath();
         return basePath;
     }
-
+    
     const std::string& getGamePath() {
-        static std::string path = getBasePath() + "games/" + Core::getInstance().getName();
+        static std::string path = std::format("{}/games/{}", getBasePath(), Core::getInstance().getName());
         return path;
     }
 
     std::string getParentPath(const std::string& fullPath) {
-        std::filesystem::path path(fullPath);
-        std::string parentPath = path.parent_path().string();
-
-        return parentPath;
+        return std::filesystem::path(fullPath).parent_path().string();
     }
 
     std::string getFileName(const std::string& fullPath) {
-        std::filesystem::path path(fullPath);
-        std::string fileName = path.filename().string();
-
-        return fileName;
+        return std::filesystem::path(fullPath).filename().string();
     }
 }

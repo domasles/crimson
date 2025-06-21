@@ -6,13 +6,13 @@ namespace launcher::utils::filesystem {
     std::string getExecutableDirectory() {
         #ifdef LAUNCHER_PLATFORM_WINDOWS
             char buffer[MAX_PATH];
-
-            if (GetModuleFileNameA(NULL, buffer, MAX_PATH)) {
+            
+            if (GetModuleFileNameA(nullptr, buffer, MAX_PATH)) {
                 std::string executablePath(buffer);
 
-                size_t pos = executablePath.find_last_of("\\/");
-
-                return executablePath.substr(0, pos);
+                if (auto pos = executablePath.find_last_of("\\/"); pos != std::string::npos) {
+                    return executablePath.substr(0, pos);
+                }
             }
 
             return "";

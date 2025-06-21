@@ -12,7 +12,7 @@ add_library(crimson SHARED ${CRIMSON_SOURCES})
 
 # ===== PROPERTIES =====
 set_target_properties(crimson PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/crimson"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/crimson"

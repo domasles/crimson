@@ -25,9 +25,9 @@ namespace engine {
     void Map::loadTiles() {
         const std::string& filePath = std::string(SDL_GetBasePath()) + "games/" + Core::getInstance().getName() + "/" + m_WorkingDir + "/" + m_FileName;
         std::ifstream file(filePath);
-
+        
         if (!file.is_open()) {
-            Logger::engine_error("Failed to open file: %s", filePath.c_str());
+            Logger::engine_error("Failed to open file: {}", filePath);
             return;
         }
 
@@ -43,8 +43,7 @@ namespace engine {
             for (const auto& level : m_JsonFile["levels"]) {
                 if (!level.contains("layerInstances")) {
                     std::string id = level["identifier"];
-
-                    Logger::engine_error("Missing 'layerInstances' field in level: %s.", id.c_str());
+                    Logger::engine_error("Missing 'layerInstances' field in level: {}", id);
 
                     continue;
                 }
@@ -54,13 +53,13 @@ namespace engine {
                         continue;
                     }
 
-                    const std::string& tilesetRelPath = layer["__tilesetRelPath"];
-                    const std::string& tilesetKey = getFileName(tilesetRelPath);
-
-                    if (m_Tilesets.find(tilesetKey) == m_Tilesets.end()) {
-                        Logger::engine_error("Tileset not found: %s", tilesetKey.c_str());
-                        continue;
-                    }
+                const std::string& tilesetRelPath = layer["__tilesetRelPath"];
+                const std::string& tilesetKey = getFileName(tilesetRelPath);
+                
+                if (m_Tilesets.find(tilesetKey) == m_Tilesets.end()) {
+                    Logger::engine_error("Tileset not found: {}", tilesetKey);
+                    continue;
+                }
 
                     const auto& tileset = m_Tilesets[tilesetKey];
 
@@ -82,10 +81,11 @@ namespace engine {
                         textureQueue->add(tileset.texture, m_TileSize, m_TilePosition + m_Origin, m_CropSize, m_CropRegion);
                     }
                 }
-            }        }
-
+            }
+        }
+            
         catch (const std::exception& e) {
-            Logger::engine_error("JSON parsing error: %s", e.what());
+            Logger::engine_error("JSON parsing error: {}", e.what());
             return;
         }
 
@@ -151,9 +151,9 @@ namespace engine {
                 }
             }
         }
-
+        
         catch (const std::exception& e) {
-            Logger::engine_error("JSON parsing error: %s", e.what());
+            Logger::engine_error("JSON parsing error: {}", e.what());
         }
 
         return false;

@@ -12,9 +12,9 @@ namespace engine {
             static SceneManager& instance = *new SceneManager();
             return instance;
         }
-
+        
         catch (const std::bad_alloc& e) {
-            Logger::engine_error("Memory allocation failed: %s", e.what());
+            Logger::engine_error("Memory allocation failed: {}", e.what());
         }
 
         static SceneManager fallbackInstance;
@@ -26,9 +26,9 @@ namespace engine {
             Logger::engine_error("Cannot register scene: Scene pointer is null!");
             return false;
         }
-
+        
         if (m_Scenes.find(name) != m_Scenes.end()) {
-            Logger::engine_warn("Scene %s is already registered!", name.c_str());
+            Logger::engine_warn("Scene {} is already registered!", name);
             return false;
         }
         
@@ -41,9 +41,9 @@ namespace engine {
 
     const bool SceneManager::unregisterScene(const std::string& name) {
         auto it = m_Scenes.find(name);
-
+        
         if (it == m_Scenes.end()) {
-            Logger::engine_warn("Scene %s not found. Cannot unregister!", name.c_str());
+            Logger::engine_warn("Scene {} not found. Cannot unregister!", name);
             return false;
         }
 
@@ -55,7 +55,7 @@ namespace engine {
         auto sceneIt = m_Scenes.find(name);
 
         if (sceneIt == m_Scenes.end()) {
-            Logger::engine_error("Scene %s not found!", name.c_str());
+            Logger::engine_error("Scene {} not found!", name);
             return false;
         }
 

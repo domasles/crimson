@@ -35,21 +35,21 @@ namespace engine::utils::rendering {
             static RenderQueueManager& instance = *new RenderQueueManager();
             return instance;
         }
-
+        
         catch (const std::bad_alloc& e) {
-            Logger::engine_error("Memory allocation failed: %s", e.what());
+            Logger::engine_error("Memory allocation failed: {}", e.what());
         }
 
         static RenderQueueManager fallbackInstance;
         return fallbackInstance;
     }
-
+    
     void RenderQueueManager::render(const std::shared_ptr<TileRenderQueue>& queue) {
-        for (const auto& item : queue->getItems()) {
-            Vector2 size = item.size.getRawVector();
-            Vector2 position = item.position.getRawVector();
+        for (const auto& [texture, size, position, cropSize, cropPosition] : queue->getItems()) {
+            auto actualSize = size.getRawVector();
+            auto actualPosition = position.getRawVector();
 
-            item.texture->render(size, position, item.cropSize, item.cropPosition);
+            texture->render(actualSize, actualPosition, cropSize, cropPosition);
         }
     }
 }
