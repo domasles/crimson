@@ -30,6 +30,7 @@ target_link_libraries(engine
     PUBLIC
         SDL3::SDL3-shared
         SDL3_image::SDL3_image-shared
+        SDL3_mixer::SDL3_mixer-shared
 )
 
 # ===== PLATFORM SPECIFIC =====

@@ -67,9 +67,10 @@ crimson/
 │   │   ├── utils/            # Utility functions (math, rendering, fs)
 │   │   └── *.cpp             # Core engine implementation
 ├── vendor/                   # Third-party dependencies
-│   ├── sdl3/                 # SDL3 (built from source)
+│   ├── json/                 # nlohmann/json (header-only)
+│   ├── sdl3/                 # SDL3 (built from source) 
 │   ├── sdl3-image/           # SDL3_image (built from source)
-│   └── json/                 # nlohmann/json (header-only)
+│   └── sdl3-mixer/           # SDL3_mixer (built from source)
 ├── games/crimson/            # Main game project (shared library)
 │   ├── src/
 │   │   ├── entities/         # Game entities (Player, etc.)
@@ -131,6 +132,7 @@ cmake --build build --target launcher --config Debug
 ### Built from Source (Shared Libraries)
 - **[SDL3](https://github.com/libsdl-org/SDL)** - Graphics, audio, input, and windowing
 - **[SDL3_image](https://github.com/libsdl-org/SDL_image)** - Image loading (PNG, JPG, BMP, GIF support)
+- **[SDL3_mixer](https://github.com/libsdl-org/SDL_mixer)** - Audio mixing and playback
 
 ### Header-Only Libraries  
 - **[nlohmann/json](https://github.com/nlohmann/json)** - JSON parsing

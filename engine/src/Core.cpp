@@ -27,35 +27,15 @@ namespace engine {
         static Core fallbackInstance;
         return fallbackInstance;
     }
-    
+
+    Core::~Core() {
+        Mix_CloseAudio();
+        Mix_Quit();
+        SDL_Quit();
+    }
+
     const bool Core::init(const std::string& workingDir, const std::string& title, const int width, const int height, const bool resizable) {
-        m_ParentFolder = workingDir;
-        SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
-        
-        if (!SDL_Init(SDL_INIT_VIDEO)) {
-            Logger::engine_error("SDL_Init failed: {}", SDL_GetError());
-            return false;
-        }
-
-        ENGINE_LOG_INIT("SDL");
-
-        if (!initWindowedWindow(title, width, height, resizable)) {
-            Logger::engine_error("initWindowedWindow failed");
-            return false;
-        }
-
-        ENGINE_LOG_INIT("Windowed Window");
-
-        m_WindowWidth = m_TargetWindowWidth = width;
-        m_WindowHeight = m_TargetWindowHeight = height;
-
-        if (!initRenderer()) {
-            Logger::engine_error("initRenderer failed");
-            return false;
-        }
-
-        ENGINE_LOG_INIT("Renderer");
-        return true;
+        return initInternal(workingDir, title, WindowMode::Windowed, width, height, resizable);
     }
 
     const bool Core::init(const std::string& workingDir, const std::string& title, const bool fullScreen) {
@@ -63,25 +43,70 @@ namespace engine {
             Logger::engine_error("Flag 'fullscreen' must be set to true!");
             return false;
         }
+        return initInternal(workingDir, title, WindowMode::Fullscreen);
+    }
 
+    const bool Core::initInternal(const std::string& workingDir, const std::string& title, WindowMode mode, int width, int height, bool resizable) {
         m_ParentFolder = workingDir;
+
         SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
-        
-        if (!SDL_Init(SDL_INIT_VIDEO)) {
+
+        if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
             Logger::engine_error("SDL_Init failed: {}", SDL_GetError());
             return false;
         }
 
         ENGINE_LOG_INIT("SDL");
 
-        if (!initFullScreenWindow(title)) {
-            Logger::engine_error("initFullScreenWindow failed");
+        const int mixFlags = MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_FLAC;
+
+        if ((Mix_Init(mixFlags) & mixFlags) != mixFlags) {
+            Logger::engine_error("Mix_Init missing codec support: {}", SDL_GetError());
             return false;
         }
 
-        ENGINE_LOG_INIT("Fullscreen Window");
-        
-        SDL_GetWindowSize(getWindow(), &m_WindowWidth, &m_WindowHeight);
+        if (!Mix_OpenAudio(0, nullptr)) {
+            Logger::engine_error("Mix_OpenAudio failed: {}", SDL_GetError());
+            return false;
+        }
+
+        Mix_AllocateChannels(32);
+        ENGINE_LOG_INIT("Audio");
+
+        bool windowSuccess = false;
+
+        switch (mode) {
+            case WindowMode::Windowed:
+                windowSuccess = initWindowedWindow(title, width, height, resizable);
+
+                if (windowSuccess) {
+                    m_WindowWidth = m_TargetWindowWidth = width;
+                    m_WindowHeight = m_TargetWindowHeight = height;
+
+                    ENGINE_LOG_INIT("Windowed Window");
+                }
+
+                break;
+
+            case WindowMode::Fullscreen:
+                windowSuccess = initFullScreenWindow(title);
+
+                if (windowSuccess) {
+                    SDL_GetWindowSize(getWindow(), &m_WindowWidth, &m_WindowHeight);
+
+                    m_TargetWindowWidth = m_WindowWidth;
+                    m_TargetWindowHeight = m_WindowHeight;
+
+                    ENGINE_LOG_INIT("Fullscreen Window");
+                }
+
+                break;
+        }
+
+        if (!windowSuccess) {
+            Logger::engine_error("Window initialization failed");
+            return false;
+        }
 
         if (!initRenderer()) {
             Logger::engine_error("initRenderer failed");
@@ -89,10 +114,6 @@ namespace engine {
         }
 
         ENGINE_LOG_INIT("Renderer");
-
-        m_TargetWindowWidth = m_WindowWidth;
-        m_TargetWindowHeight = m_WindowHeight;
-
         return true;
     }
 

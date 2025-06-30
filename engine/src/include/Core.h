@@ -19,8 +19,14 @@ namespace engine {
         public:
             static Core& getInstance();
 
+            enum class WindowMode {
+                Windowed,
+                Fullscreen
+            };
+
             const bool init(const std::string& workingDir, const std::string& title, const int width=800, const int height=600, const bool resizable=false);
             const bool init(const std::string& workingDir, const std::string& title, const bool fullScreen=false);
+            const bool initInternal(const std::string& workingDir, const std::string& title, WindowMode mode, int width = 0, int height = 0, bool resizable = false);
 
             const bool processEvents();
             const std::string& getName() const { return m_ParentFolder; }
@@ -37,7 +43,7 @@ namespace engine {
 
         private:
             Core() : m_Window(nullptr, SDL_DestroyWindow), m_Renderer(nullptr, SDL_DestroyRenderer) {}
-            ~Core() { SDL_Quit(); }
+            ~Core();
 
             Core(const Core&) = delete;
             Core& operator=(const Core&) = delete;

@@ -36,6 +36,7 @@ target_include_directories(crimson
         ../../vendor/json/include
         ../../vendor/sdl3/include
         ../../vendor/sdl3-image/include
+        ../../vendor/sdl3-mixer/include
 )
 
 # ===== LINK LIBRARIES =====

@@ -166,7 +166,7 @@ function(generate_vscode_config)
         \"${GENERATORS_JSON}\"
     ],
     \"files.associations\": {
-        \"*.h\": \"c\",
+        \"*.h\": \"cpp\",
         \"*.hpp\": \"cpp\",
         \"*.cpp\": \"cpp\"
     },
@@ -195,9 +195,10 @@ function(generate_vscode_config)
                 \"\${workspaceFolder}/**\",
                 \"\${workspaceFolder}/engine/src/include/**\",
                 \"\${workspaceFolder}/launcher/src/include/**\",
+                \"\${workspaceFolder}/vendor/json/include/**\",
                 \"\${workspaceFolder}/vendor/sdl3/include/**\",
                 \"\${workspaceFolder}/vendor/sdl3-image/include/**\",
-                \"\${workspaceFolder}/vendor/json/include/**\"
+                \"\${workspaceFolder}/vendor/sdl3-mixer/include/**\"
             ],
             \"defines\": [
                 \"_DEBUG\",
@@ -227,9 +228,10 @@ function(generate_vscode_config)
                 \"\${workspaceFolder}/**\",
                 \"\${workspaceFolder}/engine/src/include/**\",
                 \"\${workspaceFolder}/launcher/src/include/**\",
+                \"\${workspaceFolder}/vendor/json/include/**\",
                 \"\${workspaceFolder}/vendor/sdl3/include/**\",
                 \"\${workspaceFolder}/vendor/sdl3-image/include/**\",
-                \"\${workspaceFolder}/vendor/json/include/**\"
+                \"\${workspaceFolder}/vendor/sdl3-mixer/include/**\"
             ],
             \"defines\": [
                 \"_DEBUG\",
@@ -270,12 +272,21 @@ set(SDLIMAGE_BMP ON CACHE BOOL "Support loading BMP images")
 set(SDLIMAGE_GIF ON CACHE BOOL "Support loading GIF images")
 set(SDLIMAGE_BACKEND_STB ON CACHE BOOL "Use stb_image for loading JPEG and PNG files")
 
+# ===== SDL3_MIXER CONFIGURATION =====
+set(SDLMIXER_VENDORED ON CACHE BOOL "Use vendored libraries for SDL3_mixer")
+set(SDL3MIXER_ENABLE_MP3_MPG123 ON CACHE BOOL "Enable MP3 support via mpg123")
+set(SDL3MIXER_ENABLE_OGG ON CACHE BOOL "Enable Ogg vorbis support (stb or libvorbis)")
+set(SDL3MIXER_ENABLE_FLAC ON CACHE BOOL "Enable FLAC support (dr_flac or libflac)")
+set(SDL3MIXER_MIDI OFF CACHE BOOL "Disable MIDI support for SDL3_mixer")
+set(SDL3MIXER_OPUS OFF CACHE BOOL "Disable Opus support for SDL3_mixer")
+
 # SDL3_image should be shared too when SDL3 is shared
 set(BUILD_SHARED_LIBS ON)
 
 # ===== DEPENDENCIES =====
 add_subdirectory(vendor/sdl3)
 add_subdirectory(vendor/sdl3-image)
+add_subdirectory(vendor/sdl3-mixer)
 
 # ===== PROJECT MODULES =====
 add_subdirectory(engine)
