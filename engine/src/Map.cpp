@@ -102,7 +102,7 @@ namespace engine {
             m_Tilesets[fileName] = Tileset{};
 
             m_Tilesets[fileName].texture = std::move(tilesetTexture);
-            m_Tilesets[fileName].texture->loadImage(fileName);
+            m_Tilesets[fileName].texture->loadTexture(fileName);
 
             m_Tilesets[fileName].textureSize.set(pxWid, pxHei);
             m_Tilesets[fileName].tileSize = tileGridSize;

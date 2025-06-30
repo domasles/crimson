@@ -8,7 +8,7 @@ namespace crimson {
         m_InputSystem->loadInputActions("InputActions.json");
 
         m_Texture = std::make_shared<Texture>("assets/tilesets");
-        m_Texture->loadImage("TX Tileset Ground.png");
+        m_Texture->loadTexture("TX Tileset Ground.png");
 
         m_Map = std::make_unique<Map>("assets/maps");
         m_Map->loadMap("TestMap.ldtk", { 100, 100 }, { 0, 0 });

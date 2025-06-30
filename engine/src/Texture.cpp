@@ -47,7 +47,7 @@ namespace engine {
         return m_Texture.get();
     }
 
-    const bool Texture::loadImage(const std::string& fileName, SDL_ScaleMode scaleMode) {
+    const bool Texture::loadTexture(const std::string& fileName, SDL_ScaleMode scaleMode) {
         const std::string& filePath = getGamePath()  + "/" + m_WorkingDir + "/" + fileName;
 
         SDL_Texture* texture = IMG_LoadTexture(Core::getInstance().getRenderer(), filePath.c_str());

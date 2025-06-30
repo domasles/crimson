@@ -10,8 +10,7 @@ using namespace engine::utils::filesystem;
 using namespace engine::utils::logger;
 
 namespace engine {
-
-    bool Sound::load(const std::string& fileName) {
+    const bool Sound::loadSound(const std::string& fileName) {
         std::string filePath = getGamePath() + "/" + m_WorkingDir + "/" + fileName;
         Mix_Chunk* chunk = Mix_LoadWAV(filePath.c_str());
 
@@ -31,7 +30,7 @@ namespace engine {
         return true;
     }
 
-    bool Sound::play(int loops) {
+    const bool Sound::play(int loops) {
         if (!m_Sound) {
             Logger::engine_error("Sound not loaded!");
             return false;
