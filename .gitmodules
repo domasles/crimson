@@ -10,3 +10,6 @@
 [submodule "vendor/sdl3-mixer"]
 	path = vendor/sdl3-mixer
 	url = https://github.com/libsdl-org/SDL_mixer
+[submodule "vendor/emsdk"]
+	path = vendor/emsdk
+	url = https://github.com/emscripten-core/emsdk.git

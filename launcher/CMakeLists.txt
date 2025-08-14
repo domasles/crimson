@@ -30,8 +30,18 @@ target_link_libraries(launcher
         crimson
 )
 
+# For WASM builds, we need to set specific linker flags
+if(WASM)
+    set_target_properties(launcher PROPERTIES
+        LINK_FLAGS "-s WASM=1 -s USE_SDL=2 --preload-file ${CMAKE_SOURCE_DIR}/games/crimson/assets@assets --preload-file ${CMAKE_SOURCE_DIR}/games/crimson/config@config -s ALLOW_MEMORY_GROWTH=1 -s NO_DISABLE_EXCEPTION_CATCHING=1 --shell-file ${CMAKE_SOURCE_DIR}/wasm/launcher.html"
+        SUFFIX ".html"
+    )
+endif()
+
 # ===== PLATFORM SPECIFIC =====
-if(WIN32)
+if(WASM)
+    target_compile_definitions(launcher PRIVATE LAUNCHER_PLATFORM_EMSCRIPTEN)
+elseif(WIN32)
     target_compile_definitions(launcher PRIVATE LAUNCHER_PLATFORM_WINDOWS)
     set_property(TARGET launcher PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 elseif(UNIX AND NOT APPLE)

@@ -33,7 +33,12 @@ namespace engine::utils::filesystem {
     }
     
     const std::string& getGamePath() {
-        static std::string path = std::format("{}/games/{}", getBasePath(), Core::getInstance().getName());
+        #ifdef ENGINE_PLATFORM_EMSCRIPTEN
+            static std::string path = "";
+        #else
+            static std::string path = std::format("{}/games/{}", getBasePath(), Core::getInstance().getName());
+        #endif
+
         return path;
     }
 

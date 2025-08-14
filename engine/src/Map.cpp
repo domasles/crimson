@@ -15,7 +15,7 @@ namespace engine {
         m_DesiredTileSize = minTileSize;
         m_Origin = mapOrigin;
 
-        const std::string& filePath = std::string(SDL_GetBasePath()) + "games/" + Core::getInstance().getName() + "/" + m_WorkingDir + "/" + m_FileName;
+        const std::string& filePath = getGamePath() + "/" + m_WorkingDir + "/" + m_FileName;
 
         loadJSONFile(filePath, &m_JsonFile);
 

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en-us">
+<head>
+  <meta charset="utf-8">
+  <title>Crimson Game</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+    }
+    
+    .emscripten {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    
+    .spinner {
+      height: 50px;
+      width: 50px;
+      border: 5px solid #333;
+      border-top: 5px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="spinner" id="spinner"></div>
+  <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+  
+  <script type='text/javascript'>
+    var Module = {
+      preRun: [],
+      postRun: [],
+      print: function(text) {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+        console.log(text);
+      },
+      canvas: (function() {
+        var canvas = document.getElementById('canvas');
+        canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+        return canvas;
+      })(),
+      setStatus: function(text) {
+        if (text) {
+          Module.setStatus.last = { time: Date.now(), text: text };
+        } else {
+          var canvas = Module.canvas;
+          canvas.style.display = "block";
+          document.getElementById('spinner').style.display = 'none';
+        }
+      },
+      totalDependencies: 0,
+      monitorRunDependencies: function(left) {
+        this.totalDependencies = Math.max(this.totalDependencies, left);
+        Module.setStatus(left ? 'Loading...' : '');
+      }
+    };
+    
+    Module.setStatus('Downloading...');
+    
+    window.onerror = function() {
+      Module.setStatus('Exception thrown, see JavaScript console');
+      document.getElementById('spinner').style.display = 'none';
+      Module.setStatus = function(text) {
+        if (text) console.error('[post-exception status] ' + text);
+      };
+    };
+  </script>
+  {{{ SCRIPT }}}
+</body>
+</html>

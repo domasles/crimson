@@ -3,7 +3,7 @@
 /.vscode
 
 /out
-/build
+/build*
 
 # User files
 *.user

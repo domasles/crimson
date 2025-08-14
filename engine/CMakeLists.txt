@@ -26,15 +26,26 @@ target_include_directories(engine
 )
 
 # ===== LINK LIBRARIES =====
-target_link_libraries(engine
-    PUBLIC
-        SDL3::SDL3-shared
-        SDL3_image::SDL3_image-shared
-        SDL3_mixer::SDL3_mixer-shared
-)
+if(WASM)
+    target_link_libraries(engine
+        PUBLIC
+            SDL3::SDL3-static
+            SDL3_image::SDL3_image-static
+            SDL3_mixer::SDL3_mixer-static
+    )
+else()
+    target_link_libraries(engine
+        PUBLIC
+            SDL3::SDL3-shared
+            SDL3_image::SDL3_image-shared
+            SDL3_mixer::SDL3_mixer-shared
+    )
+endif()
 
 # ===== PLATFORM SPECIFIC =====
-if(WIN32)
+if(WASM)
+    target_compile_definitions(engine PRIVATE ENGINE_PLATFORM_EMSCRIPTEN)
+elseif(WIN32)
     target_compile_definitions(engine PRIVATE ENGINE_PLATFORM_WINDOWS)
     set_property(TARGET engine PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 elseif(UNIX AND NOT APPLE)

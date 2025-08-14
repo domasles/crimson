@@ -6,8 +6,41 @@
 #include <Scene.h>
 #include <Core.h>
 
+#ifdef ENGINE_PLATFORM_EMSCRIPTEN
+    #include <emscripten.h>
+#endif
+
 using namespace engine::utils::logger;
 using namespace engine::utils::math;
+using namespace engine;
+
+#ifdef ENGINE_PLATFORM_EMSCRIPTEN
+    static std::function<void()> s_WASMUpdate;
+
+    static void emscripten_main_loop() {
+        Core& core = Core::getInstance();
+
+        if (!core.processEvents()) {
+            emscripten_cancel_main_loop();
+            return;
+        }
+
+        if (!SDL_RenderClear(core.getRenderer())) {
+            Logger::engine_error("SDL_RenderClear failed: {}", SDL_GetError());
+        }
+
+        core.updateVectorScale();
+
+        if (s_WASMUpdate) {
+            s_WASMUpdate();
+        }
+
+        SceneManager::getInstance().update();
+        SceneManager::getInstance().render();
+
+        SDL_RenderPresent(core.getRenderer());
+    }
+#endif
 
 ENGINE_API void internalUpdate(std::function<void()> customUpdate) {
     engine::Core::getInstance().run(customUpdate);
@@ -137,22 +170,27 @@ namespace engine {
     }
 
     void Core::run(std::function<void()> customUpdate) {
-        while (processEvents()) {
-            if (!SDL_RenderClear(getRenderer())) {
-                Logger::engine_error("SDL_RenderClear failed: {}", SDL_GetError());
+        #ifdef ENGINE_PLATFORM_EMSCRIPTEN
+            s_WASMUpdate = customUpdate;
+            emscripten_set_main_loop(emscripten_main_loop, 0, 1);
+        #else
+            while (processEvents()) {
+                if (!SDL_RenderClear(getRenderer())) {
+                    Logger::engine_error("SDL_RenderClear failed: {}", SDL_GetError());
+                }
+
+                updateVectorScale();
+
+                if (customUpdate) {
+                    customUpdate();
+                }
+
+                SceneManager::getInstance().update();
+                SceneManager::getInstance().render();
+
+                SDL_RenderPresent(getRenderer());
             }
-            
-            updateVectorScale();
-
-            if (customUpdate) {
-                customUpdate();
-            }
-
-            SceneManager::getInstance().update();
-            SceneManager::getInstance().render();
-
-            SDL_RenderPresent(getRenderer());
-        }
+        #endif
     }
 
     void Core::setVectorScale(int targetWindowWidth, int targetWindowHeight) {
@@ -212,9 +250,12 @@ namespace engine {
             return false;
         }
         
+#ifndef ENGINE_PLATFORM_EMSCRIPTEN
+        // VSync can interfere with Emscripten's main loop timing
         if (!SDL_SetRenderVSync(getRenderer(), true)) {
             Logger::engine_error("SDL_SetRenderVSync failed: {}", SDL_GetError());
         }
+#endif
         
         return true;
     }

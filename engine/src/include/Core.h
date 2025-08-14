@@ -4,12 +4,16 @@
     #define GAME_API extern "C" __declspec(dllexport)
 #elif GAME_PLATFORM_LINUX
     #define GAME_API extern "C" __attribute__((visibility("default")))
+#elif GAME_PLATFORM_EMSCRIPTEN
+    #define GAME_API extern "C"
 #endif
 
 #ifdef ENGINE_PLATFORM_WINDOWS
     #define ENGINE_API extern "C" __declspec(dllexport)
 #elif ENGINE_PLATFORM_LINUX
     #define ENGINE_API extern "C" __attribute__((visibility("default")))
+#elif ENGINE_PLATFORM_EMSCRIPTEN
+    #define ENGINE_API extern "C"
 #endif
 
 #include <Input.h>
@@ -36,6 +40,8 @@ namespace engine {
             void setVectorScale(int targetWindowWidth, int targetWindowHeight);
             void setVectorScale(bool useDefaultScale=true);
 
+            void updateVectorScale();
+
             SDL_Renderer* getRenderer() const;
             SDL_Window* getWindow() const;
 
@@ -51,8 +57,6 @@ namespace engine {
             bool initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable);
             bool initFullScreenWindow(const std::string& title);
             bool initRenderer();
-            
-            void updateVectorScale();
 
             float calculateUniformScale(int width, int height, float baseWidth, float baseHeight);
 

@@ -6,6 +6,15 @@ project(Crimson
     DESCRIPTION "Crimson Game Engine"
 )
 
+# ===== WASM BUILD DETECTION =====
+if(EMSCRIPTEN)
+    set(WASM ON)
+    message(STATUS "Building for WebAssembly/Emscripten")
+else()
+    set(WASM OFF)
+    message(STATUS "Building for native platform")
+endif()
+
 # ===== GLOBAL SETTINGS =====
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -31,7 +40,13 @@ foreach(config ${CMAKE_CONFIGURATION_TYPES})
 endforeach()
 
 # ===== PLATFORM DEFINITIONS =====
-if(WIN32)
+if(WASM)
+    add_compile_definitions(
+        ENGINE_PLATFORM_EMSCRIPTEN
+        GAME_PLATFORM_EMSCRIPTEN
+        LAUNCHER_PLATFORM_EMSCRIPTEN
+    )
+elseif(WIN32)
     add_compile_definitions(
         ENGINE_PLATFORM_WINDOWS
         GAME_PLATFORM_WINDOWS
@@ -253,8 +268,18 @@ function(generate_vscode_config)
 endfunction()
 
 # ===== SDL3 CONFIGURATION =====
-set(SDL_SHARED ON CACHE BOOL "Build SDL3 as shared library")
-set(SDL_STATIC OFF CACHE BOOL "Build SDL3 as static library")
+if(WASM)
+    # Static linking for WASM
+    set(SDL_SHARED OFF CACHE BOOL "Build SDL3 as shared library" FORCE)
+    set(SDL_STATIC ON CACHE BOOL "Build SDL3 as static library" FORCE)
+    set(BUILD_SHARED_LIBS OFF)
+else()
+    # Shared linking for native platforms
+    set(SDL_SHARED ON CACHE BOOL "Build SDL3 as shared library")
+    set(SDL_STATIC OFF CACHE BOOL "Build SDL3 as static library")
+    set(BUILD_SHARED_LIBS ON)
+endif()
+
 set(SDL_TESTS OFF CACHE BOOL "Build SDL3 tests")
 set(SDL_EXAMPLES OFF CACHE BOOL "Build SDL3 examples")
 
@@ -280,9 +305,6 @@ set(SDL3MIXER_ENABLE_FLAC ON CACHE BOOL "Enable FLAC support (dr_flac or libflac
 set(SDL3MIXER_MIDI OFF CACHE BOOL "Disable MIDI support for SDL3_mixer")
 set(SDL3MIXER_OPUS OFF CACHE BOOL "Disable Opus support for SDL3_mixer")
 
-# SDL3_image should be shared too when SDL3 is shared
-set(BUILD_SHARED_LIBS ON)
-
 # ===== DEPENDENCIES =====
 add_subdirectory(vendor/sdl3)
 add_subdirectory(vendor/sdl3-image)
@@ -302,6 +324,73 @@ endforeach()
 
 # ===== IDE CONFIGURATION =====
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT launcher)
+
+# ===== DUAL BUILD SETUP =====
+# Create both native and WASM build directories when generating projects
+if(NOT CMAKE_CROSSCOMPILING AND NOT EMSCRIPTEN)
+    message(STATUS "Setting up dual build configuration...")
+    
+    # Create build directory for native builds (if not exists)
+    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/build")
+        file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/build")
+        message(STATUS "Created build/ directory for native builds")
+    endif()
+    
+    # Create build-wasm directory and configure it for WASM builds (if not exists)
+    if(NOT EXISTS "${CMAKE_SOURCE_DIR}/build-wasm")
+        file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/build-wasm")
+        message(STATUS "Created build-wasm/ directory for WASM builds")
+        
+        # Determine the correct emsdk command based on platform
+        if(WIN32)
+            set(EMSDK_CMD "${CMAKE_SOURCE_DIR}/vendor/emsdk/emsdk.bat")
+            set(EMCMAKE_CMD "${CMAKE_SOURCE_DIR}/vendor/emsdk/upstream/emscripten/emcmake.bat")
+        else()
+            set(EMSDK_CMD "${CMAKE_SOURCE_DIR}/vendor/emsdk/emsdk")
+            set(EMCMAKE_CMD "${CMAKE_SOURCE_DIR}/vendor/emsdk/upstream/emscripten/emcmake")
+        endif()
+        
+        # Initialize emsdk if it exists
+        if(EXISTS "${EMSDK_CMD}")
+            message(STATUS "Setting up Emscripten environment...")
+            
+            # Install and activate latest emsdk
+            execute_process(
+                COMMAND "${EMSDK_CMD}" install latest
+                WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/emsdk"
+                RESULT_VARIABLE EMSDK_INSTALL_RESULT
+            )
+            
+            execute_process(
+                COMMAND "${EMSDK_CMD}" activate latest
+                WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/emsdk"
+                RESULT_VARIABLE EMSDK_ACTIVATE_RESULT
+            )
+            
+            if(EMSDK_INSTALL_RESULT EQUAL 0 AND EMSDK_ACTIVATE_RESULT EQUAL 0)
+                message(STATUS "Emscripten SDK setup completed")
+                
+                # Configure WASM build using emcmake
+                message(STATUS "Configuring WASM build...")
+                execute_process(
+                    COMMAND "${EMCMAKE_CMD}" cmake -B build-wasm -S .
+                    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                    RESULT_VARIABLE WASM_CONFIG_RESULT
+                )
+                
+                if(WASM_CONFIG_RESULT EQUAL 0)
+                    message(STATUS "WASM build configured successfully")
+                else()
+                    message(WARNING "Failed to configure WASM build (exit code: ${WASM_CONFIG_RESULT})")
+                endif()
+            else()
+                message(WARNING "Failed to set up Emscripten SDK (install: ${EMSDK_INSTALL_RESULT}, activate: ${EMSDK_ACTIVATE_RESULT})")
+            endif()
+        else()
+            message(WARNING "Emscripten SDK not found. WASM builds will not be available.")
+        endif()
+    endif()
+endif()
 
 # Generate VSCode config files
 generate_vscode_config()

@@ -8,7 +8,11 @@ file(GLOB_RECURSE CRIMSON_SOURCES
 )
 
 # ===== CREATE LIBRARY =====
-add_library(crimson SHARED ${CRIMSON_SOURCES})
+if(WASM)
+    add_library(crimson STATIC ${CRIMSON_SOURCES})
+else()
+    add_library(crimson SHARED ${CRIMSON_SOURCES})
+endif()
 
 # ===== PROPERTIES =====
 set_target_properties(crimson PROPERTIES
@@ -46,7 +50,9 @@ target_link_libraries(crimson
 )
 
 # ===== PLATFORM SPECIFIC =====
-if(WIN32)
+if(WASM)
+    target_compile_definitions(crimson PRIVATE GAME_PLATFORM_EMSCRIPTEN)
+elseif(WIN32)
     target_compile_definitions(crimson PRIVATE GAME_PLATFORM_WINDOWS)
     set_property(TARGET crimson PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 elseif(UNIX AND NOT APPLE)
