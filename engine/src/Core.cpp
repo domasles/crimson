@@ -221,7 +221,11 @@ namespace engine {
     }
     
     bool Core::initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable) {
-        m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, resizable ? SDL_WINDOW_RESIZABLE : SDL_WINDOW_EXTERNAL), SDL_DestroyWindow);
+        #ifdef ENGINE_PLATFORM_EMSCRIPTEN
+            m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_RESIZABLE), SDL_DestroyWindow);
+        #else
+            m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, resizable ? SDL_WINDOW_RESIZABLE : SDL_WINDOW_EXTERNAL), SDL_DestroyWindow);
+        #endif
 
         if (!m_Window) {
             Logger::engine_error("SDL_CreateWindow failed: {}", SDL_GetError());
@@ -232,7 +236,7 @@ namespace engine {
     }
 
     bool Core::initFullScreenWindow(const std::string& title) {
-        m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), 0, 0, true), SDL_DestroyWindow);
+        m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), 1600, 900, true), SDL_DestroyWindow);
       
         if (!m_Window) {
             Logger::engine_error("SDL_CreateWindow failed: {}", SDL_GetError());
