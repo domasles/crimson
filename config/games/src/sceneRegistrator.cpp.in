@@ -1,16 +1,14 @@
 #include <pch.h>
 
-#include <sceneRegistrator.h>
-
 #include <scenes/MainScene.h>
 
-using namespace engine;
+#include <Scene.h>
+
+#include <sceneRegistrator.h>
 
 namespace @GAME_NAME@ {
     void registrateScenes() {
-        SceneManager& sceneManager = SceneManager::getInstance();
-        
-        sceneManager.registerScene<MainScene>("MainScene");
-        sceneManager.setActiveScene("MainScene");
+        createScene<MainScene>("MainScene");
+        switchToScene("MainScene");
     }
 }

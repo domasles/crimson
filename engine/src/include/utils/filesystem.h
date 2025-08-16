@@ -10,4 +10,5 @@ namespace engine::utils::filesystem {
 
     std::string getParentPath(const std::string& fullPath);
     std::string getFileName(const std::string& fullPath);
+    std::string normalizePath(const std::string& path);
 }

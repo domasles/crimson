@@ -12,7 +12,7 @@ constexpr int WINDOW_HEIGHT = 600;
 
 constexpr bool RESIZABLE = true;
 
-Core& engineCore = Core::getInstance();
+Core& engineCore = getCore();
 
 GAME_API bool start() {
     if (!engineCore.init("@GAME_NAME@", "@GAME_DISPLAY_NAME@", WINDOW_WIDTH, WINDOW_HEIGHT, RESIZABLE)) {
@@ -21,12 +21,4 @@ GAME_API bool start() {
 
     registrateScenes();
     return true;
-}
-
-GAME_API void update() {
-    engineCore.update();
-}
-
-GAME_API void close() {
-    engineCore.close();
 }

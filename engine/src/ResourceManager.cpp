@@ -1,9 +1,11 @@
 #include <pch.h>
 
+#include <utils/filesystem.h>
 #include <utils/logger.h>
 
 #include <ResourceManager.h>
 
+using namespace engine::utils::filesystem;
 using namespace engine::utils::logger;
 
 namespace engine {
@@ -82,30 +84,6 @@ namespace engine {
 
     std::string ResourceManager::makeKey(const std::string& workingDir, const std::string& fileName) const {
         std::string path = workingDir + "/" + fileName;
-
-        std::vector<std::string> parts;
-        std::stringstream ss(path);
-        std::string part;
-        
-        while (std::getline(ss, part, '/')) {
-            if (part == "..") {
-                if (!parts.empty() && parts.back() != "..") {
-                    parts.pop_back();
-                }
-            }
-
-            else if (part != "." && !part.empty()) {
-                parts.push_back(part);
-            }
-        }
-
-        std::string normalized;
-
-        for (size_t i = 0; i < parts.size(); ++i) {
-            if (i > 0) normalized += "/";
-            normalized += parts[i];
-        }
-        
-        return normalized;
+        return normalizePath(path);
     }
 }

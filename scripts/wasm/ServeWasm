@@ -7,6 +7,6 @@ echo ""
 echo "Press Ctrl+C to stop the server"
 echo ""
 
-cd "$(dirname "$0")/build-wasm/bin"
+cd "$(dirname "$0")/../../build-wasm/bin"
 
 python3 -m http.server 8000 2>/dev/null || python -m SimpleHTTPServer 8000 2>/dev/null || npx serve -l 8000 .

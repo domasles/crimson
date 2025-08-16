@@ -49,4 +49,8 @@ namespace engine::utils::filesystem {
     std::string getFileName(const std::string& fullPath) {
         return std::filesystem::path(fullPath).filename().string();
     }
+
+    std::string normalizePath(const std::string& path) {
+        return std::filesystem::path(path).lexically_normal().string();
+    }
 }

@@ -18,7 +18,8 @@ namespace engine {
             virtual void render() = 0;
 
             void setTransform(const Transform& transform) { m_Transform = transform; }
-            const Transform& getTransform() const { return m_Transform; }
+
+            Transform& getTransform() { return m_Transform; }
 
             void setPosition(const Vector2& position) { m_Transform.setPosition(position); }
             void addPosition(const Vector2& offset) { m_Transform.addPosition(offset); }
@@ -29,7 +30,7 @@ namespace engine {
             const Vector2& getSize() const { return m_Transform.getSize(); }
 
             void setRotation(float rotation) { m_Transform.setRotation(rotation); }
-            float getRotation() const { return m_Transform.getRotation(); }
+            const float getRotation() const { return m_Transform.getRotation(); }
 
             void setTexture(std::shared_ptr<Texture> texture) { m_Texture = texture; }
             bool hasTexture() const { return m_Texture != nullptr; }
