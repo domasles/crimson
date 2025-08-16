@@ -1,14 +1,36 @@
 {
-    "cmake.buildDirectory": "${workspaceFolder}/build",
-    "cmake.configureOnOpen": false,
+    "cmake.sourceDirectory": "@SOURCE_DIR@",
+    "cmake.buildDirectory": "@BUILD_DIR@",
+    "cmake.configureOnOpen": true,
+    "cmake.buildBeforeRun": true,
+    "cmake.clearOutputBeforeBuild": true,
     "cmake.generator": "@GENERATOR@",
     "cmake.preferredGenerators": @PREFERRED_GENERATORS_JSON@,
+    
     "files.associations": {
-        "*.h": "cpp",
+        "*.h": "c",
         "*.hpp": "cpp",
-        "*.cpp": "cpp"
+        "*.inl": "cpp"
     },
+    
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "C_Cpp.default.intelliSenseMode": "@INTELLISENSE_MODE@",
+    "C_Cpp.default.compilerPath": "@COMPILER_PATH@",
+    "C_Cpp.default.cStandard": "c17",
+    "C_Cpp.default.cppStandard": "c++20",
     "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
-    "C_Cpp.intelliSenseEngine": "default"
+    "C_Cpp.intelliSenseEngine": "default",
+    
+    "files.exclude": {
+        "**/build/": true,
+        "**/.cache/": true,
+        "**/vendor/*/build/": true,
+        "**/.git/": true
+    },
+    
+    "search.exclude": {
+        "**/build/": true,
+        "**/vendor/": true,
+        "**/.git/": true
+    }
 }

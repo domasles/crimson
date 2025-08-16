@@ -12,6 +12,24 @@
             "environment": [],
             "console": "integratedTerminal",
             "preLaunchTask": "CMake: Build Debug"
+        },
+        {
+            "name": "Launch Crimson (Release)",
+            "type": "@DEBUGGER_TYPE@",
+            "request": "launch",
+            "program": "@EXECUTABLE_PATH_RELEASE@",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "@WORKING_DIR@",
+            "environment": [],
+            "console": "integratedTerminal",
+            "preLaunchTask": "CMake: Build Release"
+        },
+        {
+            "name": "Attach to Crimson",
+            "type": "@DEBUGGER_TYPE@",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
         }
     ]
 }

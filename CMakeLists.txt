@@ -6,6 +6,12 @@ project(Crimson
     DESCRIPTION "Crimson Game Engine"
 )
 
+# ===== CMAKE MODULE PATH =====
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/config/cmake")
+
+# ===== ENVIRONMENT DETECTION =====
+include(detect_environment)
+
 # ===== WASM BUILD DETECTION =====
 if(EMSCRIPTEN)
     set(WASM ON)
@@ -95,74 +101,6 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
     endif()
 endif()
-
-# ===== FUNCTION TO GENERATE VSCODE CONFIG =====
-function(generate_vscode_config)
-    # Create .vscode directory
-    file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/.vscode")
-    
-    # Detect platform for configuration
-    if(WIN32)
-        set(PROBLEM_MATCHER "$msvc")
-        set(DEBUGGER_TYPE "cppvsdbg")
-        set(EXECUTABLE_PATH "\${workspaceFolder}/build/bin/Debug/launcher.exe")
-        set(WORKING_DIR "\${workspaceFolder}/build/bin/Debug")
-        set(GENERATOR "Visual Studio 17 2022")
-        set(PREFERRED_GENERATORS "Visual Studio 17 2022" "Visual Studio 16 2019" "Ninja")
-        set(COMPILER_PATH "")
-        if(MSVC)
-            get_filename_component(COMPILER_PATH "${CMAKE_CXX_COMPILER}" ABSOLUTE)
-        endif()
-        if(NOT COMPILER_PATH OR NOT EXISTS "${COMPILER_PATH}")
-            set(COMPILER_PATH "cl.exe")
-        endif()
-    elseif(APPLE)
-        set(PROBLEM_MATCHER "$gcc")
-        set(DEBUGGER_TYPE "cppdbg")
-        set(EXECUTABLE_PATH "\${workspaceFolder}/build/bin/launcher")
-        set(WORKING_DIR "\${workspaceFolder}/build/bin")
-        set(GENERATOR "Xcode")
-        set(PREFERRED_GENERATORS "Xcode" "Unix Makefiles" "Ninja")
-        set(COMPILER_PATH "/usr/bin/clang++")
-    else()
-        set(PROBLEM_MATCHER "$gcc")
-        set(DEBUGGER_TYPE "cppdbg")
-        set(EXECUTABLE_PATH "\${workspaceFolder}/build/bin/launcher")
-        set(WORKING_DIR "\${workspaceFolder}/build/bin")
-        set(GENERATOR "Unix Makefiles")
-        set(PREFERRED_GENERATORS "Unix Makefiles" "Ninja")
-        set(COMPILER_PATH "/usr/bin/gcc")
-    endif()
-    
-    # Generate tasks.json from template
-    file(READ "${CMAKE_SOURCE_DIR}/config/vscode/tasks.json.in" TASKS_TEMPLATE)
-    string(REPLACE "@PROBLEM_MATCHER@" "${PROBLEM_MATCHER}" TASKS_CONTENT "${TASKS_TEMPLATE}")
-    file(WRITE "${CMAKE_SOURCE_DIR}/.vscode/tasks.json" "${TASKS_CONTENT}")
-
-    # Generate launch.json from template
-    file(READ "${CMAKE_SOURCE_DIR}/config/vscode/launch.json.in" LAUNCH_TEMPLATE)
-    string(REPLACE "@DEBUGGER_TYPE@" "${DEBUGGER_TYPE}" LAUNCH_CONTENT "${LAUNCH_TEMPLATE}")
-    string(REPLACE "@EXECUTABLE_PATH@" "${EXECUTABLE_PATH}" LAUNCH_CONTENT "${LAUNCH_CONTENT}")
-    string(REPLACE "@WORKING_DIR@" "${WORKING_DIR}" LAUNCH_CONTENT "${LAUNCH_CONTENT}")
-    file(WRITE "${CMAKE_SOURCE_DIR}/.vscode/launch.json" "${LAUNCH_CONTENT}")
-
-    # Generate settings.json from template
-    string(REPLACE ";" "\",\n        \"" GENERATORS_JSON "${PREFERRED_GENERATORS}")
-    set(PREFERRED_GENERATORS_JSON "[
-        \"${GENERATORS_JSON}\"
-    ]")
-    file(READ "${CMAKE_SOURCE_DIR}/config/vscode/settings.json.in" SETTINGS_TEMPLATE)
-    string(REPLACE "@GENERATOR@" "${GENERATOR}" SETTINGS_CONTENT "${SETTINGS_TEMPLATE}")
-    string(REPLACE "@PREFERRED_GENERATORS_JSON@" "${PREFERRED_GENERATORS_JSON}" SETTINGS_CONTENT "${SETTINGS_CONTENT}")
-    file(WRITE "${CMAKE_SOURCE_DIR}/.vscode/settings.json" "${SETTINGS_CONTENT}")
-
-    # Generate c_cpp_properties.json from template
-    file(READ "${CMAKE_SOURCE_DIR}/config/vscode/c_cpp_properties.json.in" CPP_TEMPLATE)
-    string(REPLACE "@COMPILER_PATH@" "${COMPILER_PATH}" CPP_CONTENT "${CPP_TEMPLATE}")
-    file(WRITE "${CMAKE_SOURCE_DIR}/.vscode/c_cpp_properties.json" "${CPP_CONTENT}")
-
-    message(STATUS "Generated VSCode configuration files in .vscode/")
-endfunction()
 
 # ===== SDL3 CONFIGURATION =====
 if(WASM)
@@ -289,5 +227,5 @@ if(NOT CMAKE_CROSSCOMPILING AND NOT EMSCRIPTEN)
     endif()
 endif()
 
-# Generate VSCode config files
-generate_vscode_config()
+# ===== VS CODE CONFIGURATION =====
+include(configure_vscode)

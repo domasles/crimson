@@ -2,43 +2,61 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "CMake: Configure Debug",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-S", "@SOURCE_DIR@",
+                "-B", "@BUILD_DIR@",
+                "-DCMAKE_BUILD_TYPE=Debug"
+            ],
+            "group": "build",
+            "problemMatcher": "$gcc",
+            "detail": "Configure CMake for Debug build"
+        },
+        {
+            "label": "CMake: Configure Release",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-S", "@SOURCE_DIR@",
+                "-B", "@BUILD_DIR@",
+                "-DCMAKE_BUILD_TYPE=Release"
+            ],
+            "group": "build",
+            "problemMatcher": "$gcc",
+            "detail": "Configure CMake for Release build"
+        },
+        {
             "label": "CMake: Build Debug",
             "type": "shell",
             "command": "cmake",
-            "args": ["--build", "build", "--config", "Debug"],
+            "args": ["--build", "@BUILD_DIR@", "--config", "Debug"],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "problemMatcher": ["@PROBLEM_MATCHER@"],
-            "detail": "Build project in Debug mode"
+            "dependsOn": "CMake: Configure Debug",
+            "problemMatcher": "$gcc",
+            "detail": "Build Debug configuration"
         },
         {
             "label": "CMake: Build Release",
             "type": "shell",
             "command": "cmake",
-            "args": ["--build", "build", "--config", "Release"],
+            "args": ["--build", "@BUILD_DIR@", "--config", "Release"],
             "group": "build",
-            "problemMatcher": ["@PROBLEM_MATCHER@"],
-            "detail": "Build project in Release mode"
+            "dependsOn": "CMake: Configure Release",
+            "problemMatcher": "$gcc",
+            "detail": "Build Release configuration"
         },
         {
             "label": "CMake: Clean",
             "type": "shell",
             "command": "cmake",
-            "args": ["--build", "build", "--target", "clean"],
+            "args": ["--build", "@BUILD_DIR@", "--target", "clean"],
             "group": "build",
-            "problemMatcher": ["@PROBLEM_MATCHER@"],
             "detail": "Clean build artifacts"
-        },
-        {
-            "label": "CMake: Regenerate",
-            "type": "shell",
-            "command": "cmake",
-            "args": ["-B", "build", "-S", "."],
-            "group": "build",
-            "problemMatcher": ["@PROBLEM_MATCHER@"],
-            "detail": "Regenerate CMake build files"
         }
     ]
 }
