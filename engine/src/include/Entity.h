@@ -30,7 +30,7 @@ namespace engine {
             const Vector2& getSize() const { return m_Transform.getSize(); }
 
             void setRotation(float rotation) { m_Transform.setRotation(rotation); }
-            const float getRotation() const { return m_Transform.getRotation(); }
+            float getRotation() const { return m_Transform.getRotation(); }
 
             void setTexture(std::shared_ptr<Texture> texture) { m_Texture = texture; }
             bool hasTexture() const { return m_Texture != nullptr; }

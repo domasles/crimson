@@ -16,7 +16,7 @@ namespace engine {
 
             void setInitialized(bool value) { m_Initialized = value; }
 
-            const bool getInitialized() const { return m_Initialized; }
+            bool getInitialized() const { return m_Initialized; }
             const std::string& getName() const { return m_Name; }
 
             template<typename T, typename... Args>
@@ -53,13 +53,13 @@ namespace engine {
 
             void setMap(std::unique_ptr<Map> map) { m_Map = std::move(map); }
             bool hasMap() const { return m_Map != nullptr; }
-
-            Map* getMap() const { return m_Map.get(); }
+            Map* getMap() { return m_Map.get(); }
+            const Map* getMap() const { return m_Map.get(); }
 
             void setInputSystem(std::unique_ptr<InputSystem> inputSystem) { m_InputSystem = std::move(inputSystem); }
             bool hasInputSystem() const { return m_InputSystem != nullptr; }
-
-            InputSystem* getInputSystem() const { return m_InputSystem.get(); }
+            InputSystem* getInputSystem() { return m_InputSystem.get(); }
+            const InputSystem* getInputSystem() const { return m_InputSystem.get(); }
 
         protected:
             bool m_Initialized = false;

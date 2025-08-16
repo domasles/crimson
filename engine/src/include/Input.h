@@ -11,7 +11,7 @@ namespace engine {
             InputAction(const SDL_Keycode key) : m_Key(key) {}
 
             virtual ~InputAction() = default;
-            virtual const Vector2 getDirection() const { return { 0, 0 }; }
+            virtual Vector2 getDirection() const { return { 0, 0 }; }
 
             const bool isPressed() const;
 
@@ -22,7 +22,7 @@ namespace engine {
     class DirectionalInputAction : public InputAction {
         public:
             DirectionalInputAction(const SDL_Keycode key, const Vector2 direction) : InputAction(key), m_Direction(direction) {}
-            const Vector2 getDirection() const override { return m_Direction; }
+            Vector2 getDirection() const override { return m_Direction; }
 
         private:
             Vector2 m_Direction;

@@ -24,11 +24,11 @@ namespace engine::utils::math {
 
             bool operator==(const Vector2& other) const { return m_X == other.m_X && m_Y == other.m_Y; }
 
-            const float getX() const { return m_ScaledX; }
-            const float getY() const { return m_ScaledY; }
+            float getX() const { return m_ScaledX; }
+            float getY() const { return m_ScaledY; }
 
-            const float getRawX() const { return m_X; }
-            const float getRawY() const { return m_Y; }
+            float getRawX() const { return m_X; }
+            float getRawY() const { return m_Y; }
 
             void set(float x, float y);
             void update();
@@ -36,7 +36,7 @@ namespace engine::utils::math {
             static void setGlobalScale(float scaleX, float scaleY);
             static void updateAll();
 
-            const Vector2 getRawVector() const { return Vector2{ getRawX(), getRawY() }; }
+            Vector2 getRawVector() const { return Vector2{ getRawX(), getRawY() }; }
 
             Vector2 normalize() const;
 
