@@ -11,10 +11,10 @@ namespace crimson {
             void update(float deltaTime) override;
             void render() override;
 
+            void setInputSystem(InputSystem* inputSystem) { m_InputSystem = inputSystem; }
+
         private:
             float m_Speed = 200;
-
-            std::unique_ptr<InputSystem> m_InputSystem;
-            std::unique_ptr<Map> m_Map;
+            InputSystem* m_InputSystem = nullptr;
     };
 }

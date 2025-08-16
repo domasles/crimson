@@ -14,7 +14,7 @@ constexpr int WINDOW_HEIGHT = 600;
 
 constexpr bool RESIZABLE = true;
 
-Core& engineCore = Core::getInstance();
+Core& engineCore = getCore();
 
 GAME_API bool start() {
     if (!engineCore.init("crimson", "Crimson", WINDOW_WIDTH, WINDOW_HEIGHT, RESIZABLE)) {

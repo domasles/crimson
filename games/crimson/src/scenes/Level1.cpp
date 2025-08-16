@@ -4,21 +4,38 @@
 
 namespace crimson {
     void Level1::init() {
-        if (!m_Player) {
-            m_Player = std::make_unique<Player>();
-            m_Player->init();
+        setInputSystem(std::make_unique<InputSystem>("config"));
 
-            m_Map = std::make_unique<Map>("assets/maps");
-            m_Map->loadMap("TestMap.ldtk", { 100, 100 }, { 0, 0 });
+        if (hasInputSystem()) {
+            getInputSystem()->loadInputActions("InputActions.json");
+        }
+
+        setMap(std::make_unique<Map>("assets/maps"));
+
+        if (hasMap()) {
+            getMap()->loadMap("TestMap.ldtk", {100, 100}, {0, 0});
+        }
+
+        m_Player = createEntity<Player>();
+        m_Player->setInputSystem(getInputSystem());
+        m_Player->init();
+
+        if (hasMap()) {
+            for (const auto& entity : getMap()->getEntitiesPositions()) {
+                if (entity.first == "Player") {
+                    m_Player->setPosition(entity.second);
+                    break;
+                }
+            }
         }
     }
 
     void Level1::update(const float deltaTime) {
-        m_Player->update(deltaTime);
+        updateEntities(deltaTime);
     }
 
     void Level1::render() {
-        m_Map->render();
-        m_Player->render();
+        if (hasMap()) getMap()->render();
+        renderEntities();
     }
 }

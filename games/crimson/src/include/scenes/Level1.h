@@ -16,7 +16,6 @@ namespace crimson {
             void render() override;
 
         private:
-            std::unique_ptr<Player> m_Player;
-            std::unique_ptr<Map> m_Map;
+            Player* m_Player = nullptr;
     };
 }

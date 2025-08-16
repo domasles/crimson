@@ -8,6 +8,7 @@ namespace engine {
     class Texture {
         public:
             Texture(const std::string& workingDir) : m_Texture(nullptr, SDL_DestroyTexture), m_WorkingDir(workingDir) {}
+            ~Texture() = default;
 
             const bool loadTexture(const std::string& fileName, SDL_ScaleMode scaleMode=SDL_SCALEMODE_NEAREST);
 

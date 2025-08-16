@@ -2,6 +2,7 @@
 
 #include <utils/math.h>
 
+#include <Transform.h>
 #include <Texture.h>
 #include <Core.h>
 
@@ -16,15 +17,27 @@ namespace engine {
             virtual void update(const float deltaTime) = 0;
             virtual void render() = 0;
 
-            void setPosition(Vector2 position) { m_Position = position; }
-            void addPosition(Vector2 position) { m_Position += position; }
+            void setTransform(const Transform& transform) { m_Transform = transform; }
+            const Transform& getTransform() const { return m_Transform; }
 
-            const Vector2& getPosition() const { return m_Position; }
+            void setPosition(const Vector2& position) { m_Transform.setPosition(position); }
+            void addPosition(const Vector2& offset) { m_Transform.addPosition(offset); }
+
+            void setSize(const Vector2& size) { m_Transform.setSize(size); }
+
+            const Vector2& getPosition() const { return m_Transform.getPosition(); }
+            const Vector2& getSize() const { return m_Transform.getSize(); }
+
+            void setRotation(float rotation) { m_Transform.setRotation(rotation); }
+            float getRotation() const { return m_Transform.getRotation(); }
+
+            void setTexture(std::shared_ptr<Texture> texture) { m_Texture = texture; }
+            bool hasTexture() const { return m_Texture != nullptr; }
+
+            std::shared_ptr<Texture> getTexture() const { return m_Texture; }
 
         protected:
-            Vector2 m_Size = { 100.0f, 100.0f };
-            Vector2 m_Position = { 0.0f, 0.0f };
-
+            Transform m_Transform;
             std::shared_ptr<Texture> m_Texture;
     };
 }

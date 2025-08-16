@@ -45,7 +45,6 @@ namespace engine {
             std::string m_FileName;
 
             std::shared_ptr<TileRenderQueue> textureQueue;
-
             std::unordered_map<std::string, Tileset> m_Tilesets;
     };
 }

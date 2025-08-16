@@ -1,24 +1,27 @@
 #pragma once
 
-#pragma once
-
 #ifdef GAME_PLATFORM_WINDOWS
     #define GAME_API extern "C" __declspec(dllexport)
-#elif GAME_PLATFORM_MACOS
+#elif defined(GAME_PLATFORM_MACOS)
     #define GAME_API extern "C" __attribute__((visibility("default")))
-#elif GAME_PLATFORM_LINUX
+#elif defined(GAME_PLATFORM_LINUX)
     #define GAME_API extern "C" __attribute__((visibility("default")))
-#elif GAME_PLATFORM_EMSCRIPTEN
+#elif defined(GAME_PLATFORM_EMSCRIPTEN)
+    #define GAME_API extern "C"
+#else
     #define GAME_API extern "C"
 #endif
 
+
 #ifdef ENGINE_PLATFORM_WINDOWS
     #define ENGINE_API extern "C" __declspec(dllexport)
-#elif ENGINE_PLATFORM_MACOS
+#elif defined(ENGINE_PLATFORM_MACOS)
     #define ENGINE_API extern "C" __attribute__((visibility("default")))
-#elif ENGINE_PLATFORM_LINUX
+#elif defined(ENGINE_PLATFORM_LINUX)
     #define ENGINE_API extern "C" __attribute__((visibility("default")))
-#elif ENGINE_PLATFORM_EMSCRIPTEN
+#elif defined(ENGINE_PLATFORM_EMSCRIPTEN)
+    #define ENGINE_API extern "C"
+#else
     #define ENGINE_API extern "C"
 #endif
 
@@ -88,4 +91,9 @@ namespace engine {
 
             std::queue<SDL_Event> m_EventQueue;
     };
+
+    inline Core& getCore() { return Core::getInstance(); }
+    inline SDL_Renderer* getRenderer() { return getCore().getRenderer(); }
+    inline SDL_Window* getWindow() { return getCore().getWindow(); }
+    inline Vector2 getWindowSize() { return getCore().getWindowSize(); }
 }

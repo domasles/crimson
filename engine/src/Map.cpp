@@ -3,6 +3,7 @@
 #include <utils/filesystem.h>
 #include <utils/logger.h>
 
+#include <ResourceManager.h>
 #include <Core.h>
 #include <Map.h>
 
@@ -97,12 +98,11 @@ namespace engine {
             const float spacing = tileset["spacing"];
             const float padding = tileset["padding"];
 
-            std::shared_ptr<Texture> tilesetTexture = std::make_shared<Texture>(relPath);
+            std::shared_ptr<Texture> tilesetTexture = loadTexture(relPath, fileName);
 
             m_Tilesets[fileName] = Tileset{};
 
-            m_Tilesets[fileName].texture = std::move(tilesetTexture);
-            m_Tilesets[fileName].texture->loadTexture(fileName);
+            m_Tilesets[fileName].texture = tilesetTexture;
 
             m_Tilesets[fileName].textureSize.set(pxWid, pxHei);
             m_Tilesets[fileName].tileSize = tileGridSize;

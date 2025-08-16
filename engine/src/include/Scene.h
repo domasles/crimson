@@ -1,6 +1,9 @@
 #pragma once
 
+#include <Entity.h>
+#include <Input.h>
 #include <Core.h>
+#include <Map.h>
 
 namespace engine {
     class Scene {
@@ -16,9 +19,68 @@ namespace engine {
             const bool getInitialized() const { return m_Initialized; }
             const std::string& getName() const { return m_Name; }
 
+            template<typename T, typename... Args>
+
+            T* createEntity(Args&&... args) {
+                auto entity = std::make_unique<T>(std::forward<Args>(args)...);
+
+                T* ptr = entity.get();
+                m_Entities.push_back(std::move(entity));
+
+                return ptr;
+            }
+
+            template<typename T>
+
+            T* findEntity() {
+                for (auto& entity : m_Entities) {
+                    if (auto* typed = dynamic_cast<T*>(entity.get())) {
+                        return typed;
+                    }
+                }
+
+                return nullptr;
+            }
+
+            void removeEntity(Entity* entity) {
+                m_Entities.erase(
+                    std::remove_if(m_Entities.begin(), m_Entities.end(),
+                        [entity](const auto& ptr) { return ptr.get() == entity; }),
+                    m_Entities.end());
+            }
+
+            size_t getEntityCount() const { return m_Entities.size(); }
+
+            void setMap(std::unique_ptr<Map> map) { m_Map = std::move(map); }
+            bool hasMap() const { return m_Map != nullptr; }
+
+            Map* getMap() const { return m_Map.get(); }
+
+            void setInputSystem(std::unique_ptr<InputSystem> inputSystem) { m_InputSystem = std::move(inputSystem); }
+            bool hasInputSystem() const { return m_InputSystem != nullptr; }
+
+            InputSystem* getInputSystem() const { return m_InputSystem.get(); }
+
         protected:
             bool m_Initialized = false;
             std::string m_Name;
+
+            std::vector<std::unique_ptr<Entity>> m_Entities;
+
+            std::unique_ptr<Map> m_Map;
+            std::unique_ptr<InputSystem> m_InputSystem;
+
+            void updateEntities(float deltaTime) {
+                for (auto& entity : m_Entities) {
+                    entity->update(deltaTime);
+                }
+            }
+
+            void renderEntities() {
+                for (auto& entity : m_Entities) {
+                    entity->render();
+                }
+            }
     };
 
     class SceneManager {
@@ -50,4 +112,18 @@ namespace engine {
 
             uint64_t m_LastFrameTime;
     };
+
+    inline SceneManager& getSceneManager() {
+        return SceneManager::getInstance();
+    }
+    
+    template<typename T>
+
+    bool createScene(const std::string& name) {
+        return getSceneManager().registerScene(name, std::make_shared<T>());
+    }
+    
+    inline bool switchToScene(const std::string& name) {
+        return getSceneManager().changeScene(name);
+    }
 }
