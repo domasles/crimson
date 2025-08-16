@@ -55,7 +55,13 @@ if(WASM)
 elseif(WIN32)
     target_compile_definitions(crimson PRIVATE GAME_PLATFORM_WINDOWS)
     set_property(TARGET crimson PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-elseif(UNIX AND NOT APPLE)
+elseif(APPLE)
+    target_compile_definitions(crimson PRIVATE GAME_PLATFORM_MACOS)
+    target_link_options(crimson PRIVATE
+        -Wl,-rpath,@executable_path
+        -Wl,-rpath,@executable_path/../..
+    )
+elseif(UNIX)
     target_compile_definitions(crimson PRIVATE GAME_PLATFORM_LINUX)
     target_link_options(crimson PRIVATE
         -Wl,-rpath,'$ORIGIN'

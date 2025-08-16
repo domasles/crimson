@@ -50,6 +50,29 @@
             "cppStandard": "c++20",
             "intelliSenseMode": "linux-gcc-x64",
             "configurationProvider": "ms-vscode.cmake-tools"
+        },
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/engine/src/include/**",
+                "${workspaceFolder}/launcher/src/include/**",
+                "${workspaceFolder}/vendor/json/include/**",
+                "${workspaceFolder}/vendor/sdl3/include/**",
+                "${workspaceFolder}/vendor/sdl3-image/include/**",
+                "${workspaceFolder}/vendor/sdl3-mixer/include/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "ENGINE_PLATFORM_MACOS",
+                "GAME_PLATFORM_MACOS",
+                "LAUNCHER_PLATFORM_MACOS"
+            ],
+            "compilerPath": "/usr/bin/clang++",
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "macos-clang-x64",
+            "configurationProvider": "ms-vscode.cmake-tools"
         }
     ]
 }

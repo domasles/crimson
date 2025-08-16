@@ -25,6 +25,8 @@
     int main() {
         #ifdef LAUNCHER_PLATFORM_WINDOWS
             const std::string fileName = "games/crimson/crimson.dll";
+        #elif defined(LAUNCHER_PLATFORM_MACOS)
+            const std::string fileName = "games/crimson/libcrimson.dylib";
         #else
             const std::string fileName = "games/crimson/libcrimson.so";
         #endif

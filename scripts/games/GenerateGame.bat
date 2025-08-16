@@ -21,7 +21,7 @@ call :ToUpper GAME_NAME_UPPER "%GAME_NAME%"
 
 set "SCRIPT_DIR=%~dp0"
 set "PROJECT_ROOT=%SCRIPT_DIR%..\.."
-set "TEMPLATE_DIR=%PROJECT_ROOT%\config\cmake"
+set "TEMPLATE_DIR=%PROJECT_ROOT%\config\games"
 set "GAMES_DIR=%PROJECT_ROOT%\games"
 set "TARGET_DIR=%GAMES_DIR%\%GAME_NAME%"
 

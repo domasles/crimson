@@ -1,29 +1,59 @@
 #!/bin/bash
 
-echo "Generating build files for Linux..."
+# Detect OS and set generator
+OS_TYPE="$(uname)"
+echo "Generating build files for $OS_TYPE..."
 
-# Create build directory for intermediate files only
+if [[ "$OS_TYPE" == "Darwin" ]]; then
+    # macOS
+    if command -v xcodebuild &> /dev/null; then
+        GENERATOR="Xcode"
+        echo "Xcode detected - using Xcode generator"
+    else
+        GENERATOR="Unix Makefiles"
+        echo "Xcode not found - using Unix Makefiles"
+    fi
+    CPU_COUNT=$(sysctl -n hw.ncpu)
+else
+    # Assume Linux or other Unix
+    GENERATOR="Unix Makefiles"
+    CPU_COUNT=$(nproc)
+fi
+
+# Create build directory
 mkdir -p build
 
-# Generate Makefiles
-cmake -B build -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug
-
+# Generate project files with CMake
+cmake -B build -G "$GENERATOR" -DCMAKE_BUILD_TYPE=Debug
 if [ $? -ne 0 ]; then
     echo "Failed to generate project files!"
     exit 1
 fi
 
+# Success message
 echo ""
 echo "Project generation completed successfully!"
 echo "Build files are located in the 'build' directory."
 echo ""
-echo "To build the project:"
-echo "  cmake --build build --config Debug"
-echo "  cmake --build build --config Release"
+
+# Instructions
+if [[ "$GENERATOR" == "Xcode" ]]; then
+    echo "To build the project:"
+    echo "  cmake --build build --config Debug"
+    echo "  cmake --build build --config Release"
+    echo ""
+    echo "To open in Xcode:"
+    echo "  open build/Crimson.xcodeproj"
+else
+    echo "To build the project:"
+    echo "  cmake --build build --config Debug"
+    echo "  cmake --build build --config Release"
+    echo ""
+    echo "Alternative build commands:"
+    echo "  cd build && make -j$CPU_COUNT"
+fi
+
 echo ""
 echo "To develop:"
 echo "  Open folder in VS Code"
-echo ""
-echo "  1. cmake .. -DCMAKE_BUILD_TYPE=Release"
-echo "  2. make -j$(nproc)"
 echo ""

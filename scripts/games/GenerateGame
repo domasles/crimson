@@ -1,18 +1,18 @@
 #!/bin/bash
 
-if [ $# -eq 0 ]; then
-    echo "Usage: $0 <game_name> [display_name]"
-    echo "Example: $0 mygame \"My Awesome Game\""
-    exit 1
-fi
+read -p "Enter game name: " GAME_NAME
+while [ -z "$GAME_NAME" ]; do
+    read -p "Game name cannot be empty. Enter game name: " GAME_NAME
+done
 
-GAME_NAME="$1"
-GAME_DISPLAY_NAME="${2:-$GAME_NAME}"
+read -p "Enter display name (leave empty to use game name): " GAME_DISPLAY_NAME
+GAME_DISPLAY_NAME=${GAME_DISPLAY_NAME:-$GAME_NAME}
+
 GAME_NAME_UPPER=$(echo "$GAME_NAME" | tr '[:lower:]' '[:upper:]')
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-TEMPLATE_DIR="$PROJECT_ROOT/config/cmake"
+TEMPLATE_DIR="$PROJECT_ROOT/config/games"
 GAMES_DIR="$PROJECT_ROOT/games"
 TARGET_DIR="$GAMES_DIR/$GAME_NAME"
 
@@ -26,16 +26,21 @@ echo "Target directory: $TARGET_DIR"
 
 mkdir -p "$TARGET_DIR"
 
+if [[ "$(uname)" == "Darwin" ]] && command -v gsed &> /dev/null; then
+    SED_CMD="gsed"
+else
+    SED_CMD="sed"
+fi
+
 copy_and_replace() {
     local src="$1"
     local dst="$2"
-    
     if [[ "$src" == *.in ]]; then
         local dst_clean="${dst%.in}"
-        sed -e "s/@GAME_NAME@/$GAME_NAME/g" \
-            -e "s/@GAME_DISPLAY_NAME@/$GAME_DISPLAY_NAME/g" \
-            -e "s/@GAME_NAME_UPPER@/$GAME_NAME_UPPER/g" \
-            "$src" > "$dst_clean"
+        $SED_CMD -e "s/@GAME_NAME@/$GAME_NAME/g" \
+                 -e "s/@GAME_DISPLAY_NAME@/$GAME_DISPLAY_NAME/g" \
+                 -e "s/@GAME_NAME_UPPER@/$GAME_NAME_UPPER/g" \
+                 "$src" > "$dst_clean"
         echo "  Generated: $dst_clean"
     else
         cp -r "$src" "$dst"
@@ -47,7 +52,6 @@ find "$TEMPLATE_DIR" -type f | while read -r file; do
     rel_path="${file#$TEMPLATE_DIR/}"
     target_file="$TARGET_DIR/$rel_path"
     target_dir=$(dirname "$target_file")
-    
     mkdir -p "$target_dir"
     copy_and_replace "$file" "$target_file"
 done
@@ -59,10 +63,27 @@ find "$TEMPLATE_DIR" -type d | while read -r dir; do
     fi
 done
 
+BUILD_DIR="$TARGET_DIR/build"
+mkdir -p "$BUILD_DIR"
+
+if [[ "$(uname)" == "Darwin" ]] && command -v xcodebuild &> /dev/null; then
+    GENERATOR="Xcode"
+else
+    GENERATOR="Unix Makefiles"
+fi
+
+cmake -B "$BUILD_DIR" -G "$GENERATOR" -DCMAKE_BUILD_TYPE=Debug
+
 echo ""
-echo "Game '$GAME_NAME' created successfully!"
-echo "Location: $TARGET_DIR"
-echo ""
-echo "To build your game:"
-echo "  cmake -B build -S ."
-echo "  cmake --build build"
+echo "Game '$GAME_NAME' created successfully at $TARGET_DIR"
+
+if [[ "$GENERATOR" == "Xcode" ]]; then
+    echo "Build with: cmake --build $BUILD_DIR --config Debug"
+else
+    if [[ "$(uname)" == "Darwin" ]]; then
+        CPU_COUNT=$(sysctl -n hw.ncpu)
+    else
+        CPU_COUNT=$(nproc)
+    fi
+    echo "Build with: cmake --build $BUILD_DIR -j$CPU_COUNT"
+fi

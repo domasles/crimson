@@ -1,7 +1,11 @@
 #pragma once
 
+#pragma once
+
 #ifdef GAME_PLATFORM_WINDOWS
     #define GAME_API extern "C" __declspec(dllexport)
+#elif GAME_PLATFORM_MACOS
+    #define GAME_API extern "C" __attribute__((visibility("default")))
 #elif GAME_PLATFORM_LINUX
     #define GAME_API extern "C" __attribute__((visibility("default")))
 #elif GAME_PLATFORM_EMSCRIPTEN
@@ -10,6 +14,8 @@
 
 #ifdef ENGINE_PLATFORM_WINDOWS
     #define ENGINE_API extern "C" __declspec(dllexport)
+#elif ENGINE_PLATFORM_MACOS
+    #define ENGINE_API extern "C" __attribute__((visibility("default")))
 #elif ENGINE_PLATFORM_LINUX
     #define ENGINE_API extern "C" __attribute__((visibility("default")))
 #elif ENGINE_PLATFORM_EMSCRIPTEN

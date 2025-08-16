@@ -1,3 +1,13 @@
+#pragma once
+
+#ifdef ENGINE_PLATFORM_WINDOWS
+    #define NOMINMAX
+    #define WIN32_LEAN_AND_MEAN
+    #include <windows.h>
+#elif defined(ENGINE_PLATFORM_MACOS)
+    #include <TargetConditionals.h>
+#endif
+
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_mixer/SDL_mixer.h>
 #include <SDL3/SDL_surface.h>

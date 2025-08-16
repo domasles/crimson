@@ -17,6 +17,17 @@ namespace launcher::utils::filesystem {
 
             return "";
 
+        #elif defined(LAUNCHER_PLATFORM_MACOS)
+            char result[1024];
+            uint32_t size = sizeof(result);
+
+            if (_NSGetExecutablePath(result, &size) == 0) {
+                std::string executablePath(result);
+                return std::string(dirname(&executablePath[0]));
+            }
+
+            return "";
+
         #else
             char result[1024];
 

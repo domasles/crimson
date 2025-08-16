@@ -44,7 +44,9 @@ if(WASM)
 elseif(WIN32)
     target_compile_definitions(launcher PRIVATE LAUNCHER_PLATFORM_WINDOWS)
     set_property(TARGET launcher PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-elseif(UNIX AND NOT APPLE)
+elseif(APPLE)
+    target_compile_definitions(launcher PRIVATE LAUNCHER_PLATFORM_MACOS)
+elseif(UNIX)
     target_compile_definitions(launcher PRIVATE LAUNCHER_PLATFORM_LINUX)
 endif()
 
@@ -61,19 +63,26 @@ target_precompile_headers(launcher PRIVATE src/pch/pch.h)
 add_dependencies(launcher crimson)
 
 # ===== POST BUILD COMMANDS =====
-# Copy SDL3 DLLs to launcher output directory
-if(WIN32)
+# Copy SDL3 libraries to launcher output directory (Windows only needs DLLs)
+if(WIN32 AND NOT WASM)
     add_custom_command(TARGET launcher POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "$<TARGET_FILE:SDL3::SDL3-shared>"
         "$<TARGET_FILE_DIR:launcher>"
-        COMMENT "Copying SDL3.dll to launcher output directory"
+        COMMENT "Copying SDL3 library to launcher output directory"
     )
     
     add_custom_command(TARGET launcher POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "$<TARGET_FILE:SDL3_image::SDL3_image-shared>"
         "$<TARGET_FILE_DIR:launcher>"
-        COMMENT "Copying SDL3_image.dll to launcher output directory"
+        COMMENT "Copying SDL3_image library to launcher output directory"
+    )
+    
+    add_custom_command(TARGET launcher POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "$<TARGET_FILE:SDL3_mixer::SDL3_mixer-shared>"
+        "$<TARGET_FILE_DIR:launcher>"
+        COMMENT "Copying SDL3_mixer library to launcher output directory"
     )
 endif()

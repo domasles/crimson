@@ -52,7 +52,13 @@ elseif(WIN32)
         GAME_PLATFORM_WINDOWS
         LAUNCHER_PLATFORM_WINDOWS
     )
-elseif(UNIX AND NOT APPLE)
+elseif(APPLE)
+    add_compile_definitions(
+        ENGINE_PLATFORM_MACOS
+        GAME_PLATFORM_MACOS
+        LAUNCHER_PLATFORM_MACOS
+    )
+elseif(UNIX)
     add_compile_definitions(
         ENGINE_PLATFORM_LINUX
         GAME_PLATFORM_LINUX
@@ -79,10 +85,15 @@ endif()
 if(MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     add_compile_options(/utf-8 /MP)
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(-fPIC)
-    set(CMAKE_INSTALL_RPATH "$ORIGIN:$ORIGIN/../..")
-    set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+    if(NOT APPLE)
+        set(CMAKE_INSTALL_RPATH "$ORIGIN:$ORIGIN/../..")
+        set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+    else()
+        set(CMAKE_INSTALL_RPATH "@executable_path:@executable_path/../..")
+        set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+    endif()
 endif()
 
 # ===== FUNCTION TO GENERATE VSCODE CONFIG =====
@@ -105,6 +116,14 @@ function(generate_vscode_config)
         if(NOT COMPILER_PATH OR NOT EXISTS "${COMPILER_PATH}")
             set(COMPILER_PATH "cl.exe")
         endif()
+    elseif(APPLE)
+        set(PROBLEM_MATCHER "$gcc")
+        set(DEBUGGER_TYPE "cppdbg")
+        set(EXECUTABLE_PATH "\${workspaceFolder}/build/bin/launcher")
+        set(WORKING_DIR "\${workspaceFolder}/build/bin")
+        set(GENERATOR "Xcode")
+        set(PREFERRED_GENERATORS "Xcode" "Unix Makefiles" "Ninja")
+        set(COMPILER_PATH "/usr/bin/clang++")
     else()
         set(PROBLEM_MATCHER "$gcc")
         set(DEBUGGER_TYPE "cppdbg")
