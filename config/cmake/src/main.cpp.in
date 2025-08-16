@@ -1,0 +1,32 @@
+#include <pch.h>
+
+#include <Engine.h>
+
+#include <sceneRegistrator.h>
+
+using namespace engine;
+using namespace @GAME_NAME@;
+
+constexpr int WINDOW_WIDTH = 800;
+constexpr int WINDOW_HEIGHT = 600;
+
+constexpr bool RESIZABLE = true;
+
+Core& engineCore = Core::getInstance();
+
+GAME_API bool start() {
+    if (!engineCore.init("@GAME_NAME@", "@GAME_DISPLAY_NAME@", WINDOW_WIDTH, WINDOW_HEIGHT, RESIZABLE)) {
+        return false;
+    }
+
+    registrateScenes();
+    return true;
+}
+
+GAME_API void update() {
+    engineCore.update();
+}
+
+GAME_API void close() {
+    engineCore.close();
+}

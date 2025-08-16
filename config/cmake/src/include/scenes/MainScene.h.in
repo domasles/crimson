@@ -1,0 +1,13 @@
+#pragma once
+
+#include <Scene.h>
+
+namespace @GAME_NAME@ {
+    class MainScene : public engine::Scene {
+    public:
+        virtual void init() override;
+        virtual void update() override;
+        virtual void render() override;
+        virtual void close() override;
+    };
+}

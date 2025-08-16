@@ -89,7 +89,8 @@ endif()
 function(generate_vscode_config)
     # Create .vscode directory
     file(MAKE_DIRECTORY "${CMAKE_SOURCE_DIR}/.vscode")
-      # Detect platform for configuration
+    
+    # Detect platform for configuration
     if(WIN32)
         set(PROBLEM_MATCHER "$msvc")
         set(DEBUGGER_TYPE "cppvsdbg")
@@ -97,6 +98,13 @@ function(generate_vscode_config)
         set(WORKING_DIR "\${workspaceFolder}/build/bin/Debug")
         set(GENERATOR "Visual Studio 17 2022")
         set(PREFERRED_GENERATORS "Visual Studio 17 2022" "Visual Studio 16 2019" "Ninja")
+        set(COMPILER_PATH "")
+        if(MSVC)
+            get_filename_component(COMPILER_PATH "${CMAKE_CXX_COMPILER}" ABSOLUTE)
+        endif()
+        if(NOT COMPILER_PATH OR NOT EXISTS "${COMPILER_PATH}")
+            set(COMPILER_PATH "cl.exe")
+        endif()
     else()
         set(PROBLEM_MATCHER "$gcc")
         set(DEBUGGER_TYPE "cppdbg")
@@ -104,165 +112,35 @@ function(generate_vscode_config)
         set(WORKING_DIR "\${workspaceFolder}/build/bin")
         set(GENERATOR "Unix Makefiles")
         set(PREFERRED_GENERATORS "Unix Makefiles" "Ninja")
+        set(COMPILER_PATH "/usr/bin/gcc")
     endif()
     
-    # Generate tasks.json
-    file(WRITE "${CMAKE_SOURCE_DIR}/.vscode/tasks.json" "{
-    \"version\": \"2.0.0\",
-    \"tasks\": [
-        {
-            \"label\": \"CMake: Build Debug\",
-            \"type\": \"shell\",
-            \"command\": \"cmake\",
-            \"args\": [\"--build\", \"build\", \"--config\", \"Debug\"],
-            \"group\": {
-                \"kind\": \"build\",
-                \"isDefault\": true
-            },
-            \"problemMatcher\": [\"${PROBLEM_MATCHER}\"],
-            \"detail\": \"Build project in Debug mode\"
-        },
-        {
-            \"label\": \"CMake: Build Release\",
-            \"type\": \"shell\",
-            \"command\": \"cmake\",
-            \"args\": [\"--build\", \"build\", \"--config\", \"Release\"],
-            \"group\": \"build\",
-            \"problemMatcher\": [\"${PROBLEM_MATCHER}\"],
-            \"detail\": \"Build project in Release mode\"
-        },
-        {
-            \"label\": \"CMake: Clean\",
-            \"type\": \"shell\",
-            \"command\": \"cmake\",
-            \"args\": [\"--build\", \"build\", \"--target\", \"clean\"],
-            \"group\": \"build\",
-            \"problemMatcher\": [\"${PROBLEM_MATCHER}\"],
-            \"detail\": \"Clean build artifacts\"
-        },
-        {
-            \"label\": \"CMake: Regenerate\",
-            \"type\": \"shell\",
-            \"command\": \"cmake\",
-            \"args\": [\"-B\", \"build\", \"-S\", \".\"],
-            \"group\": \"build\",
-            \"problemMatcher\": [\"${PROBLEM_MATCHER}\"],
-            \"detail\": \"Regenerate CMake build files\"
-        }
-    ]
-}")
+    # Generate tasks.json from template
+    file(READ "${CMAKE_SOURCE_DIR}/config/vscode/tasks.json.in" TASKS_TEMPLATE)
+    string(REPLACE "@PROBLEM_MATCHER@" "${PROBLEM_MATCHER}" TASKS_CONTENT "${TASKS_TEMPLATE}")
+    file(WRITE "${CMAKE_SOURCE_DIR}/.vscode/tasks.json" "${TASKS_CONTENT}")
 
-    # Generate launch.json
-    file(WRITE "${CMAKE_SOURCE_DIR}/.vscode/launch.json" "{
-    \"version\": \"0.2.0\",
-    \"configurations\": [
-        {
-            \"name\": \"Launch Crimson (Debug)\",
-            \"type\": \"${DEBUGGER_TYPE}\",
-            \"request\": \"launch\",
-            \"program\": \"${EXECUTABLE_PATH}\",
-            \"args\": [],
-            \"stopAtEntry\": false,
-            \"cwd\": \"${WORKING_DIR}\",
-            \"environment\": [],
-            \"console\": \"integratedTerminal\",
-            \"preLaunchTask\": \"CMake: Build Debug\"
-        }
-    ]
-}")
+    # Generate launch.json from template
+    file(READ "${CMAKE_SOURCE_DIR}/config/vscode/launch.json.in" LAUNCH_TEMPLATE)
+    string(REPLACE "@DEBUGGER_TYPE@" "${DEBUGGER_TYPE}" LAUNCH_CONTENT "${LAUNCH_TEMPLATE}")
+    string(REPLACE "@EXECUTABLE_PATH@" "${EXECUTABLE_PATH}" LAUNCH_CONTENT "${LAUNCH_CONTENT}")
+    string(REPLACE "@WORKING_DIR@" "${WORKING_DIR}" LAUNCH_CONTENT "${LAUNCH_CONTENT}")
+    file(WRITE "${CMAKE_SOURCE_DIR}/.vscode/launch.json" "${LAUNCH_CONTENT}")
 
-    # Generate settings.json
+    # Generate settings.json from template
     string(REPLACE ";" "\",\n        \"" GENERATORS_JSON "${PREFERRED_GENERATORS}")
-    file(WRITE "${CMAKE_SOURCE_DIR}/.vscode/settings.json" "{
-    \"cmake.buildDirectory\": \"\${workspaceFolder}/build\",
-    \"cmake.configureOnOpen\": false,
-    \"cmake.generator\": \"${GENERATOR}\",
-    \"cmake.preferredGenerators\": [
+    set(PREFERRED_GENERATORS_JSON "[
         \"${GENERATORS_JSON}\"
-    ],
-    \"files.associations\": {
-        \"*.h\": \"cpp\",
-        \"*.hpp\": \"cpp\",
-        \"*.cpp\": \"cpp\"
-    },
-    \"C_Cpp.default.configurationProvider\": \"ms-vscode.cmake-tools\",
-    \"C_Cpp.default.compileCommands\": \"\${workspaceFolder}/build/compile_commands.json\",
-    \"C_Cpp.intelliSenseEngine\": \"default\"
-}")
+    ]")
+    file(READ "${CMAKE_SOURCE_DIR}/config/vscode/settings.json.in" SETTINGS_TEMPLATE)
+    string(REPLACE "@GENERATOR@" "${GENERATOR}" SETTINGS_CONTENT "${SETTINGS_TEMPLATE}")
+    string(REPLACE "@PREFERRED_GENERATORS_JSON@" "${PREFERRED_GENERATORS_JSON}" SETTINGS_CONTENT "${SETTINGS_CONTENT}")
+    file(WRITE "${CMAKE_SOURCE_DIR}/.vscode/settings.json" "${SETTINGS_CONTENT}")
 
-    # Generate c_cpp_properties.json with dynamic compiler detection
-    if(WIN32)
-        set(COMPILER_PATH "")
-        if(MSVC)
-            # Try to get the actual MSVC path
-            get_filename_component(COMPILER_PATH "${CMAKE_CXX_COMPILER}" ABSOLUTE)
-        endif()
-        if(NOT COMPILER_PATH OR NOT EXISTS "${COMPILER_PATH}")
-            set(COMPILER_PATH "cl.exe")
-        endif()
-        
-        file(WRITE "${CMAKE_SOURCE_DIR}/.vscode/c_cpp_properties.json" "{
-    \"version\": 4,
-    \"configurations\": [
-        {
-            \"name\": \"Win32\",
-            \"includePath\": [
-                \"\${workspaceFolder}/**\",
-                \"\${workspaceFolder}/engine/src/include/**\",
-                \"\${workspaceFolder}/launcher/src/include/**\",
-                \"\${workspaceFolder}/vendor/json/include/**\",
-                \"\${workspaceFolder}/vendor/sdl3/include/**\",
-                \"\${workspaceFolder}/vendor/sdl3-image/include/**\",
-                \"\${workspaceFolder}/vendor/sdl3-mixer/include/**\"
-            ],
-            \"defines\": [
-                \"_DEBUG\",
-                \"UNICODE\",
-                \"_UNICODE\",
-                \"WIN32\",
-                \"_WIN32\",
-                \"ENGINE_PLATFORM_WINDOWS\",
-                \"GAME_PLATFORM_WINDOWS\",
-                \"LAUNCHER_PLATFORM_WINDOWS\"
-            ],
-            \"compilerPath\": \"${COMPILER_PATH}\",
-            \"cStandard\": \"c17\",
-            \"cppStandard\": \"c++20\",
-            \"intelliSenseMode\": \"windows-msvc-x64\",
-            \"configurationProvider\": \"ms-vscode.cmake-tools\"
-        }
-    ]
-}")
-    else()
-        file(WRITE "${CMAKE_SOURCE_DIR}/.vscode/c_cpp_properties.json" "{
-    \"version\": 4,
-    \"configurations\": [
-        {
-            \"name\": \"Linux\",
-            \"includePath\": [
-                \"\${workspaceFolder}/**\",
-                \"\${workspaceFolder}/engine/src/include/**\",
-                \"\${workspaceFolder}/launcher/src/include/**\",
-                \"\${workspaceFolder}/vendor/json/include/**\",
-                \"\${workspaceFolder}/vendor/sdl3/include/**\",
-                \"\${workspaceFolder}/vendor/sdl3-image/include/**\",
-                \"\${workspaceFolder}/vendor/sdl3-mixer/include/**\"
-            ],
-            \"defines\": [
-                \"_DEBUG\",
-                \"ENGINE_PLATFORM_LINUX\",
-                \"GAME_PLATFORM_LINUX\",
-                \"LAUNCHER_PLATFORM_LINUX\"
-            ],
-            \"compilerPath\": \"/usr/bin/gcc\",
-            \"cStandard\": \"c17\",
-            \"cppStandard\": \"c++17\",
-            \"intelliSenseMode\": \"linux-gcc-x64\",
-            \"configurationProvider\": \"ms-vscode.cmake-tools\"
-        }
-    ]
-}")
-    endif()
+    # Generate c_cpp_properties.json from template
+    file(READ "${CMAKE_SOURCE_DIR}/config/vscode/c_cpp_properties.json.in" CPP_TEMPLATE)
+    string(REPLACE "@COMPILER_PATH@" "${COMPILER_PATH}" CPP_CONTENT "${CPP_TEMPLATE}")
+    file(WRITE "${CMAKE_SOURCE_DIR}/.vscode/c_cpp_properties.json" "${CPP_CONTENT}")
 
     message(STATUS "Generated VSCode configuration files in .vscode/")
 endfunction()

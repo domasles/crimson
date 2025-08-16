@@ -1,0 +1,31 @@
+#pragma once
+
+#define NOMINMAX
+#define WIN32_LEAN_AND_MEAN
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <memory>
+#include <unordered_map>
+#include <functional>
+#include <algorithm>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
+#include <cmath>
+#include <chrono>
+#include <thread>
+#include <mutex>
+#include <atomic>
+#include <random>
+
+#ifdef GAME_PLATFORM_WINDOWS
+    #include <windows.h>
+#endif
+
+#include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
+#include <SDL3_mixer/SDL_mixer.h>
+
+#include <nlohmann/json.hpp>

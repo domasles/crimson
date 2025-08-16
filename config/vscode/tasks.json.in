@@ -1,0 +1,44 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake: Build Debug",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "build", "--config", "Debug"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["@PROBLEM_MATCHER@"],
+            "detail": "Build project in Debug mode"
+        },
+        {
+            "label": "CMake: Build Release",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "build", "--config", "Release"],
+            "group": "build",
+            "problemMatcher": ["@PROBLEM_MATCHER@"],
+            "detail": "Build project in Release mode"
+        },
+        {
+            "label": "CMake: Clean",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["--build", "build", "--target", "clean"],
+            "group": "build",
+            "problemMatcher": ["@PROBLEM_MATCHER@"],
+            "detail": "Clean build artifacts"
+        },
+        {
+            "label": "CMake: Regenerate",
+            "type": "shell",
+            "command": "cmake",
+            "args": ["-B", "build", "-S", "."],
+            "group": "build",
+            "problemMatcher": ["@PROBLEM_MATCHER@"],
+            "detail": "Regenerate CMake build files"
+        }
+    ]
+}

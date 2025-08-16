@@ -1,0 +1,58 @@
+cmake_minimum_required(VERSION 3.16)
+project(@GAME_NAME@ LANGUAGES CXX)
+
+# ===== SOURCE FILES =====
+file(GLOB_RECURSE @GAME_NAME_UPPER@_SOURCES
+    src/*.cpp
+    src/*.h
+)
+
+# ===== CREATE LIBRARY =====
+if(WASM)
+    add_library(@GAME_NAME@ STATIC ${@GAME_NAME_UPPER@_SOURCES})
+else()
+    add_library(@GAME_NAME@ SHARED ${@GAME_NAME_UPPER@_SOURCES})
+endif()
+
+# ===== PROPERTIES =====
+set_target_properties(@GAME_NAME@ PROPERTIES
+    CXX_STANDARD 20
+    CXX_STANDARD_REQUIRED ON
+)
+
+# ===== INCLUDE DIRECTORIES =====
+target_include_directories(@GAME_NAME@
+    PUBLIC
+        src/include
+    PRIVATE
+        src/pch
+        ../../engine/src/include
+)
+
+# ===== LINK LIBRARIES =====
+target_link_libraries(@GAME_NAME@
+    PUBLIC
+        engine
+)
+
+# ===== PLATFORM SPECIFIC =====
+if(WASM)
+    target_compile_definitions(@GAME_NAME@ PRIVATE GAME_PLATFORM_EMSCRIPTEN)
+elseif(WIN32)
+    target_compile_definitions(@GAME_NAME@ PRIVATE GAME_PLATFORM_WINDOWS)
+    set_property(TARGET @GAME_NAME@ PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+elseif(UNIX AND NOT APPLE)
+    target_compile_definitions(@GAME_NAME@ PRIVATE GAME_PLATFORM_LINUX)
+endif()
+
+# ===== BUILD CONFIGURATION =====
+target_compile_definitions(@GAME_NAME@ PRIVATE
+    $<$<CONFIG:Debug>:GAME_DEBUG>
+    $<$<CONFIG:Release>:GAME_RELEASE>
+)
+
+# ===== PRECOMPILED HEADERS =====
+target_precompile_headers(@GAME_NAME@ PRIVATE src/pch/pch.h)
+
+# ===== DEPENDENCIES =====
+add_dependencies(@GAME_NAME@ engine)

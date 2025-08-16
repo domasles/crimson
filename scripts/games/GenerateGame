@@ -1,0 +1,68 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <game_name> [display_name]"
+    echo "Example: $0 mygame \"My Awesome Game\""
+    exit 1
+fi
+
+GAME_NAME="$1"
+GAME_DISPLAY_NAME="${2:-$GAME_NAME}"
+GAME_NAME_UPPER=$(echo "$GAME_NAME" | tr '[:lower:]' '[:upper:]')
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+TEMPLATE_DIR="$PROJECT_ROOT/config/cmake"
+GAMES_DIR="$PROJECT_ROOT/games"
+TARGET_DIR="$GAMES_DIR/$GAME_NAME"
+
+if [ -d "$TARGET_DIR" ]; then
+    echo "Error: Game '$GAME_NAME' already exists in $TARGET_DIR"
+    exit 1
+fi
+
+echo "Creating new game: $GAME_NAME ($GAME_DISPLAY_NAME)"
+echo "Target directory: $TARGET_DIR"
+
+mkdir -p "$TARGET_DIR"
+
+copy_and_replace() {
+    local src="$1"
+    local dst="$2"
+    
+    if [[ "$src" == *.in ]]; then
+        local dst_clean="${dst%.in}"
+        sed -e "s/@GAME_NAME@/$GAME_NAME/g" \
+            -e "s/@GAME_DISPLAY_NAME@/$GAME_DISPLAY_NAME/g" \
+            -e "s/@GAME_NAME_UPPER@/$GAME_NAME_UPPER/g" \
+            "$src" > "$dst_clean"
+        echo "  Generated: $dst_clean"
+    else
+        cp -r "$src" "$dst"
+        echo "  Copied: $dst"
+    fi
+}
+
+find "$TEMPLATE_DIR" -type f | while read -r file; do
+    rel_path="${file#$TEMPLATE_DIR/}"
+    target_file="$TARGET_DIR/$rel_path"
+    target_dir=$(dirname "$target_file")
+    
+    mkdir -p "$target_dir"
+    copy_and_replace "$file" "$target_file"
+done
+
+find "$TEMPLATE_DIR" -type d | while read -r dir; do
+    rel_path="${dir#$TEMPLATE_DIR/}"
+    if [ -n "$rel_path" ]; then
+        mkdir -p "$TARGET_DIR/$rel_path"
+    fi
+done
+
+echo ""
+echo "Game '$GAME_NAME' created successfully!"
+echo "Location: $TARGET_DIR"
+echo ""
+echo "To build your game:"
+echo "  cmake -B build -S ."
+echo "  cmake --build build"

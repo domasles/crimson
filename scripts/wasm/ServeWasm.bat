@@ -1,7 +1,8 @@
 @echo off
+
 echo Starting local server for Crimson WASM build...
 echo.
-echo Navigate to: http://localhost:8000/launcher.html
+echo Navigate to: http://localhost:8000/
 echo.
 echo Press Ctrl+C to stop the server
 echo.

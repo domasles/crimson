@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch Crimson (Debug)",
+            "type": "@DEBUGGER_TYPE@",
+            "request": "launch",
+            "program": "@EXECUTABLE_PATH@",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "@WORKING_DIR@",
+            "environment": [],
+            "console": "integratedTerminal",
+            "preLaunchTask": "CMake: Build Debug"
+        }
+    ]
+}

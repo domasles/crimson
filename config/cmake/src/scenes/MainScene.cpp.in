@@ -1,0 +1,29 @@
+#include <pch.h>
+
+#include <scenes/MainScene.h>
+
+using namespace engine;
+
+namespace @GAME_NAME@ {
+    void MainScene::init() {
+        Logger::game_info("MainScene initialized");
+    }
+
+    void MainScene::update() {
+        
+    }
+
+    void MainScene::render() {
+        Core& core = Core::getInstance();
+        SDL_Renderer* renderer = core.getRenderer();
+        
+        SDL_SetRenderDrawColor(renderer, 32, 32, 32, 255);
+        SDL_RenderClear(renderer);
+        
+        SDL_RenderPresent(renderer);
+    }
+
+    void MainScene::close() {
+        Logger::game_info("MainScene closed");
+    }
+}

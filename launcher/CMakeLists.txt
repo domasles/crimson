@@ -33,7 +33,7 @@ target_link_libraries(launcher
 # For WASM builds, we need to set specific linker flags
 if(WASM)
     set_target_properties(launcher PROPERTIES
-        LINK_FLAGS "-s WASM=1 -s USE_SDL=2 --preload-file ${CMAKE_SOURCE_DIR}/games/crimson/assets@assets --preload-file ${CMAKE_SOURCE_DIR}/games/crimson/config@config -s ALLOW_MEMORY_GROWTH=1 -s NO_DISABLE_EXCEPTION_CATCHING=1 --shell-file ${CMAKE_SOURCE_DIR}/wasm/launcher.html"
+        LINK_FLAGS "-s WASM=1 -s USE_SDL=2 --preload-file ${CMAKE_SOURCE_DIR}/games/crimson/assets@assets --preload-file ${CMAKE_SOURCE_DIR}/games/crimson/config@config -s ALLOW_MEMORY_GROWTH=1 -s NO_DISABLE_EXCEPTION_CATCHING=1 --shell-file ${CMAKE_SOURCE_DIR}/config/wasm/index.html"
         SUFFIX ".html"
     )
 endif()
