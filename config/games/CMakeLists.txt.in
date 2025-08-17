@@ -18,18 +18,31 @@ endif()
 set_target_properties(@GAME_NAME@ PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/@GAME_NAME@"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/@GAME_NAME@"
 )
 
-# Multi-config generators
-foreach(config ${CMAKE_CONFIGURATION_TYPES})
-    string(TOUPPER ${config} config_upper)
+# ===== OUTPUT DIRECTORIES =====
+if(WASM)
+    # For WASM builds, use config-aware directories
     set_target_properties(@GAME_NAME@ PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/@GAME_NAME@"
-        LIBRARY_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/@GAME_NAME@"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/games/@GAME_NAME@"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/games/@GAME_NAME@"
     )
-endforeach()
+else()
+    # For native builds
+    set_target_properties(@GAME_NAME@ PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/@GAME_NAME@"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/@GAME_NAME@"
+    )
+    
+    # Multi-config generators
+    foreach(config ${CMAKE_CONFIGURATION_TYPES})
+        string(TOUPPER ${config} config_upper)
+        set_target_properties(@GAME_NAME@ PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/@GAME_NAME@"
+            LIBRARY_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/@GAME_NAME@"
+        )
+    endforeach()
+endif()
 
 # ===== INCLUDE DIRECTORIES =====
 target_include_directories(@GAME_NAME@

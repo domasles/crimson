@@ -55,8 +55,10 @@ namespace engine::utils::logger {
 
             template<typename... Args>
             static void engine_debug(std::format_string<Args...> fmt, Args&&... args) {
-                auto message = std::format("ENGINE: {}", std::format(fmt, std::forward<Args>(args)...));
-                SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "%s", message.c_str());
+                #ifdef ENGINE_DEBUG
+                    auto message = std::format("ENGINE: {}", std::format(fmt, std::forward<Args>(args)...));
+                    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "%s", message.c_str());
+                #endif
             }
 
             template<typename... Args>
@@ -79,8 +81,10 @@ namespace engine::utils::logger {
 
             template<typename... Args>
             static void client_debug(std::format_string<Args...> fmt, Args&&... args) {
-                auto message = std::format("CLIENT: {}", std::format(fmt, std::forward<Args>(args)...));
-                SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "%s", message.c_str());
+                #ifdef GAME_DEBUG
+                    auto message = std::format("CLIENT: {}", std::format(fmt, std::forward<Args>(args)...));
+                    SDL_LogDebug(SDL_LOG_CATEGORY_APPLICATION, "%s", message.c_str());
+                #endif
             }
     };
 }

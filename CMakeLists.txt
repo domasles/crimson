@@ -33,17 +33,25 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 # ===== OUTPUT DIRECTORIES =====
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-
-# Multi-config generators (Visual Studio, Xcode)
-foreach(config ${CMAKE_CONFIGURATION_TYPES})
-    string(TOUPPER ${config} config_upper)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/bin/${config})
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/bin/${config})
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/lib/${config})
-endforeach()
+if(WASM)
+    # For WASM builds, respect Debug/Release directories
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/$<CONFIG>)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/$<CONFIG>)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib/$<CONFIG>)
+else()
+    # For native builds
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+    
+    # Multi-config generators (Visual Studio, Xcode)
+    foreach(config ${CMAKE_CONFIGURATION_TYPES})
+        string(TOUPPER ${config} config_upper)
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/bin/${config})
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/bin/${config})
+        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/lib/${config})
+    endforeach()
+endif()
 
 # ===== PLATFORM DEFINITIONS =====
 if(WASM)
@@ -73,19 +81,15 @@ elseif(UNIX)
 endif()
 
 # ===== BUILD CONFIGURATION DEFINITIONS =====
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(
-        ENGINE_DEBUG
-        GAME_DEBUG
-        LAUNCHER_DEBUG
-    )
-elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_compile_definitions(
-        ENGINE_RELEASE
-        GAME_RELEASE
-        LAUNCHER_RELEASE
-    )
-endif()
+# Use generator expressions to properly handle multi-config generators
+add_compile_definitions(
+    $<$<CONFIG:Debug>:ENGINE_DEBUG>
+    $<$<CONFIG:Debug>:GAME_DEBUG>
+    $<$<CONFIG:Debug>:LAUNCHER_DEBUG>
+    $<$<CONFIG:Release>:ENGINE_RELEASE>
+    $<$<CONFIG:Release>:GAME_RELEASE>
+    $<$<CONFIG:Release>:LAUNCHER_RELEASE>
+)
 
 # ===== COMPILER SETTINGS =====
 if(MSVC)
@@ -205,10 +209,10 @@ if(NOT CMAKE_CROSSCOMPILING AND NOT EMSCRIPTEN)
             if(EMSDK_INSTALL_RESULT EQUAL 0 AND EMSDK_ACTIVATE_RESULT EQUAL 0)
                 message(STATUS "Emscripten SDK setup completed")
                 
-                # Configure WASM build using emcmake
+                # Configure WASM build using emcmake with multi-config support
                 message(STATUS "Configuring WASM build...")
                 execute_process(
-                    COMMAND "${EMCMAKE_CMD}" cmake -B build-wasm -S .
+                    COMMAND "${EMCMAKE_CMD}" cmake -B build-wasm -S . -G "Ninja Multi-Config"
                     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
                     RESULT_VARIABLE WASM_CONFIG_RESULT
                 )

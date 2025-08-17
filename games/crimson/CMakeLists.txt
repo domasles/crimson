@@ -18,18 +18,31 @@ endif()
 set_target_properties(crimson PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/crimson"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/crimson"
 )
 
-# Multi-config generators
-foreach(config ${CMAKE_CONFIGURATION_TYPES})
-    string(TOUPPER ${config} config_upper)
+# ===== OUTPUT DIRECTORIES =====
+if(WASM)
+    # For WASM builds, use config-aware directories
     set_target_properties(crimson PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/crimson"
-        LIBRARY_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/crimson"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/games/crimson"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/games/crimson"
     )
-endforeach()
+else()
+    # For native builds
+    set_target_properties(crimson PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/crimson"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/crimson"
+    )
+    
+    # Multi-config generators
+    foreach(config ${CMAKE_CONFIGURATION_TYPES})
+        string(TOUPPER ${config} config_upper)
+        set_target_properties(crimson PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/crimson"
+            LIBRARY_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/crimson"
+        )
+    endforeach()
+endif()
 
 # ===== INCLUDE DIRECTORIES =====
 target_include_directories(crimson

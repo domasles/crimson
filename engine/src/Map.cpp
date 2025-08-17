@@ -180,7 +180,7 @@ namespace engine {
                 }
             }
 
-            Logger::engine_info("Map validation passed for: {}", relativePath);
+            Logger::engine_debug("Map validation passed for: {}", relativePath);
             return true;
         }
 

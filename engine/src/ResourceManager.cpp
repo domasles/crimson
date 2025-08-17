@@ -29,7 +29,7 @@ namespace engine {
         auto it = m_Textures.find(key);
 
         if (it != m_Textures.end()) {
-            Logger::engine_info("Texture cache hit: {}", key);
+            Logger::engine_debug("Texture cache hit: {}", key);
             return it->second;
         }
 
@@ -37,7 +37,7 @@ namespace engine {
 
         if (texture->loadTexture(fileName)) {
             m_Textures[key] = texture;
-            Logger::engine_info("Texture loaded and cached: {}", key);
+            Logger::engine_debug("Texture loaded and cached: {}", key);
             return texture;
         }
 
@@ -51,7 +51,7 @@ namespace engine {
         auto it = m_Sounds.find(key);
 
         if (it != m_Sounds.end()) {
-            Logger::engine_info("Sound cache hit: {}", key);
+            Logger::engine_debug("Sound cache hit: {}", key);
             return it->second;
         }
 
@@ -59,7 +59,7 @@ namespace engine {
 
         if (sound->loadSound(fileName)) {
             m_Sounds[key] = sound;
-            Logger::engine_info("Sound loaded and cached: {}", key);
+            Logger::engine_debug("Sound loaded and cached: {}", key);
             return sound;
         }
 
@@ -73,12 +73,12 @@ namespace engine {
     }
 
     void ResourceManager::clearTextureCache() {
-        Logger::engine_info("Clearing texture cache ({} textures)", m_Textures.size());
+        Logger::engine_debug("Clearing texture cache ({} textures)", m_Textures.size());
         m_Textures.clear();
     }
 
     void ResourceManager::clearSoundCache() {
-        Logger::engine_info("Clearing sound cache ({} sounds)", m_Sounds.size());
+        Logger::engine_debug("Clearing sound cache ({} sounds)", m_Sounds.size());
         m_Sounds.clear();
     }
 
