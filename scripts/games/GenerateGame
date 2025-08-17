@@ -1,13 +1,13 @@
 #!/bin/bash
 
-read -p "Enter game name: " GAME_NAME
-while [ -z "$GAME_NAME" ]; do
-    read -p "Game name cannot be empty. Enter game name: " GAME_NAME
-done
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <game_name> [display_name]"
+    echo "Example: $0 mygame \"My Awesome Game\""
+    exit 1
+fi
 
-read -p "Enter display name (leave empty to use game name): " GAME_DISPLAY_NAME
-GAME_DISPLAY_NAME=${GAME_DISPLAY_NAME:-$GAME_NAME}
-
+GAME_NAME="$1"
+GAME_DISPLAY_NAME="${2:-$GAME_NAME}"
 GAME_NAME_UPPER=$(echo "$GAME_NAME" | tr '[:lower:]' '[:upper:]')
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -63,27 +63,12 @@ find "$TEMPLATE_DIR" -type d | while read -r dir; do
     fi
 done
 
-BUILD_DIR="$TARGET_DIR/build"
-mkdir -p "$BUILD_DIR"
-
-if [[ "$(uname)" == "Darwin" ]] && command -v xcodebuild &> /dev/null; then
-    GENERATOR="Xcode"
-else
-    GENERATOR="Unix Makefiles"
-fi
-
-cmake -B "$BUILD_DIR" -G "$GENERATOR" -DCMAKE_BUILD_TYPE=Debug
+# Create empty assets directory
+mkdir -p "$TARGET_DIR/assets"
 
 echo ""
 echo "Game '$GAME_NAME' created successfully at $TARGET_DIR"
-
-if [[ "$GENERATOR" == "Xcode" ]]; then
-    echo "Build with: cmake --build $BUILD_DIR --config Debug"
-else
-    if [[ "$(uname)" == "Darwin" ]]; then
-        CPU_COUNT=$(sysctl -n hw.ncpu)
-    else
-        CPU_COUNT=$(nproc)
-    fi
-    echo "Build with: cmake --build $BUILD_DIR -j$CPU_COUNT"
-fi
+echo ""
+echo "To build your game:"
+echo "  cmake -B build -S ."
+echo "  cmake --build build"
