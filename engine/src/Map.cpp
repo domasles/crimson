@@ -145,6 +145,17 @@ namespace engine {
         
         return entities;
     }
+
+    Vector2 Map::getEntityPosition(std::string entityName) const {
+        for (const auto& entity : getEntitiesPositions()) {
+            if (entity.first == entityName) {
+                return entity.second;
+                break;
+            }
+        }
+
+        return Vector2{ 0.0f, 0.0f };
+    }
     
     const bool Map::validateMapStructure() const {
         std::string relativePath = m_WorkingDir + "/" + m_FileName;

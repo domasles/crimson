@@ -29,6 +29,8 @@ namespace engine {
             const Vector2& getPosition() const { return m_Transform.getPosition(); }
             const Vector2& getSize() const { return m_Transform.getSize(); }
 
+            void setInputSystem(InputSystem* inputSystem) { m_InputSystem = inputSystem; }
+
             void setRotation(float rotation) { m_Transform.setRotation(rotation); }
             float getRotation() const { return m_Transform.getRotation(); }
 
@@ -39,6 +41,7 @@ namespace engine {
 
         protected:
             Transform m_Transform;
-            std::shared_ptr<Texture> m_Texture;
+            InputSystem* m_InputSystem = nullptr;
+            std::shared_ptr<Texture> m_Texture = nullptr;
     };
 }

@@ -21,12 +21,7 @@ namespace crimson {
         m_Player->init();
 
         if (hasMap()) {
-            for (const auto& entity : getMap()->getEntitiesPositions()) {
-                if (entity.first == "Player") {
-                    m_Player->setPosition(entity.second);
-                    break;
-                }
-            }
+            m_Player->setPosition(getMap()->getEntityPosition("Player"));
         }
     }
 

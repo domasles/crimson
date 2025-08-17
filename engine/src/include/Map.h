@@ -20,6 +20,7 @@ namespace engine {
             void loadTiles();
             void render();
 
+            Vector2 getEntityPosition(std::string entityName) const;
             std::vector<std::pair<std::string, Vector2>> getEntitiesPositions() const;
         
         private:

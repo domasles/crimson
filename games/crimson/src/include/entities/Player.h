@@ -11,10 +11,7 @@ namespace crimson {
             void update(float deltaTime) override;
             void render() override;
 
-            void setInputSystem(InputSystem* inputSystem) { m_InputSystem = inputSystem; }
-
         private:
             float m_Speed = 200;
-            InputSystem* m_InputSystem = nullptr;
     };
 }
