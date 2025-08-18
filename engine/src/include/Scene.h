@@ -53,11 +53,13 @@ namespace engine {
 
             void setMap(std::unique_ptr<Map> map) { m_Map = std::move(map); }
             bool hasMap() const { return m_Map != nullptr; }
+
             Map* getMap() { return m_Map.get(); }
             const Map* getMap() const { return m_Map.get(); }
 
             void setInputSystem(std::unique_ptr<InputSystem> inputSystem) { m_InputSystem = std::move(inputSystem); }
             bool hasInputSystem() const { return m_InputSystem != nullptr; }
+
             InputSystem* getInputSystem() { return m_InputSystem.get(); }
             const InputSystem* getInputSystem() const { return m_InputSystem.get(); }
 

@@ -7,7 +7,6 @@
 #include <componentRegistrator.h>
 #include <sceneRegistrator.h>
 
-using namespace engine;
 using namespace crimson;
 
 constexpr int WINDOW_WIDTH = 800;

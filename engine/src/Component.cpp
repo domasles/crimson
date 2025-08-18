@@ -2,7 +2,7 @@
 
 #include <utils/logger.h>
 
-#include <ComponentManager.h>
+#include <Component.h>
 
 using namespace engine::utils::logger;
 

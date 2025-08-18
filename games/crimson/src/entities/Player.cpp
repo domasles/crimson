@@ -2,15 +2,11 @@
 
 #include <entities/Player.h>
 
-#include <components/TransformComponent.h>
-#include <components/TextureComponent.h>
-#include <components/InputComponent.h>
-
 namespace crimson {
     void Player::init() {
-        auto* transform = addComponent<engine::TransformComponent>();
-        auto* texture = addComponent<engine::TextureComponent>();
-        auto* input = addComponent<engine::InputComponent>();
+        auto* transform = addComponent<TransformComponent>();
+        auto* texture = addComponent<TextureComponent>();
+        auto* input = addComponent<InputComponent>();
 
         texture->setTexture(loadTexture("assets/tilesets", "TX Tileset Ground.png"));
         transform->setSize({100, 100});
@@ -19,8 +15,8 @@ namespace crimson {
     void Player::update(float deltaTime) {
         updateComponents(deltaTime);
 
-        auto* input = getComponent<engine::InputComponent>();
-        auto* transform = getComponent<engine::TransformComponent>();
+        auto* input = getComponent<InputComponent>();
+        auto* transform = getComponent<TransformComponent>();
 
         if (input && transform && input->getInputSystem()) {
             Vector2 movement = input->getMovementVector();
@@ -29,8 +25,8 @@ namespace crimson {
     }
 
     void Player::render() {
-        auto* texture = getComponent<engine::TextureComponent>();
-        auto* transform = getComponent<engine::TransformComponent>();
+        auto* texture = getComponent<TextureComponent>();
+        auto* transform = getComponent<TransformComponent>();
 
         if (texture && texture->hasTexture() && transform) {
             Vector2 cRegion{0, 0};

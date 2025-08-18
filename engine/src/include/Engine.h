@@ -3,7 +3,12 @@
 #include <utils/filesystem.h>
 #include <utils/math.h>
 
-#include <ResourceManager.h>
+#include <components/TransformComponent.h>
+#include <components/TextureComponent.h>
+#include <components/InputComponent.h>
+
+#include <Resources.h>
+#include <Component.h>
 #include <Transform.h>
 #include <Texture.h>
 #include <Sound.h>

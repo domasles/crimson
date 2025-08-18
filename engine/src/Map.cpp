@@ -3,7 +3,7 @@
 #include <utils/filesystem.h>
 #include <utils/logger.h>
 
-#include <ResourceManager.h>
+#include <Resources.h>
 #include <Core.h>
 #include <Map.h>
 
