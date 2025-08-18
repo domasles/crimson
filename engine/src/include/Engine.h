@@ -7,18 +7,22 @@
 #include <components/TextureComponent.h>
 #include <components/InputComponent.h>
 
-#include <Resources.h>
 #include <Component.h>
+#include <Resources.h>
 #include <Transform.h>
 #include <Texture.h>
-#include <Sound.h>
 #include <Entity.h>
+#include <Sound.h>
+
 #include <Scene.h>
-#include <Input.h>
-#include <Core.h>
 #include <Map.h>
 
-namespace crimson {
-    using namespace engine;
-    using namespace engine::utils::math;
-}
+#include <Input.h>
+#include <Core.h>
+
+using namespace engine;
+
+using namespace engine::utils::math;
+using namespace engine::utils::logger;
+using namespace engine::utils::filesystem;
+

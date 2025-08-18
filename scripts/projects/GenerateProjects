@@ -17,9 +17,9 @@ else
     CPU_COUNT=$(nproc)
 fi
 
-mkdir -p build
+mkdir -p build-native
 
-cmake -B build -G "$GENERATOR" -DCMAKE_BUILD_TYPE=Debug
+cmake -B build-native -G "$GENERATOR" -DCMAKE_BUILD_TYPE=Debug
 if [ $? -ne 0 ]; then
     echo "Failed to generate project files!"
     exit 1
@@ -27,23 +27,23 @@ fi
 
 echo ""
 echo "Project generation completed successfully!"
-echo "Build files are located in the 'build' directory."
+echo "Build files are located in the 'build-native' directory."
 echo ""
 
 if [[ "$GENERATOR" == "Xcode" ]]; then
     echo "To build the project:"
-    echo "  cmake --build build --config Debug"
-    echo "  cmake --build build --config Release"
+    echo "  cmake --build build-native --config Debug"
+    echo "  cmake --build build-native --config Release"
     echo ""
     echo "To open in Xcode:"
-    echo "  open build/Crimson.xcodeproj"
+    echo "  open build-native/Crimson.xcodeproj"
 else
     echo "To build the project:"
-    echo "  cmake --build build --config Debug"
-    echo "  cmake --build build --config Release"
+    echo "  cmake --build build-native --config Debug"
+    echo "  cmake --build build-native --config Release"
     echo ""
     echo "Alternative build commands:"
-    echo "  cd build && make -j$CPU_COUNT"
+    echo "  cd build-native && make -j$CPU_COUNT"
 fi
 
 echo ""

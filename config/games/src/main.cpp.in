@@ -2,6 +2,7 @@
 
 #include <Engine.h>
 
+#include <componentRegistrator.h>
 #include <sceneRegistrator.h>
 
 using namespace @GAME_NAME@;

@@ -62,7 +62,7 @@ mkdir "%TARGET_DIR%\assets" 2>nul
 
 echo.
 echo To build your game:
-echo   cmake -B build -S .
+echo   cmake -B build-native -S .
 echo   cmake --build build
 
 goto :eof
