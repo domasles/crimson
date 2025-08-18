@@ -4,6 +4,7 @@
 
 #include <Engine.h>
 
+#include <componentRegistrator.h>
 #include <sceneRegistrator.h>
 
 using namespace engine;
@@ -21,6 +22,8 @@ GAME_API bool start() {
         return false;
     }
 
+    registrateComponents();
     registrateScenes();
+
     return true;
 }

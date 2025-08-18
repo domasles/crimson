@@ -1,12 +1,8 @@
 #pragma once
 
-#include <utils/math.h>
+#include <typeindex>
 
-#include <Transform.h>
-#include <Texture.h>
-#include <Core.h>
-
-using namespace engine::utils::math;
+#include <Component.h>
 
 namespace engine {
     class Entity {
@@ -17,31 +13,52 @@ namespace engine {
             virtual void update(const float deltaTime) = 0;
             virtual void render() = 0;
 
-            void setTransform(const Transform& transform) { m_Transform = transform; }
+            template<typename T, typename... Args>
 
-            Transform& getTransform() { return m_Transform; }
+            T* addComponent(Args&&... args) {
+                static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
+                auto component = std::make_unique<T>(std::forward<Args>(args)...);
 
-            void setPosition(const Vector2& position) { m_Transform.setPosition(position); }
-            void addPosition(const Vector2& offset) { m_Transform.addPosition(offset); }
+                T* ptr = component.get();
 
-            void setSize(const Vector2& size) { m_Transform.setSize(size); }
+                component->setEntity(this);
+                m_Components[std::type_index(typeid(T))] = std::move(component);
 
-            const Vector2& getPosition() const { return m_Transform.getPosition(); }
-            const Vector2& getSize() const { return m_Transform.getSize(); }
+                return ptr;
+            }
 
-            void setInputSystem(InputSystem* inputSystem) { m_InputSystem = inputSystem; }
+            template<typename T>
 
-            void setRotation(float rotation) { m_Transform.setRotation(rotation); }
-            float getRotation() const { return m_Transform.getRotation(); }
+            T* getComponent() {
+                static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
+                auto it = m_Components.find(std::type_index(typeid(T)));
 
-            void setTexture(std::shared_ptr<Texture> texture) { m_Texture = texture; }
-            bool hasTexture() const { return m_Texture != nullptr; }
+                if (it != m_Components.end()) {
+                    return static_cast<T*>(it->second.get());
+                }
+                return nullptr;
+            }
 
-            std::shared_ptr<Texture> getTexture() const { return m_Texture; }
+            template<typename T>
+
+            bool hasComponent() const {
+                return m_Components.find(std::type_index(typeid(T))) != m_Components.end();
+            }
+            
+            template<typename T>
+
+            void removeComponent() {
+                auto it = m_Components.find(std::type_index(typeid(T)));
+
+                if (it != m_Components.end()) {
+                    it->second->onDestroy();
+                    m_Components.erase(it);
+                }
+            }
 
         protected:
-            Transform m_Transform;
-            InputSystem* m_InputSystem = nullptr;
-            std::shared_ptr<Texture> m_Texture = nullptr;
+            std::unordered_map<std::type_index, std::unique_ptr<Component>> m_Components;
+
+            void updateComponents(float deltaTime);
     };
 }

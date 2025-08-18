@@ -16,6 +16,7 @@
 #include <nlohmann/json.hpp>
 
 #include <unordered_map>
+#include <typeindex>
 #include <thread>
 #include <memory>
 #include <mutex>
