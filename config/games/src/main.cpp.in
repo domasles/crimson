@@ -4,7 +4,6 @@
 
 #include <sceneRegistrator.h>
 
-using namespace engine;
 using namespace @GAME_NAME@;
 
 constexpr int WINDOW_WIDTH = 800;
@@ -19,6 +18,8 @@ GAME_API bool start() {
         return false;
     }
 
+    registrateComponents();
     registrateScenes();
+
     return true;
 }

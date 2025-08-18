@@ -58,7 +58,6 @@ echo.
 echo Game '%GAME_NAME%' created successfully!
 echo Location: %TARGET_DIR%
 
-rem Create empty assets directory
 mkdir "%TARGET_DIR%\assets" 2>nul
 
 echo.

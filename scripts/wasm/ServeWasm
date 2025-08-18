@@ -2,7 +2,9 @@
 
 echo "Starting local server for Crimson WASM build..."
 echo ""
-echo "Navigate to: http://localhost:8000/"
+echo "Navigate to:"
+echo "  http://localhost:8000/Debug for a Debug build"
+echo "  http://localhost:8000/Release for a Release build"
 echo ""
 echo "Press Ctrl+C to stop the server"
 echo ""

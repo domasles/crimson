@@ -1,11 +1,9 @@
 #!/bin/bash
 
-# Detect OS and set generator
 OS_TYPE="$(uname)"
 echo "Generating build files for $OS_TYPE..."
 
 if [[ "$OS_TYPE" == "Darwin" ]]; then
-    # macOS
     if command -v xcodebuild &> /dev/null; then
         GENERATOR="Xcode"
         echo "Xcode detected - using Xcode generator"
@@ -15,28 +13,23 @@ if [[ "$OS_TYPE" == "Darwin" ]]; then
     fi
     CPU_COUNT=$(sysctl -n hw.ncpu)
 else
-    # Assume Linux or other Unix
     GENERATOR="Unix Makefiles"
     CPU_COUNT=$(nproc)
 fi
 
-# Create build directory
 mkdir -p build
 
-# Generate project files with CMake
 cmake -B build -G "$GENERATOR" -DCMAKE_BUILD_TYPE=Debug
 if [ $? -ne 0 ]; then
     echo "Failed to generate project files!"
     exit 1
 fi
 
-# Success message
 echo ""
 echo "Project generation completed successfully!"
 echo "Build files are located in the 'build' directory."
 echo ""
 
-# Instructions
 if [[ "$GENERATOR" == "Xcode" ]]; then
     echo "To build the project:"
     echo "  cmake --build build --config Debug"

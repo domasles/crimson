@@ -1,22 +1,18 @@
 cmake_minimum_required(VERSION 3.16)
 project(Engine LANGUAGES CXX)
 
-# ===== SOURCE FILES =====
 file(GLOB_RECURSE ENGINE_SOURCES
     src/*.cpp
     src/*.h
 )
 
-# ===== CREATE LIBRARY =====
 add_library(engine STATIC ${ENGINE_SOURCES})
 
-# ===== PROPERTIES =====
 set_target_properties(engine PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
 )
 
-# ===== INCLUDE DIRECTORIES =====
 target_include_directories(engine
     PUBLIC
         src/include
@@ -25,7 +21,6 @@ target_include_directories(engine
         src/pch
 )
 
-# ===== LINK LIBRARIES =====
 if(WASM)
     target_link_libraries(engine
         PUBLIC
@@ -42,7 +37,6 @@ else()
     )
 endif()
 
-# ===== PLATFORM SPECIFIC =====
 if(WASM)
     target_compile_definitions(engine PRIVATE ENGINE_PLATFORM_EMSCRIPTEN)
 elseif(WIN32)
@@ -56,11 +50,9 @@ elseif(UNIX)
     target_compile_options(engine PRIVATE -fPIC)
 endif()
 
-# ===== BUILD CONFIGURATION =====
 target_compile_definitions(engine PRIVATE
     $<$<CONFIG:Debug>:ENGINE_DEBUG>
     $<$<CONFIG:Release>:ENGINE_RELEASE>
 )
 
-# ===== PRECOMPILED HEADERS =====
 target_precompile_headers(engine PRIVATE src/pch/pch.h)

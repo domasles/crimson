@@ -3,7 +3,6 @@ setlocal EnableDelayedExpansion
 
 echo Generating Visual Studio 2022 solution...
 
-:: Generate Visual Studio solution
 cmake -G "Visual Studio 17 2022" -A x64 -B build
 
 if %ERRORLEVEL% NEQ 0 (

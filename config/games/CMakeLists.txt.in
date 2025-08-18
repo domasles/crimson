@@ -1,42 +1,36 @@
 cmake_minimum_required(VERSION 3.16)
 project(@GAME_NAME@ LANGUAGES CXX)
 
-# ===== SOURCE FILES =====
 file(GLOB_RECURSE @GAME_NAME_UPPER@_SOURCES
     src/*.cpp
     src/*.h
 )
 
-# ===== CREATE LIBRARY =====
 if(WASM)
     add_library(@GAME_NAME@ STATIC ${@GAME_NAME_UPPER@_SOURCES})
 else()
     add_library(@GAME_NAME@ SHARED ${@GAME_NAME_UPPER@_SOURCES})
 endif()
 
-# ===== PROPERTIES =====
 set_target_properties(@GAME_NAME@ PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
 )
 
-# ===== OUTPUT DIRECTORIES =====
 if(WASM)
-    # For WASM builds, use config-aware directories
     set_target_properties(@GAME_NAME@ PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/games/@GAME_NAME@"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/games/@GAME_NAME@"
     )
 else()
-    # For native builds
     set_target_properties(@GAME_NAME@ PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/@GAME_NAME@"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/@GAME_NAME@"
     )
-    
-    # Multi-config generators
+
     foreach(config ${CMAKE_CONFIGURATION_TYPES})
         string(TOUPPER ${config} config_upper)
+
         set_target_properties(@GAME_NAME@ PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/@GAME_NAME@"
             LIBRARY_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/@GAME_NAME@"
@@ -44,7 +38,6 @@ else()
     endforeach()
 endif()
 
-# ===== INCLUDE DIRECTORIES =====
 target_include_directories(@GAME_NAME@
     PRIVATE
         src/pch
@@ -56,13 +49,11 @@ target_include_directories(@GAME_NAME@
         ../../vendor/sdl3-mixer/include
 )
 
-# ===== LINK LIBRARIES =====
 target_link_libraries(@GAME_NAME@
     PRIVATE
         engine
 )
 
-# ===== PLATFORM SPECIFIC =====
 if(WASM)
     target_compile_definitions(@GAME_NAME@ PRIVATE GAME_PLATFORM_EMSCRIPTEN)
 elseif(WIN32)
@@ -70,12 +61,14 @@ elseif(WIN32)
     set_property(TARGET @GAME_NAME@ PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 elseif(APPLE)
     target_compile_definitions(@GAME_NAME@ PRIVATE GAME_PLATFORM_MACOS)
+
     target_link_options(@GAME_NAME@ PRIVATE
         -Wl,-rpath,@executable_path
         -Wl,-rpath,@executable_path/../..
     )
 elseif(UNIX)
     target_compile_definitions(@GAME_NAME@ PRIVATE GAME_PLATFORM_LINUX)
+
     target_link_options(@GAME_NAME@ PRIVATE
         -Wl,-rpath,'$ORIGIN'
         -Wl,-rpath-link,'$ORIGIN'
@@ -84,17 +77,13 @@ elseif(UNIX)
     )
 endif()
 
-# ===== BUILD CONFIGURATION =====
 target_compile_definitions(@GAME_NAME@ PRIVATE
     $<$<CONFIG:Debug>:GAME_DEBUG>
     $<$<CONFIG:Release>:GAME_RELEASE>
 )
 
-# ===== PRECOMPILED HEADERS =====
 target_precompile_headers(@GAME_NAME@ PRIVATE src/pch/pch.h)
 
-# ===== POST BUILD COMMANDS =====
-# Copy config and assets directories
 add_custom_command(TARGET @GAME_NAME@ POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_CURRENT_SOURCE_DIR}/config"

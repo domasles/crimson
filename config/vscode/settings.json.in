@@ -8,7 +8,7 @@
     "cmake.preferredGenerators": @PREFERRED_GENERATORS_JSON@,
     
     "files.associations": {
-        "*.h": "c",
+        "*.h": "cpp",
         "*.hpp": "cpp",
         "*.inl": "cpp"
     },

@@ -63,7 +63,6 @@ find "$TEMPLATE_DIR" -type d | while read -r dir; do
     fi
 done
 
-# Create empty assets directory
 mkdir -p "$TARGET_DIR/assets"
 
 echo ""

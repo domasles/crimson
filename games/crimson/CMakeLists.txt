@@ -1,42 +1,36 @@
 cmake_minimum_required(VERSION 3.16)
 project(Crimson LANGUAGES CXX)
 
-# ===== SOURCE FILES =====
 file(GLOB_RECURSE CRIMSON_SOURCES
     src/*.cpp
     src/*.h
 )
 
-# ===== CREATE LIBRARY =====
 if(WASM)
     add_library(crimson STATIC ${CRIMSON_SOURCES})
 else()
     add_library(crimson SHARED ${CRIMSON_SOURCES})
 endif()
 
-# ===== PROPERTIES =====
 set_target_properties(crimson PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
 )
 
-# ===== OUTPUT DIRECTORIES =====
 if(WASM)
-    # For WASM builds, use config-aware directories
     set_target_properties(crimson PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/games/crimson"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/games/crimson"
     )
 else()
-    # For native builds
     set_target_properties(crimson PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/crimson"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/crimson"
     )
-    
-    # Multi-config generators
+
     foreach(config ${CMAKE_CONFIGURATION_TYPES})
         string(TOUPPER ${config} config_upper)
+
         set_target_properties(crimson PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/crimson"
             LIBRARY_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/crimson"
@@ -44,7 +38,6 @@ else()
     endforeach()
 endif()
 
-# ===== INCLUDE DIRECTORIES =====
 target_include_directories(crimson
     PRIVATE
         src/pch
@@ -56,13 +49,11 @@ target_include_directories(crimson
         ../../vendor/sdl3-mixer/include
 )
 
-# ===== LINK LIBRARIES =====
 target_link_libraries(crimson
     PRIVATE
         engine
 )
 
-# ===== PLATFORM SPECIFIC =====
 if(WASM)
     target_compile_definitions(crimson PRIVATE GAME_PLATFORM_EMSCRIPTEN)
 elseif(WIN32)
@@ -70,12 +61,14 @@ elseif(WIN32)
     set_property(TARGET crimson PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 elseif(APPLE)
     target_compile_definitions(crimson PRIVATE GAME_PLATFORM_MACOS)
+
     target_link_options(crimson PRIVATE
         -Wl,-rpath,@executable_path
         -Wl,-rpath,@executable_path/../..
     )
 elseif(UNIX)
     target_compile_definitions(crimson PRIVATE GAME_PLATFORM_LINUX)
+
     target_link_options(crimson PRIVATE
         -Wl,-rpath,'$ORIGIN'
         -Wl,-rpath-link,'$ORIGIN'
@@ -84,17 +77,13 @@ elseif(UNIX)
     )
 endif()
 
-# ===== BUILD CONFIGURATION =====
 target_compile_definitions(crimson PRIVATE
     $<$<CONFIG:Debug>:GAME_DEBUG>
     $<$<CONFIG:Release>:GAME_RELEASE>
 )
 
-# ===== PRECOMPILED HEADERS =====
 target_precompile_headers(crimson PRIVATE src/pch/pch.h)
 
-# ===== POST BUILD COMMANDS =====
-# Copy config and assets directories
 add_custom_command(TARGET crimson POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_CURRENT_SOURCE_DIR}/config"
