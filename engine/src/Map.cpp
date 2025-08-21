@@ -33,6 +33,7 @@ namespace engine {
         
         loadTilesets();
         loadTiles();
+        loadCollisionData();
     }
 
     void Map::loadTiles() {
@@ -199,5 +200,74 @@ namespace engine {
             Logger::engine_error("Map validation error: {} (map: {})", e.what(), relativePath);
             return false;
         }
+    }
+
+    void Map::loadCollisionData() {
+        m_CollisionTiles.clear();
+        parseIntGridLayers();
+        
+        std::string relativePath = m_WorkingDir + "/" + m_FileName;
+        if (relativePath.find("assets/") == 0) {
+            relativePath = relativePath.substr(7);
+        }
+        
+        ENGINE_LOG_INIT(("Map: Loaded " + std::to_string(m_CollisionTiles.size()) + " collision tiles from " + relativePath).c_str());
+    }
+
+    void Map::parseIntGridLayers() {
+        for (const auto& level : m_JsonFile["levels"]) {
+            for (const auto& layer : level["layerInstances"]) {
+                if (layer["__type"] != "IntGrid") {
+                    continue;
+                }
+
+                const std::string& layerIdentifier = layer["__identifier"];
+                const auto& csvData = layer["intGridCsv"];
+                
+                if (csvData.empty()) {
+                    continue;
+                }
+
+                int gridWidth = layer["__cWid"];
+                int gridHeight = layer["__cHei"];
+                float gridSize = layer["__gridSize"];
+
+                Logger::engine_debug("Map: Parsing IntGrid layer '{}' ({}x{}, grid size: {})", layerIdentifier, gridWidth, gridHeight, gridSize);
+
+                for (size_t i = 0; i < csvData.size(); i++) {
+                    int value = csvData[i];
+
+                    if (value > 0) {
+                        int x = i % gridWidth;
+                        int y = i / gridWidth;
+
+                        CollisionTile tile;
+                        tile.worldPosition.set(x * gridSize, y * gridSize);
+                        tile.worldPosition *= m_DesiredTileSize / m_MinTileSize;
+                        tile.worldPosition += m_Origin;
+
+                        tile.size = m_DesiredTileSize / (m_MinTileSize / gridSize);
+                        tile.collisionValue = value;
+                        tile.layerIdentifier = layerIdentifier;
+
+                        m_CollisionTiles.push_back(tile);
+                    }
+                }
+
+                Logger::engine_debug("Map: Found {} collision tiles in layer '{}'", std::count_if(csvData.begin(), csvData.end(), [](int val) { return val > 0; }), layerIdentifier);
+            }
+        }
+    }
+
+    bool Map::checkCollisionAt(const Vector2& worldPos, const Vector2& size) const {
+        for (const auto& tile : m_CollisionTiles) {
+            if (worldPos.getRawX() + size.getRawX() > tile.worldPosition.getRawX() &&
+                worldPos.getRawX() < tile.worldPosition.getRawX() + tile.size.getRawX() &&
+                worldPos.getRawY() + size.getRawY() > tile.worldPosition.getRawY() &&
+                worldPos.getRawY() < tile.worldPosition.getRawY() + tile.size.getRawY()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

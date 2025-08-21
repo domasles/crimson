@@ -9,5 +9,6 @@ namespace crimson {
         registerComponent<TransformComponent>("Transform");
         registerComponent<TextureComponent>("Texture");
         registerComponent<InputComponent>("Input");
+        registerComponent<CollisionComponent>("Collision");
     }
 }

@@ -15,8 +15,9 @@ namespace engine {
 
             void setTransform(const Transform& transform) { m_Transform = transform; }
 
-            void setPosition(const Vector2& position) { m_Transform.setPosition(position); }
-            void addPosition(const Vector2& offset) { m_Transform.addPosition(offset); }
+            void setPosition(const Vector2& position);
+            void addPosition(const Vector2& offset);
+            void move(const Vector2& movement);  // Collision-aware movement
 
             void setSize(const Vector2& size) { m_Transform.setSize(size); }
             void setRotation(float rotation) { m_Transform.setRotation(rotation); }

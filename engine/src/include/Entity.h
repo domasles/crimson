@@ -22,6 +22,7 @@ namespace engine {
                 T* ptr = component.get();
 
                 component->setEntity(this);
+                component->init();
                 m_Components[std::type_index(typeid(T))] = std::move(component);
 
                 return ptr;

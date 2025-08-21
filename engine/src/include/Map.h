@@ -4,6 +4,7 @@
 #include <utils/tileset.h>
 
 #include <Texture.h>
+#include <Core.h>
 
 using namespace engine::utils::rendering;
 using namespace engine::utils::tileset;
@@ -18,10 +19,23 @@ namespace engine {
             
             void loadMap(const std::string& fileName, const Vector2& minTileSize, const Vector2& mapOrigin);
             void loadTiles();
+            void loadCollisionData();
             void render();
 
             Vector2 getEntityPosition(std::string entityName) const;
             std::vector<std::pair<std::string, Vector2>> getEntitiesPositions() const;
+            
+            // Collision data structures
+            struct CollisionTile {
+                Vector2 worldPosition;
+                Vector2 size;
+                int collisionValue;
+                std::string layerIdentifier;
+            };
+            
+            std::vector<CollisionTile> getCollisionTiles() const { return m_CollisionTiles; }
+            bool hasCollisionData() const { return !m_CollisionTiles.empty(); }
+            bool checkCollisionAt(const Vector2& worldPos, const Vector2& size) const;
         
         private:
             const bool loadTilesets();
@@ -47,5 +61,8 @@ namespace engine {
 
             std::shared_ptr<TileRenderQueue> textureQueue;
             std::unordered_map<std::string, Tileset> m_Tilesets;
+            std::vector<CollisionTile> m_CollisionTiles;
+            
+            void parseIntGridLayers();
     };
 }

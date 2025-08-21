@@ -7,6 +7,7 @@ namespace crimson {
         auto* transform = addComponent<TransformComponent>();
         auto* texture = addComponent<TextureComponent>();
         auto* input = addComponent<InputComponent>();
+        auto* collision = addComponent<CollisionComponent>();
 
         texture->setTexture(loadTexture("assets/tilesets", "TX Tileset Ground.png"));
         transform->setSize({100, 100});
