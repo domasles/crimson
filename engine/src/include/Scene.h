@@ -51,6 +51,18 @@ namespace engine {
 
             size_t getEntityCount() const { return m_Entities.size(); }
 
+            // Get all entities with CollisionComponent for collision checking
+            template<typename T>
+            std::vector<T*> getEntitiesWithComponent() {
+                std::vector<T*> result;
+                for (auto& entity : m_Entities) {
+                    if (auto* component = entity->getComponent<T>()) {
+                        result.push_back(component);
+                    }
+                }
+                return result;
+            }
+
             void setMap(std::unique_ptr<Map> map) { m_Map = std::move(map); }
             bool hasMap() const { return m_Map != nullptr; }
 
@@ -97,6 +109,7 @@ namespace engine {
             const bool render();
 
             const std::string& getCurrentSceneName() const;
+            std::shared_ptr<Scene> getCurrentScene() const;
 
         private:
             SceneManager() : m_LastFrameTime(SDL_GetTicksNS()) {}

@@ -14,25 +14,12 @@ namespace crimson {
 
         if (hasMap()) {
             getMap()->loadMap("TestMap.ldtk", {100, 100}, {0, 0});
-            CollisionComponent::setWorldMap(getMap());
         }
 
         m_Player = createEntity<Player>();
+        m_Player2 = createEntity<Player2>();
         m_Player->init();
-
-        auto* inputComp = m_Player->getComponent<InputComponent>();
-
-        if (inputComp) {
-            inputComp->setInputSystem(getInputSystem());
-        }
-
-        if (hasMap()) {
-            auto* transformComp = m_Player->getComponent<TransformComponent>();
-
-            if (transformComp) {
-                transformComp->setPosition(getMap()->getEntityPosition("Player"));
-            }
-        }
+        m_Player2->init();
     }
 
     void Level1::update(const float deltaTime) {

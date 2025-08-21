@@ -18,17 +18,10 @@ namespace engine {
             void init() override;
             void update(float deltaTime) override;
 
-            // Simple configuration - automatically uses Transform component
-            void setEnabled(bool enabled) { m_Enabled = enabled; }
-            
-            // Optional overrides (if you don't want automatic Transform integration)
+            // Configuration - automatically uses Transform component size
             void setCollisionType(CollisionType type) { m_Collision.type = type; }
             void setCollisionShape(CollisionShape shape) { m_Collision.shape = shape; }
-            void setCustomSize(const Vector2& size) { m_Collision.size = size; m_UseCustomSize = true; }
             void setOffset(const Vector2& offset) { m_Collision.offset = offset; }
-            
-            // Advanced configuration (for future features)
-            void setCollision(const Collision& collision) { m_Collision = collision; m_UseCustomSize = true; }
             
             // Getters
             bool isEnabled() const { return m_Enabled; }
@@ -36,10 +29,14 @@ namespace engine {
             CollisionType getCollisionType() const { return m_Collision.type; }
             CollisionShape getCollisionShape() const { return m_Collision.shape; }
 
+            // Simple configuration
+            void setEnabled(bool enabled) { m_Enabled = enabled; }
+            
             // Collision detection
             bool checkCollision(CollisionComponent* other) const;
             bool checkWorldCollision() const;  // Check collision with map
             bool canMoveTo(const Vector2& newPosition) const;  // Check if movement is allowed
+            bool wouldCollideAt(const Vector2& position) const;  // Check collision without moving
             Vector2 getWorldPosition() const;
             Vector2 getCollisionWorldPosition() const;
 
@@ -47,13 +44,9 @@ namespace engine {
             using CollisionCallback = std::function<void(Entity*)>;
             void setOnCollisionEnter(CollisionCallback callback) { m_OnCollisionEnter = callback; }
 
-            // Static map access for world collision
-            static void setWorldMap(class Map* map) { s_WorldMap = map; }
-
         private:
             Collision m_Collision;
             bool m_Enabled = true;
-            bool m_UseCustomSize = false;  // Whether to use custom size or Transform size
 
             // Event callbacks
             CollisionCallback m_OnCollisionEnter;
@@ -62,10 +55,12 @@ namespace engine {
             std::vector<Entity*> m_CollidingEntities;
 
             void updateFromTransform();
-            bool checkBoxCollision(CollisionComponent* other) const;
             void updateCollisionEvents();
-
-            // Static world map for collision checking
-            static class Map* s_WorldMap;
+            
+            // Get map from current scene via SceneManager
+            class Map* getCurrentMap() const;
+            
+            // Check collision with other entities at position
+            bool wouldCollideWithEntitiesAt(const Vector2& position) const;
     };
 }

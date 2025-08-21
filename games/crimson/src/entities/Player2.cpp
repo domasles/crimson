@@ -1,12 +1,11 @@
 #include <pch.h>
 
-#include <entities/Player.h>
+#include <entities/Player2.h>
 
 namespace crimson {
-    void Player::init() {
+    void Player2::init() {
         auto* transform = addComponent<TransformComponent>();
         auto* texture = addComponent<TextureComponent>();
-        auto* input = addComponent<InputComponent>();
         auto* collision = addComponent<CollisionComponent>();
 
         texture->setTexture(loadTexture("assets/tilesets", "TX Tileset Ground.png"));
@@ -16,18 +15,12 @@ namespace crimson {
             auto* transformComp = getComponent<TransformComponent>();
 
             if (transformComp) {
-                transformComp->setPosition(getSceneManager().getCurrentScene()->getMap()->getEntityPosition("Player"));
+                transformComp->setPosition(getSceneManager().getCurrentScene()->getMap()->getEntityPosition("Enemy"));
             }
-        }
-
-        auto* inputComp = getComponent<InputComponent>();
-
-        if (inputComp) {
-            inputComp->setInputSystem(getSceneManager().getCurrentScene()->getInputSystem());
         }
     }
 
-    void Player::update(float deltaTime) {
+    void Player2::update(float deltaTime) {
         updateComponents(deltaTime);
 
         auto* input = getComponent<InputComponent>();
@@ -39,7 +32,7 @@ namespace crimson {
         }
     }
 
-    void Player::render() {
+    void Player2::render() {
         auto* texture = getComponent<TextureComponent>();
         auto* transform = getComponent<TransformComponent>();
 

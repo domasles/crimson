@@ -61,13 +61,13 @@ namespace engine {
 
         std::shared_ptr<Scene> newScene = sceneIt->second;
 
+        m_PreviousScene = m_CurrentScene;
+        m_CurrentScene = newScene;
+
         if (!newScene->getInitialized()) {
             newScene->setInitialized(true);
             newScene->init();
         }
-
-        m_PreviousScene = m_CurrentScene;
-        m_CurrentScene = newScene;
 
         return true;
     }
@@ -104,5 +104,9 @@ namespace engine {
         }
 
         return m_FallbackCurrentSceneText;
+    }
+
+    std::shared_ptr<Scene> SceneManager::getCurrentScene() const {
+        return m_CurrentScene;
     }
 }

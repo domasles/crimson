@@ -1,6 +1,7 @@
 #pragma once
 
 #include <entities/Player.h>
+#include <entities/Player2.h>
 
 #include <Engine.h>
 
@@ -17,5 +18,6 @@ namespace crimson {
 
         private:
             Player* m_Player = nullptr;
+            Player2* m_Player2 = nullptr;
     };
 }

@@ -2,13 +2,12 @@
 #include <Entity.h>
 #include <components/TransformComponent.h>
 #include <utils/logger.h>
-#include <Map.h>
+#include <Scene.h>
 #include <cmath>
 
 using namespace engine::utils::logger;
 
 namespace engine {
-    Map* CollisionComponent::s_WorldMap = nullptr;
 
     void CollisionComponent::init() {
         Component::init();
@@ -23,9 +22,8 @@ namespace engine {
     void CollisionComponent::update(float deltaTime) {
         if (!m_Enabled) return;
 
-        if (!m_UseCustomSize) {
-            updateFromTransform();
-        }
+        // Always update from Transform - no custom size logic
+        updateFromTransform();
         
         updateCollisionEvents();
     }
@@ -34,42 +32,23 @@ namespace engine {
         auto* transform = m_Entity->getComponent<TransformComponent>();
         if (!transform) {
             Logger::engine_warn("CollisionComponent: No Transform component found, using default size");
-            if (!m_UseCustomSize) {
-                m_Collision.size = {32, 32}; // Default fallback size
-            }
+            m_Collision.size = {32, 32}; // Default fallback size
             return;
         }
         
-        // Automatically use Transform size if no custom size is set
-        if (!m_UseCustomSize) {
-            m_Collision.size = transform->getSize();
-        }
+        // Always use Transform size automatically
+        m_Collision.size = transform->getSize();
     }
 
     bool CollisionComponent::checkCollision(CollisionComponent* other) const {
         if (!m_Enabled || !other->isEnabled()) return false;
         if (m_Collision.type == CollisionType::NONE || other->getCollision().type == CollisionType::NONE) return false;
 
-        // For now, only support box collision as requested
-        if (m_Collision.shape == CollisionShape::BOX && other->getCollision().shape == CollisionShape::BOX) {
-            return checkBoxCollision(other);
-        }
-
-        return false;
-    }
-
-    bool CollisionComponent::checkBoxCollision(CollisionComponent* other) const {
-        Vector2 pos1 = getCollisionWorldPosition();
-        Vector2 size1 = m_Collision.size;
+        // Use unified collision system instead of hardcoded logic
+        Vector2 pos1 = getWorldPosition();
+        Vector2 pos2 = other->getWorldPosition();
         
-        Vector2 pos2 = other->getCollisionWorldPosition();
-        Vector2 size2 = other->getCollision().size;
-
-        // AABB collision detection
-        return (pos1.getRawX() < pos2.getRawX() + size2.getRawX() &&
-                pos1.getRawX() + size1.getRawX() > pos2.getRawX() &&
-                pos1.getRawY() < pos2.getRawY() + size2.getRawY() &&
-                pos1.getRawY() + size1.getRawY() > pos2.getRawY());
+        return engine::utils::collision::checkCollision(m_Collision, pos1, other->getCollision(), pos2);
     }
 
     Vector2 CollisionComponent::getWorldPosition() const {
@@ -85,7 +64,10 @@ namespace engine {
     }
 
     bool CollisionComponent::checkWorldCollision() const {
-        if (!m_Enabled || !s_WorldMap) return false;
+        if (!m_Enabled) return false;
+        
+        Map* currentMap = getCurrentMap();
+        if (!currentMap) return false;
         
         auto* transform = m_Entity->getComponent<TransformComponent>();
         if (!transform) {
@@ -95,7 +77,7 @@ namespace engine {
         Vector2 worldPos = transform->getPosition();
         Vector2 size = m_Collision.size;
         
-        return s_WorldMap->checkCollisionAt(worldPos, size);
+        return currentMap->checkCollisionAt(worldPos, size);
     }
 
     bool CollisionComponent::canMoveTo(const Vector2& newPosition) const {
@@ -124,7 +106,10 @@ namespace engine {
             return false;
         }
         
-        // TODO: Check for entity-to-entity collisions here if needed
+        // Check for entity-to-entity collisions
+        if (wouldCollideWithEntitiesAt(newPosition)) {
+            return false;
+        }
         
         return true; // Movement allowed
     }
@@ -137,6 +122,79 @@ namespace engine {
             // This would be called by the collision system when collisions are detected
             // For now, just a placeholder for the event system
         }
+    }
+
+    bool CollisionComponent::wouldCollideAt(const Vector2& position) const {
+        if (!m_Enabled) return false;
+        
+        Map* currentMap = getCurrentMap();
+        if (!currentMap) return false;
+        
+        // Create entity collision representation at the specified position
+        Collision entityCollision{m_Collision.type, m_Collision.shape, m_Collision.offset, m_Collision.size};
+        const auto& tiles = currentMap->getCollisionTiles();
+        
+        for (const auto& tile : tiles) {
+            if (engine::utils::collision::checkCollision(entityCollision, position, tile)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
+    Map* CollisionComponent::getCurrentMap() const {
+        auto& sceneManager = getSceneManager();
+        auto currentScene = sceneManager.getCurrentScene();
+        
+        if (currentScene && currentScene->hasMap()) {
+            return currentScene->getMap();
+        }
+        
+        return nullptr;
+    }
+
+    bool CollisionComponent::wouldCollideWithEntitiesAt(const Vector2& position) const {
+        if (!m_Enabled) return false;
+        
+        auto& sceneManager = getSceneManager();
+        auto currentScene = sceneManager.getCurrentScene();
+        if (!currentScene) return false;
+        
+        // Get all collision components in the scene
+        auto collisionComponents = currentScene->getEntitiesWithComponent<CollisionComponent>();
+        
+        // Create temporary collision at the test position
+        Collision testCollision{m_Collision.type, m_Collision.shape, m_Collision.offset, m_Collision.size};
+        
+        // Check collision with all other entities
+        for (auto* otherCollision : collisionComponents) {
+            // Skip self
+            if (otherCollision == this) continue;
+            
+            // Skip disabled collision components
+            if (!otherCollision->isEnabled()) continue;
+            
+            // Skip NONE collision types
+            if (otherCollision->getCollisionType() == CollisionType::NONE) continue;
+            
+            // Get other entity's position
+            Vector2 otherPosition = otherCollision->getWorldPosition();
+            
+            // Check collision between this entity at test position and other entity
+            if (engine::utils::collision::checkCollision(testCollision, position, 
+                                                       otherCollision->getCollision(), otherPosition)) {
+                
+                // Check if this collision should block movement using BlockCollision rules
+                if (otherCollision->getCollisionType() == CollisionType::BLOCK) {
+                    if (BlockCollision::shouldBlockMovement()) {
+                        return true; // Collision blocks movement
+                    }
+                }
+            }
+        }
+        
+        return false; // No blocking collisions found
     }
 
 }
