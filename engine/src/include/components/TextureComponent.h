@@ -15,7 +15,7 @@ namespace engine {
             bool hasTexture() const { return m_Texture != nullptr; }
 
             std::shared_ptr<Texture> getTexture() const { return m_Texture; }
-            
+
             void render();
             void render(const SDL_FRect& cropRegion);
             void render(const SDL_FRect& cropRegion, const SDL_FRect& destinationRegion);

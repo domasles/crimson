@@ -14,7 +14,7 @@ namespace engine {
             static ResourceManager instance;
             return instance;
         }
-        
+
         catch (const std::bad_alloc& e) {
             Logger::engine_error("Memory allocation failed: {}", e.what());
         }
@@ -25,7 +25,6 @@ namespace engine {
 
     std::shared_ptr<Texture> ResourceManager::loadTexture(const std::string& workingDir, const std::string& fileName) {
         std::string key = makeKey(workingDir, fileName);
-        
         auto it = m_Textures.find(key);
 
         if (it != m_Textures.end()) {
@@ -47,7 +46,6 @@ namespace engine {
 
     std::shared_ptr<Sound> ResourceManager::loadSound(const std::string& workingDir, const std::string& fileName) {
         std::string key = makeKey(workingDir, fileName);
-        
         auto it = m_Sounds.find(key);
 
         if (it != m_Sounds.end()) {

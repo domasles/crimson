@@ -23,7 +23,14 @@
 
 using namespace engine;
 
-using namespace engine::utils::math;
-using namespace engine::utils::logger;
-using namespace engine::utils::filesystem;
+namespace engine::utils {
+    using namespace math;
+    using namespace logger;
+    using namespace collision;
+    using namespace filesystem;
+}
 
+namespace engine::collisions {
+    using namespace types;
+    using namespace shapes;
+}

@@ -29,7 +29,7 @@ namespace engine {
 
         SDL_FRect destRect{ position.getX(), position.getY(), size.getX(), size.getY() };
         SDL_FRect cropRect{ cropPosition.getRawX(), cropPosition.getRawY(), cropSize.getRawX(), cropSize.getRawY() };
-        
+
         if (!SDL_RenderTexture(Core::getInstance().getRenderer(), getTexture(), &cropRect, &destRect)) {
             Logger::engine_error("SDL_RenderTexture (cropped) Error: {}", SDL_GetError());
             return false;
@@ -51,16 +51,14 @@ namespace engine {
         const std::string& filePath = getGamePath()  + "/" + m_WorkingDir + "/" + fileName;
 
         SDL_Texture* texture = IMG_LoadTexture(Core::getInstance().getRenderer(), filePath.c_str());
-        
+
         if (!texture) {
             Logger::engine_error("IMG_LoadTexture Error: {}", SDL_GetError());
             return false;
         }
-        
+
         SDL_SetTextureScaleMode(texture, scaleMode);
-
         m_Texture = std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)>(texture, SDL_DestroyTexture);
-
         std::string relativePath = m_WorkingDir + "/" + fileName;
 
         if (relativePath.find("assets/") == 0) {

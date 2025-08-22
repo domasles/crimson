@@ -12,7 +12,7 @@ namespace engine {
             static ComponentManager& instance = *new ComponentManager();
             return instance;
         }
-        
+
         catch (const std::bad_alloc& e) {
             Logger::engine_error("Memory allocation failed: {}", e.what());
         }

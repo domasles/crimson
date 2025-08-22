@@ -12,7 +12,7 @@ namespace engine {
             static SceneManager& instance = *new SceneManager();
             return instance;
         }
-        
+
         catch (const std::bad_alloc& e) {
             Logger::engine_error("Memory allocation failed: {}", e.what());
         }
@@ -26,22 +26,20 @@ namespace engine {
             Logger::engine_error("Cannot register scene: Scene pointer is null!");
             return false;
         }
-        
+
         if (m_Scenes.find(name) != m_Scenes.end()) {
             Logger::engine_warn("Scene {} is already registered!", name);
             return false;
         }
-        
+
         m_Scenes[name] = std::move(scene);
-
         ENGINE_LOG_INIT(("Scene: " + name).c_str());
-
         return true;
     }
 
     const bool SceneManager::unregisterScene(const std::string& name) {
         auto it = m_Scenes.find(name);
-        
+
         if (it == m_Scenes.end()) {
             Logger::engine_warn("Scene {} not found. Cannot unregister!", name);
             return false;
@@ -73,10 +71,8 @@ namespace engine {
     }
 
     const bool SceneManager::update() {
-        uint64_t currentTime = SDL_GetTicks();
-
-        float deltaTime = (currentTime - m_LastFrameTime) / 1000.0f;
-
+        uint64_t currentTime = SDL_GetTicksNS();
+        float deltaTime = (currentTime - m_LastFrameTime) / 1'000'000'000.0f;
         m_LastFrameTime = currentTime;
 
         if (!m_CurrentScene) {

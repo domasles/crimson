@@ -30,7 +30,7 @@ namespace engine {
             Logger::engine_error("Map validation failed for: {}", relativePath);
             return;
         }
-        
+
         loadTilesets();
         loadTiles();
         loadCollisionData();
@@ -138,7 +138,7 @@ namespace engine {
 
                     entityPosition *= m_DesiredTileSize / m_MinTileSize;
                     entityPosition += m_Origin;
-                    
+
                     entities.emplace_back(entityName, entityPosition);
                 }
             }
@@ -205,28 +205,25 @@ namespace engine {
     void Map::loadCollisionData() {
         m_CollisionTiles.clear();
         parseIntGridLayers();
-        
+
         std::string relativePath = m_WorkingDir + "/" + m_FileName;
+
         if (relativePath.find("assets/") == 0) {
             relativePath = relativePath.substr(7);
         }
-        
+
         ENGINE_LOG_INIT(("Map: Loaded " + std::to_string(m_CollisionTiles.size()) + " collision tiles from " + relativePath).c_str());
     }
 
     void Map::parseIntGridLayers() {
         for (const auto& level : m_JsonFile["levels"]) {
             for (const auto& layer : level["layerInstances"]) {
-                if (layer["__type"] != "IntGrid") {
-                    continue;
-                }
+                if (layer["__type"] != "IntGrid") continue;
 
                 const std::string& layerIdentifier = layer["__identifier"];
                 const auto& csvData = layer["intGridCsv"];
-                
-                if (csvData.empty()) {
-                    continue;
-                }
+
+                if (csvData.empty()) continue;
 
                 int gridWidth = layer["__cWid"];
                 int gridHeight = layer["__cHei"];
@@ -242,6 +239,7 @@ namespace engine {
                         int y = i / gridWidth;
 
                         CollisionTile tile;
+
                         tile.worldPosition.set(x * gridSize, y * gridSize);
                         tile.worldPosition *= m_DesiredTileSize / m_MinTileSize;
                         tile.worldPosition += m_Origin;
@@ -249,12 +247,11 @@ namespace engine {
                         tile.size = m_DesiredTileSize / (m_MinTileSize / gridSize);
                         tile.collisionValue = value;
                         tile.layerIdentifier = layerIdentifier;
-                        
-                        // Use configuration system to determine collision type and shape
+
                         tile.type = getCollisionType(layerIdentifier, value);
                         tile.shape = getCollisionShape(layerIdentifier, value);
 
-                        m_CollisionTiles.push_back(tile);
+                        m_CollisionTiles.push_back(std::move(tile));
                     }
                 }
 
@@ -263,91 +260,100 @@ namespace engine {
         }
     }
 
-    bool Map::checkCollisionAt(const Vector2& worldPos, const Vector2& size) const {
-        // Use unified collision system instead of hardcoded AABB
-        Collision entityCollision{CollisionType::BLOCK, CollisionShape::BOX, {0, 0}, size};
-        
+    bool Map::checkCollisionAt(const Collision& entityCollision, const Vector2& worldPos) const {
+        Vector2 entityWorldPos = {
+            worldPos.getRawX() + entityCollision.offset.getRawX(),
+            worldPos.getRawY() + entityCollision.offset.getRawY()
+        };
+
         for (const auto& tile : m_CollisionTiles) {
-            if (checkCollision(entityCollision, worldPos, tile)) {
+            if (entityCollision.shape->checkCollisionWithTile(entityWorldPos, entityCollision.size, tile)) {
                 return true;
             }
         }
+
         return false;
     }
 
-    void Map::setLayerCollisionType(const std::string& layerIdentifier, CollisionType type) {
-        m_LayerCollisionTypes[layerIdentifier] = type;
+    void Map::setLayerCollisionType(const std::string& layerIdentifier, std::unique_ptr<CollisionType> type) {
+        m_LayerCollisionTypes[layerIdentifier] = std::move(type);
     }
 
-    void Map::setValueCollisionType(int value, CollisionType type) {
-        m_ValueCollisionTypes[value] = type;
+    void Map::setValueCollisionType(int value, std::unique_ptr<CollisionType> type) {
+        m_ValueCollisionTypes[value] = std::move(type);
     }
 
-    void Map::setLayerValueCollisionType(const std::string& layerIdentifier, int value, CollisionType type) {
-        m_LayerValueCollisionTypes[layerIdentifier][value] = type;
+    void Map::setLayerValueCollisionType(const std::string& layerIdentifier, int value, std::unique_ptr<CollisionType> type) {
+        m_LayerValueCollisionTypes[layerIdentifier][value] = std::move(type);
     }
 
-    void Map::setLayerCollisionShape(const std::string& layerIdentifier, CollisionShape shape) {
-        m_LayerCollisionShapes[layerIdentifier] = shape;
+    void Map::setLayerCollisionShape(const std::string& layerIdentifier, std::unique_ptr<CollisionShape> shape) {
+        m_LayerCollisionShapes[layerIdentifier] = std::move(shape);
     }
 
-    void Map::setValueCollisionShape(int value, CollisionShape shape) {
-        m_ValueCollisionShapes[value] = shape;
+    void Map::setValueCollisionShape(int value, std::unique_ptr<CollisionShape> shape) {
+        m_ValueCollisionShapes[value] = std::move(shape);
     }
 
-    void Map::setLayerValueCollisionShape(const std::string& layerIdentifier, int value, CollisionShape shape) {
-        m_LayerValueCollisionShapes[layerIdentifier][value] = shape;
+    void Map::setLayerValueCollisionShape(const std::string& layerIdentifier, int value, std::unique_ptr<CollisionShape> shape) {
+        m_LayerValueCollisionShapes[layerIdentifier][value] = std::move(shape);
     }
 
-    CollisionType Map::getCollisionType(const std::string& layerIdentifier, int value) const {
+    std::unique_ptr<CollisionType> Map::getCollisionType(const std::string& layerIdentifier, int value) const {
         // 1. Check layer-value specific (highest priority)
         auto layerIt = m_LayerValueCollisionTypes.find(layerIdentifier);
+
         if (layerIt != m_LayerValueCollisionTypes.end()) {
             auto valueIt = layerIt->second.find(value);
             if (valueIt != layerIt->second.end()) {
-                return valueIt->second;
+                return valueIt->second->clone();
             }
         }
-        
+
         // 2. Check value-specific (medium priority)
         auto valueIt = m_ValueCollisionTypes.find(value);
+
         if (valueIt != m_ValueCollisionTypes.end()) {
-            return valueIt->second;
+            return valueIt->second->clone();
         }
-        
+
         // 3. Check layer-specific (low priority)
         auto layerTypeIt = m_LayerCollisionTypes.find(layerIdentifier);
+
         if (layerTypeIt != m_LayerCollisionTypes.end()) {
-            return layerTypeIt->second;
+            return layerTypeIt->second->clone();
         }
-        
-        // 4. Default (lowest priority) - NO HARDCODING, just sensible default
-        return CollisionType::BLOCK;
+
+        // 4. Default (lowest priority) - sensible default
+        return std::make_unique<BlockCollision>();
     }
 
-    CollisionShape Map::getCollisionShape(const std::string& layerIdentifier, int value) const {
+    std::unique_ptr<CollisionShape> Map::getCollisionShape(const std::string& layerIdentifier, int value) const {
         // 1. Check layer-value specific (highest priority)
         auto layerIt = m_LayerValueCollisionShapes.find(layerIdentifier);
+
         if (layerIt != m_LayerValueCollisionShapes.end()) {
             auto valueIt = layerIt->second.find(value);
             if (valueIt != layerIt->second.end()) {
-                return valueIt->second;
+                return valueIt->second->clone();
             }
         }
-        
+
         // 2. Check value-specific (medium priority)
         auto valueIt = m_ValueCollisionShapes.find(value);
+
         if (valueIt != m_ValueCollisionShapes.end()) {
-            return valueIt->second;
+            return valueIt->second->clone();
         }
-        
+
         // 3. Check layer-specific (low priority)
         auto layerShapeIt = m_LayerCollisionShapes.find(layerIdentifier);
+
         if (layerShapeIt != m_LayerCollisionShapes.end()) {
-            return layerShapeIt->second;
+            return layerShapeIt->second->clone();
         }
-        
-        // 4. Default (lowest priority) - Only BOX shape for now
-        return CollisionShape::BOX;
+
+        // 4. Default (lowest priority) - sensible default
+        return std::make_unique<BoxShape>();
     }
 }

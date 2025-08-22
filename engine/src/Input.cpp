@@ -13,7 +13,7 @@ namespace engine {
     const bool InputAction::isPressed() const {
         const bool* state = SDL_GetKeyboardState(nullptr);
         SDL_Scancode scancode = SDL_GetScancodeFromKey(m_Key, nullptr);
-        
+
         if (scancode == SDL_SCANCODE_UNKNOWN) {
             Logger::engine_error("Unknown scancode for key: {}", m_Key);
             return false;
@@ -54,7 +54,7 @@ namespace engine {
 
                 const std::string& type = data["type"];
                 SDL_Keycode key = SDL_GetKeyFromName(data["key"].get<std::string>().c_str());
-                
+
                 if (key == SDLK_UNKNOWN) {
                     Logger::engine_error("Unknown key: {}", data["key"].get<std::string>());
                     return false;
@@ -72,14 +72,14 @@ namespace engine {
                 else if (type == "simple") {
                     addSimpleAction(name, key);
                 }
-                
+
                 else {
                     Logger::engine_error("Unknown action type: {}", type);
                     return false;
                 }
             }
         }
-        
+
         catch (const std::exception& e) {
             Logger::engine_error("JSON parsing error: {}", e.what());
             return false;

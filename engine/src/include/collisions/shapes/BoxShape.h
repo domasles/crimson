@@ -1,23 +1,22 @@
 #pragma once
-#include <utils/math.h>
 
-using namespace engine::utils::math;
+#include <collisions/CollisionShape.h>
+
+namespace engine::utils::collision {
+    struct Collision;
+    struct CollisionTile;
+}
+
+using namespace engine::utils::collision;
 
 namespace engine::collisions::shapes {
-    struct BoxShape {
-        static bool checkCollision(const Vector2& pos1, const Vector2& size1,
-                                 const Vector2& pos2, const Vector2& size2) {
-            return (pos1.getRawX() < pos2.getRawX() + size2.getRawX() &&
-                    pos1.getRawX() + size1.getRawX() > pos2.getRawX() &&
-                    pos1.getRawY() < pos2.getRawY() + size2.getRawY() &&
-                    pos1.getRawY() + size1.getRawY() > pos2.getRawY());
-        }
-        
-        static bool pointInside(const Vector2& point, const Vector2& pos, const Vector2& size) {
-            return (point.getRawX() >= pos.getRawX() && 
-                    point.getRawX() <= pos.getRawX() + size.getRawX() &&
-                    point.getRawY() >= pos.getRawY() && 
-                    point.getRawY() <= pos.getRawY() + size.getRawY());
-        }
+    class BoxShape : public CollisionShape {
+        public:
+            bool checkCollision(const Vector2& myPos, const Vector2& mySize, const CollisionShape& other, const Vector2& otherPos, const Vector2& otherSize) const override;
+            bool checkCollisionWithBox(const Vector2& myPos, const Vector2& mySize, const Vector2& boxPos, const Vector2& boxSize) const override;
+            bool checkCollisionWithTile(const Vector2& myPos, const Vector2& mySize, const CollisionTile& tile) const override;
+            bool checkCollisionBetween(const Collision& collision1, const Vector2& pos1, const Collision& collision2, const Vector2& pos2) const override;
+            
+            std::unique_ptr<CollisionShape> clone() const override { return std::make_unique<BoxShape>(*this); }
     };
 }

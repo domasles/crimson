@@ -1,16 +1,13 @@
 #pragma once
 
+#include <collisions/CollisionType.h>
+
 namespace engine::collisions::types {
-    struct BlockCollision {
-        static constexpr bool blocksMovement = true;
-        static constexpr bool triggersEvents = false;
+    class BlockCollision : public CollisionType {
+    public:
+        bool shouldBlock() const override { return true; }
+        bool shouldTriggerEvents() const override { return false; }
         
-        static bool shouldBlockMovement() {
-            return blocksMovement;
-        }
-        
-        static bool shouldTriggerEvents() {
-            return triggersEvents;
-        }
+        std::unique_ptr<CollisionType> clone() const override { return std::make_unique<BlockCollision>(*this); }
     };
 }
