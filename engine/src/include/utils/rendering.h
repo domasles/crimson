@@ -7,6 +7,11 @@
 using namespace engine::utils::math;
 
 namespace engine::utils::rendering {
+    enum WindowMode {
+        Windowed,
+        Fullscreen
+    };
+
     enum QueueDirection
     {
         Normal,
@@ -47,5 +52,11 @@ namespace engine::utils::rendering {
 
             RenderQueueManager(const RenderQueueManager&) = delete;
             RenderQueueManager& operator=(const RenderQueueManager&) = delete;
+    };
+
+    class Color {
+        public:
+            Color(float r, float g, float b, float a = 1.0f) : r(r), g(g), b(b), a(a) {}
+            float r, g, b, a;
     };
 }

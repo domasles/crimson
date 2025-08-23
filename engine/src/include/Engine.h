@@ -3,6 +3,7 @@
 #include <utils/filesystem.h>
 #include <utils/math.h>
 
+#include <components/BoxRendererComponent.h>
 #include <components/CollisionComponent.h>
 #include <components/TransformComponent.h>
 #include <components/TextureComponent.h>

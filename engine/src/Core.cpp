@@ -25,6 +25,13 @@ using namespace engine;
             return;
         }
 
+        float r = getCore().getBackgroundColor().r * 255;
+        float g = getCore().getBackgroundColor().g * 255;
+        float b = getCore().getBackgroundColor().b * 255;
+        float a = getCore().getBackgroundColor().a * 255;
+
+        SDL_SetRenderDrawColor(getCore().getRenderer(), r, g, b, a);
+
         if (!SDL_RenderClear(core.getRenderer())) {
             Logger::engine_error("SDL_RenderClear failed: {}", SDL_GetError());
         }
@@ -175,6 +182,13 @@ namespace engine {
             emscripten_set_main_loop(emscripten_main_loop, 0, 1);
         #else
             while (processEvents()) {
+                float r = getCore().getBackgroundColor().r * 255;
+                float g = getCore().getBackgroundColor().g * 255;
+                float b = getCore().getBackgroundColor().b * 255;
+                float a = getCore().getBackgroundColor().a * 255;
+
+                SDL_SetRenderDrawColor(getCore().getRenderer(), r, g, b, a);
+
                 if (!SDL_RenderClear(getRenderer())) {
                     Logger::engine_error("SDL_RenderClear failed: {}", SDL_GetError());
                 }
@@ -191,6 +205,10 @@ namespace engine {
                 SDL_RenderPresent(getRenderer());
             }
         #endif
+    }
+
+    void Core::setBackgroundColor(const Color& color) {
+        m_BackgroundColor = color;
     }
 
     void Core::setVectorScale(int targetWindowWidth, int targetWindowHeight) {
@@ -221,6 +239,9 @@ namespace engine {
     }
     
     bool Core::initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable) {
+        m_WindowWidth = width;
+        m_WindowHeight = height;
+
         #ifdef ENGINE_PLATFORM_EMSCRIPTEN
             m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_RESIZABLE), SDL_DestroyWindow);
         #else
@@ -236,7 +257,7 @@ namespace engine {
     }
 
     bool Core::initFullScreenWindow(const std::string& title) {
-        m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), 1600, 900, true), SDL_DestroyWindow);
+        m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), m_DefaultWindowWidth, m_DefaultWindowHeight, true), SDL_DestroyWindow);
       
         if (!m_Window) {
             Logger::engine_error("SDL_CreateWindow failed: {}", SDL_GetError());
@@ -274,8 +295,8 @@ namespace engine {
         float baseHeight = 0.0f;
 
         if (m_DefaultVectorScale) {
-            baseWidth = static_cast<float>(m_DefaultVectorScaleWidth);
-            baseHeight = static_cast<float>(m_DefaultVectorScaleHeight);
+            baseWidth = static_cast<float>(m_DefaultWindowWidth);
+            baseHeight = static_cast<float>(m_DefaultWindowHeight);
         }
 
         else {
