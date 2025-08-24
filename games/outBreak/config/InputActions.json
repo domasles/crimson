@@ -1,0 +1,15 @@
+{
+    "actions": {
+        "move_left": {
+            "type": "movement",
+            "key": "left",
+            "vector": [ -1, 0 ]
+        },
+
+        "move_right": {
+            "type": "movement",
+            "key": "right",
+            "vector": [ 1, 0 ]
+        }
+    }
+}
