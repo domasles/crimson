@@ -84,16 +84,20 @@ target_compile_definitions(crimson PRIVATE
 
 target_precompile_headers(crimson PRIVATE src/pch/pch.h)
 
-add_custom_command(TARGET crimson POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_CURRENT_SOURCE_DIR}/config"
-    "$<TARGET_FILE_DIR:crimson>/config"
-    COMMENT "Copying config directory to output"
-)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/config")
+    add_custom_command(TARGET crimson POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/config"
+        "$<TARGET_FILE_DIR:crimson>/config"
+        COMMENT "Copying config directory to output"
+    )
+endif()
 
-add_custom_command(TARGET crimson POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_CURRENT_SOURCE_DIR}/assets"
-    "$<TARGET_FILE_DIR:crimson>/assets"
-    COMMENT "Copying assets directory to output"
-)
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
+    add_custom_command(TARGET crimson POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/assets"
+        "$<TARGET_FILE_DIR:crimson>/assets"
+        COMMENT "Copying assets directory to output"
+    )
+endif()
