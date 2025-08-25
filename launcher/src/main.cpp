@@ -16,27 +16,45 @@
         return 0;
     }
 #else
+    #include <utils/game_selector.h>
     #include <utils/filesystem.h>
     #include <utils/lib.h>
+
+    #include <wx/wx.h>
+    
+    class GameLauncherApp : public wxApp {
+        public:
+            bool OnInit() override {
+                return true;
+            }
+    };
+    
+    wxIMPLEMENT_APP_NO_MAIN(GameLauncherApp);
 
     using namespace launcher::utils::filesystem;
     using namespace launcher::utils::lib;
 
-    int main() {
-        #ifdef LAUNCHER_PLATFORM_WINDOWS
-            const std::string fileName = "games/crimson/crimson.dll";
-        #elif defined(LAUNCHER_PLATFORM_MACOS)
-            const std::string fileName = "games/crimson/libcrimson.dylib";
-        #else
-            const std::string fileName = "games/crimson/libcrimson.so";
-        #endif
+    using namespace launcher::utils::game_selector;
 
-        void* libraryHandle = loadLibrary(fileName);
+    int main(int argc, char* argv[]) {
+        wxInitialize(argc, argv);
 
-        if (!libraryHandle) {
+        auto availableGames = scanAvailableGames();
+        auto selectedGame = selectGame(availableGames);
+
+        if (!selectedGame) {
+            std::cerr << "No game selected or available." << std::endl;
+            wxUninitialize();
             return -1;
         }
-        
+
+        std::string fileName = selectedGame->dllPath;
+
+        wxUninitialize();
+
+        void* libraryHandle = loadLibrary(fileName);
+        if (!libraryHandle) return -1;
+    
         auto awakeFunc = reinterpret_cast<bool(*)()>(getFunction(libraryHandle, "awake"));
         auto startFunc = reinterpret_cast<bool(*)()>(getFunction(libraryHandle, "start"));
 
@@ -72,4 +90,14 @@
 
         return 0;
     }
+
+    #ifdef _WIN32
+        #ifdef NDEBUG
+            #include <windows.h>
+
+            int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
+                return main(__argc, __argv);
+            }
+        #endif
+    #endif
 #endif

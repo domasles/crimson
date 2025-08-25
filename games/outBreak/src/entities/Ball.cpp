@@ -7,7 +7,7 @@ namespace outBreak {
         auto* transform = addComponent<TransformComponent>();
         auto* renderer = addComponent<BoxRendererComponent>();
 
-        transform->setPosition({800.0f - BALL_SIZE/2, 400.0f}); // Center horizontally, middle vertically
+        transform->setPosition({800.0f - BALL_SIZE/2, 700.0f});
         transform->setSize({BALL_SIZE, BALL_SIZE});
         renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f)); // Black
     }

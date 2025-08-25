@@ -28,14 +28,18 @@ else()
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/outBreak"
     )
 
-    foreach(config ${CMAKE_CONFIGURATION_TYPES})
-        string(TOUPPER ${config} config_upper)
+    if(CMAKE_CONFIGURATION_TYPES)
+        foreach(config ${CMAKE_CONFIGURATION_TYPES})
+            string(TOUPPER ${config} config_upper)
 
-        set_target_properties(outBreak PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/outBreak"
-            LIBRARY_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/outBreak"
-        )
-    endforeach()
+            set_target_properties(outBreak PROPERTIES
+                RUNTIME_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/outBreak"
+                LIBRARY_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/outBreak"
+            )
+        endforeach()
+    else()
+        message(FATAL_ERROR "No valid multi-configuration build generators found. Please install one.")
+    endif()
 endif()
 
 target_include_directories(outBreak

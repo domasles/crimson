@@ -33,6 +33,8 @@ echo Target directory: %TARGET_DIR%
 echo.
 
 mkdir "%TARGET_DIR%" 2>nul
+mkdir "%TARGET_DIR%\config" 2>nul
+mkdir "%TARGET_DIR%\assets" 2>nul
 
 for /r "%TEMPLATE_DIR%" %%f in (*) do (
     set "file=%%f"
@@ -58,12 +60,18 @@ echo.
 echo Game '%GAME_NAME%' created successfully!
 echo Location: %TARGET_DIR%
 
-mkdir "%TARGET_DIR%\assets" 2>nul
-
 echo.
-echo To build your game:
+echo To build specific game ^(native^):
 echo   cmake -B build-native -S .
-echo   cmake --build build
+echo   cmake --build build-native --target %GAME_NAME%
+echo.
+echo To build specific game ^(WASM^):
+echo   cmake -B build-wasm -S .
+echo   cmake --build build-wasm --target %GAME_NAME%_launcher
+echo.
+echo To build all games:
+echo   cmake -B build-native -S .
+echo   cmake --build build-native
 
 goto :eof
 

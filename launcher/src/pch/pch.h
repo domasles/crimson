@@ -16,8 +16,18 @@
     #include <dlfcn.h>
 #endif
 
+#if !defined(LAUNCHER_PLATFORM_EMSCRIPTEN)
+    #include <wx/wx.h>
+    #include <wx/choicdlg.h>
+#endif
+
+#include <filesystem>
 #include <iostream>
+#include <fstream>
+
 #include <format>
 #include <string>
+#include <vector>
 
 #include <functional>
+#include <optional>

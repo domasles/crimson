@@ -6,7 +6,7 @@ project(Crimson
     DESCRIPTION "Crimson Game Engine"
 )
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/config/cmake")
+list(PREPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/config/cmake")
 include(detect_environment)
 
 if(EMSCRIPTEN)
@@ -33,12 +33,16 @@ else()
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
-    foreach(config ${CMAKE_CONFIGURATION_TYPES})
-        string(TOUPPER ${config} config_upper)
-        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/bin/${config})
-        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/bin/${config})
-        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/lib/${config})
-    endforeach()
+    if(CMAKE_CONFIGURATION_TYPES)
+        foreach(config ${CMAKE_CONFIGURATION_TYPES})
+            string(TOUPPER ${config} config_upper)
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/bin/${config})
+            set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/bin/${config})
+            set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/lib/${config})
+        endforeach()
+    else()
+        message(FATAL_ERROR "No valid multi-configuration build generators found. Please install one.")
+    endif()
 endif()
 
 if(WASM)
@@ -123,31 +127,44 @@ set(SDL3MIXER_ENABLE_FLAC ON CACHE BOOL "Enable FLAC support (dr_flac or libflac
 set(SDL3MIXER_MIDI OFF CACHE BOOL "Disable MIDI support for SDL3_mixer")
 set(SDL3MIXER_OPUS OFF CACHE BOOL "Disable Opus support for SDL3_mixer")
 
+if(NOT WASM)
+    set(wxBUILD_SHARED OFF CACHE BOOL "Build wxWidgets as shared library" FORCE)
+    set(wxBUILD_SAMPLES OFF CACHE BOOL "Build wxWidgets samples" FORCE)
+    set(wxBUILD_DEMOS OFF CACHE BOOL "Build wxWidgets demos" FORCE)
+    set(wxBUILD_TESTS OFF CACHE BOOL "Build wxWidgets tests" FORCE)
+
+    add_subdirectory(vendor/wxwidgets)
+endif()
+
 add_subdirectory(vendor/sdl3)
 add_subdirectory(vendor/sdl3-image)
 add_subdirectory(vendor/sdl3-mixer)
 
 add_subdirectory(engine)
-add_subdirectory(launcher)
 
-file(GLOB children RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/games" "${CMAKE_CURRENT_SOURCE_DIR}/games/*")
+file(GLOB all_dirs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/games" "${CMAKE_CURRENT_SOURCE_DIR}/games/*")
+set(AVAILABLE_GAMES "")
 
-foreach(child ${children})
-    if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/games/${child}")
-        add_subdirectory("games/${child}")
+foreach(dir ${all_dirs})
+    if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/games/${dir}")
+        add_subdirectory("games/${dir}")
+        list(APPEND AVAILABLE_GAMES ${dir})
     endif()
 endforeach()
 
+message(STATUS "Available game targets: ${AVAILABLE_GAMES}")
+add_subdirectory(launcher)
+
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT launcher)
 
-option(CRIMSON_BUILD_NATIVE "Enable native host build (Win/Linux/Mac)" ON)
-option(CRIMSON_BUILD_WASM "Enable WebAssembly build (Emscripten)" ON)
+option(BUILD_NATIVE "Enable native host build (Win/Linux/Mac)" ON)
+option(BUILD_WASM "Enable WebAssembly build (Emscripten)" ON)
 
-if(CRIMSON_BUILD_NATIVE)
+if(BUILD_NATIVE)
     message(STATUS "Configuring Native build...")
 endif()
 
-if(CRIMSON_BUILD_WASM)
+if(BUILD_WASM)
     message(STATUS "Configuring WASM build...")
 
     if(WIN32)

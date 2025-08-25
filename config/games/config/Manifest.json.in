@@ -1,0 +1,5 @@
+{
+    "display_name": "@GAME_DISPLAY_NAME@",
+    "version": "1.0.0",
+    "dll_name": "@GAME_NAME@.dll"
+}

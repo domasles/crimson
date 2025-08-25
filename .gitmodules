@@ -13,3 +13,6 @@
 [submodule "vendor/emsdk"]
 	path = vendor/emsdk
 	url = https://github.com/emscripten-core/emsdk.git
+[submodule "vendor/wxwidgets"]
+	path = vendor/wxwidgets
+	url = https://github.com/wxWidgets/wxWidgets.git
