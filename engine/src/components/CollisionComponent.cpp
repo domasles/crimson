@@ -39,14 +39,91 @@ namespace engine {
         m_Collision.size = transform->getSize();
     }
 
-    bool CollisionComponent::checkCollision(CollisionComponent* other) const {
-        if (!m_Enabled || !other->isEnabled()) return false;
-        if (!m_Collision.type->shouldBlock() || !other->getCollision().type->shouldBlock()) return false;
+    CollisionResult CollisionComponent::testCollisionAt(const Vector2& testPosition) const {
+        if (!m_Enabled) return CollisionResult{};
 
-        Vector2 pos1 = getWorldPosition();
-        Vector2 pos2 = other->getWorldPosition();
+        // Test map collision first
+        if (testMapCollisionAt(testPosition)) {
+            CollisionResult result;
+            result.hasCollision = true;
+            result.hitType = nullptr; // Map collision doesn't have a specific type
+            result.hitEntity = nullptr;
+            result.contactPoint = testPosition;
+            return result;
+        }
 
-        return m_Collision.shape->checkCollisionBetween(m_Collision, pos1, other->getCollision(), pos2);
+        // Test entity collisions
+        auto otherEntities = getOtherCollisionEntities();
+        for (auto* otherEntity : otherEntities) {
+            auto* otherCollision = otherEntity->getComponent<CollisionComponent>();
+            if (!otherCollision || !otherCollision->isEnabled()) continue;
+
+            CollisionResult result = checkCollisionWithEntityAt(otherEntity, testPosition);
+            if (result.hasCollision) {
+                return result; // Return first collision found
+            }
+        }
+
+        return CollisionResult{}; // No collision
+    }
+
+    CollisionResult CollisionComponent::checkCollisionWithEntity(Entity* other) const {
+        return checkCollisionWithEntityAt(other, getWorldPosition());
+    }
+
+    CollisionResult CollisionComponent::checkCollisionWithEntityAt(Entity* other, const Vector2& testPosition) const {
+        if (!m_Enabled || !other) return CollisionResult{};
+
+        auto* otherCollision = other->getComponent<CollisionComponent>();
+        if (!otherCollision || !otherCollision->isEnabled()) return CollisionResult{};
+
+        Vector2 myWorldPos = {
+            testPosition.getRawX() + m_Collision.offset.getRawX(),
+            testPosition.getRawY() + m_Collision.offset.getRawY()
+        };
+
+        Vector2 otherWorldPos = otherCollision->getCollisionWorldPosition();
+
+        bool hasCollision = m_Collision.shape->checkCollision(
+            myWorldPos, m_Collision.size,
+            *otherCollision->getCollision().shape,
+            otherWorldPos, otherCollision->getCollision().size
+        );
+
+        CollisionResult result;
+        result.hasCollision = hasCollision;
+        result.hitType = hasCollision ? otherCollision->getCollisionType() : nullptr;
+        result.hitEntity = hasCollision ? other : nullptr;
+        result.contactPoint = myWorldPos;
+
+        return result;
+    }
+
+    MultiCollisionResult CollisionComponent::getAllCollisionsAt(const Vector2& testPosition) const {
+        MultiCollisionResult result;
+        
+        if (!m_Enabled) return result;
+
+        // Test map collision
+        if (testMapCollisionAt(testPosition)) {
+            CollisionResult mapCollision;
+            mapCollision.hasCollision = true;
+            mapCollision.hitType = nullptr;
+            mapCollision.hitEntity = nullptr;
+            mapCollision.contactPoint = testPosition;
+            result.collisions.push_back(mapCollision);
+        }
+
+        // Test all entity collisions
+        auto otherEntities = getOtherCollisionEntities();
+        for (auto* otherEntity : otherEntities) {
+            CollisionResult entityCollision = checkCollisionWithEntityAt(otherEntity, testPosition);
+            if (entityCollision.hasCollision) {
+                result.collisions.push_back(entityCollision);
+            }
+        }
+
+        return result;
     }
 
     Vector2 CollisionComponent::getWorldPosition() const {
@@ -62,44 +139,13 @@ namespace engine {
         return {worldPos.getRawX() + m_Collision.offset.getRawX(), worldPos.getRawY() + m_Collision.offset.getRawY()};
     }
 
-    bool CollisionComponent::checkWorldCollision() const {
-        if (!m_Enabled) return false;
-
-        Map* currentMap = getCurrentMap();
-        if (!currentMap) return false;
-
-        Vector2 worldPos = getWorldPosition();
-        return currentMap->checkCollisionAt(m_Collision, worldPos);
-    }
-    
-    bool CollisionComponent::canMoveTo(const Vector2& newPosition) const {
-        if (!m_Enabled) return true;
-
-        auto* transform = m_Entity->getComponent<TransformComponent>();
-        if (!transform) return true;
-
-        Vector2 originalPos = transform->getPosition();
-        Transform& directTransform = const_cast<TransformComponent*>(transform)->getTransform();
-
-        directTransform.setPosition(newPosition);
-        bool wouldCollide = checkWorldCollision();
-        directTransform.setPosition(originalPos);
-
-        if (wouldCollide) return false;
-        if (wouldCollideWithEntitiesAt(newPosition)) return false;
-
-        return true;
-    }
-
-    bool CollisionComponent::wouldCollideAt(const Vector2& position) const {
-        if (!m_Enabled) return false;
-
+    bool CollisionComponent::testMapCollisionAt(const Vector2& testPosition) const {
         Map* currentMap = getCurrentMap();
         if (!currentMap) return false;
 
         Vector2 testWorldPos = {
-            position.getRawX() + m_Collision.offset.getRawX(),
-            position.getRawY() + m_Collision.offset.getRawY()
+            testPosition.getRawX() + m_Collision.offset.getRawX(),
+            testPosition.getRawY() + m_Collision.offset.getRawY()
         };
 
         const auto& tiles = currentMap->getCollisionTiles();
@@ -122,38 +168,27 @@ namespace engine {
         return nullptr;
     }
 
-    bool CollisionComponent::wouldCollideWithEntitiesAt(const Vector2& position) const {
-        if (!m_Enabled) return false;
-        
+    std::vector<Entity*> CollisionComponent::getOtherCollisionEntities() const {
         auto& sceneManager = getSceneManager();
         auto currentScene = sceneManager.getCurrentScene();
 
-        if (!currentScene) return false;
+        if (!currentScene) return {};
+
         auto collisionComponents = currentScene->getEntitiesWithComponent<CollisionComponent>();
+        std::vector<Entity*> otherEntities;
 
         for (auto* otherCollision : collisionComponents) {
-            if (otherCollision == this) continue;
+            if (otherCollision == this) continue; // Skip self
             if (!otherCollision->isEnabled()) continue;
-            if (!otherCollision->getCollisionType()->shouldBlock()) continue;
-
-            Vector2 otherPosition = otherCollision->getWorldPosition();
-
-            Vector2 testWorldPos = {
-                position.getRawX() + m_Collision.offset.getRawX(),
-                position.getRawY() + m_Collision.offset.getRawY()
-            };
-
-            Vector2 otherWorldPos = {
-                otherPosition.getRawX() + otherCollision->getCollision().offset.getRawX(),
-                otherPosition.getRawY() + otherCollision->getCollision().offset.getRawY()
-            };
-
-            if (m_Collision.shape->checkCollision(testWorldPos, m_Collision.size, *otherCollision->getCollision().shape, otherWorldPos, otherCollision->getCollision().size)) {
-                if (otherCollision->getCollisionType()->shouldBlock()) return true;
+            
+            // Only include entities that participate in queries OR are blocking
+            if (otherCollision->getParticipatesInQueries() || 
+                (otherCollision->getCollisionType() && otherCollision->getCollisionType()->shouldBlock())) {
+                otherEntities.push_back(otherCollision->getEntity());
             }
         }
-        
-        return false;
+
+        return otherEntities;
     }
 
 }

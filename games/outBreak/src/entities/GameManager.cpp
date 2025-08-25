@@ -4,6 +4,10 @@
 #include <entities/Ball.h>
 #include <entities/Paddle.h>
 #include <entities/Brick.h>
+#include <components/CollisionComponent.h>
+#include <utils/collision.h>
+
+using namespace engine::utils::collision;
 
 namespace outBreak {
     void GameManager::init() {
@@ -45,6 +49,12 @@ namespace outBreak {
                 brick->setRainbowEffect(false);
                 brick->setRainbowTime(0.0f);
                 
+                // Re-enable collision when brick is reset
+                auto* brickCollision = brick->getComponent<CollisionComponent>();
+                if (brickCollision) {
+                    brickCollision->setEnabled(true);
+                }
+                
                 // Reset color to black
                 auto* renderer = brick->getComponent<BoxRendererComponent>();
                 if (renderer) {
@@ -62,26 +72,23 @@ namespace outBreak {
     void GameManager::checkBallPaddleCollision() {
         if (!m_Ball || !m_Paddle) return;
 
+        auto* ballCollision = m_Ball->getComponent<CollisionComponent>();
         auto* ballTransform = m_Ball->getComponent<TransformComponent>();
-        auto* paddleTransform = m_Paddle->getComponent<TransformComponent>();
-
-        if (!ballTransform || !paddleTransform) return;
-
-        Vector2 ballPos = ballTransform->getPosition();
-        Vector2 ballSize = ballTransform->getSize();
-        Vector2 paddlePos = paddleTransform->getPosition();
-        Vector2 paddleSize = paddleTransform->getSize();
-
-        // Expand collision area slightly to catch fast-moving balls
-        float collisionMargin = 5.0f;
         
-        // Check if ball is overlapping with paddle (with margin)
-        if (ballPos.getRawX() < paddlePos.getRawX() + paddleSize.getRawX() + collisionMargin &&
-            ballPos.getRawX() + ballSize.getRawX() > paddlePos.getRawX() - collisionMargin &&
-            ballPos.getRawY() < paddlePos.getRawY() + paddleSize.getRawY() + collisionMargin &&
-            ballPos.getRawY() + ballSize.getRawY() > paddlePos.getRawY() - collisionMargin) {
+        if (!ballCollision || !ballTransform) return;
+
+        // Use engine's collision detection to check if ball hits paddle
+        CollisionResult collision = ballCollision->checkCollisionWithEntity(m_Paddle);
+        
+        if (collision.hasCollision) {
+            Vector2 ballPos = ballTransform->getPosition();
+            Vector2 ballSize = ballTransform->getSize();
             
-            // Get ball center and paddle center
+            auto* paddleTransform = m_Paddle->getComponent<TransformComponent>();
+            Vector2 paddlePos = paddleTransform->getPosition();
+            Vector2 paddleSize = paddleTransform->getSize();
+
+            // Get ball center and paddle center for collision direction calculation
             float ballCenterX = ballPos.getRawX() + ballSize.getRawX() / 2.0f;
             float ballCenterY = ballPos.getRawY() + ballSize.getRawY() / 2.0f;
             float paddleCenterX = paddlePos.getRawX() + paddleSize.getRawX() / 2.0f;
@@ -124,8 +131,9 @@ namespace outBreak {
     void GameManager::checkBallBrickCollisions() {
         if (!m_Ball) return;
 
+        auto* ballCollision = m_Ball->getComponent<CollisionComponent>();
         auto* ballTransform = m_Ball->getComponent<TransformComponent>();
-        if (!ballTransform) return;
+        if (!ballCollision || !ballTransform) return;
 
         Vector2 ballPos = ballTransform->getPosition();
         Vector2 ballSize = ballTransform->getSize();
@@ -133,20 +141,21 @@ namespace outBreak {
         for (auto* brick : m_Bricks) {
             if (!brick || brick->isDestroyed()) continue;
 
-            auto* brickTransform = brick->getComponent<TransformComponent>();
-            if (!brickTransform) continue;
-
-            Vector2 brickPos = brickTransform->getPosition();
-            Vector2 brickSize = brickTransform->getSize();
-
-            // AABB collision detection
-            if (ballPos.getRawX() < brickPos.getRawX() + brickSize.getRawX() &&
-                ballPos.getRawX() + ballSize.getRawX() > brickPos.getRawX() &&
-                ballPos.getRawY() < brickPos.getRawY() + brickSize.getRawY() &&
-                ballPos.getRawY() + ballSize.getRawY() > brickPos.getRawY()) {
-                
-                // Collision detected - destroy brick
+            // Use engine's collision detection to check if ball hits brick
+            CollisionResult collision = ballCollision->checkCollisionWithEntity(brick);
+            
+            if (collision.hasCollision) {
+                // Collision detected - destroy brick and disable its collision
                 brick->setDestroyed(true);
+                
+                auto* brickCollision = brick->getComponent<CollisionComponent>();
+                if (brickCollision) {
+                    brickCollision->setEnabled(false);
+                }
+
+                auto* brickTransform = brick->getComponent<TransformComponent>();
+                Vector2 brickPos = brickTransform->getPosition();
+                Vector2 brickSize = brickTransform->getSize();
 
                 // Calculate collision side for proper bounce
                 float ballCenterX = ballPos.getRawX() + ballSize.getRawX() / 2.0f;

@@ -5,10 +5,56 @@
 #include <collisions/shapes/BoxShape.h>
 #include <collisions/types/BlockCollision.h>
 
+#include <Entity.h>
+
 using namespace engine::collisions::shapes;
 using namespace engine::collisions::types;
 
 namespace engine::utils::collision {
+    bool CollisionResult::isBlocking() const {
+        return hitType && hitType->shouldBlock();
+    }
+
+    bool CollisionResult::isTrigger() const {
+        return hitType && hitType->shouldTriggerEvents() && !hitType->shouldBlock();
+    }
+
+    bool MultiCollisionResult::hasBlockingCollision() const {
+        for (const auto& collision : collisions) {
+            if (collision.isBlocking()) return true;
+        }
+
+        return false;
+    }
+
+    CollisionResult MultiCollisionResult::getFirstBlocking() const {
+        for (const auto& collision : collisions) {
+            if (collision.isBlocking()) return collision;
+        }
+
+        return CollisionResult{};
+    }
+
+    std::vector<CollisionResult> MultiCollisionResult::getAllBlocking() const {
+        std::vector<CollisionResult> blocking;
+
+        for (const auto& collision : collisions) {
+            if (collision.isBlocking()) blocking.push_back(collision);
+        }
+
+        return blocking;
+    }
+
+    std::vector<CollisionResult> MultiCollisionResult::getAllTriggers() const {
+        std::vector<CollisionResult> triggers;
+
+        for (const auto& collision : collisions) {
+            if (collision.isTrigger()) triggers.push_back(collision);
+        }
+
+        return triggers;
+    }
+
     Collision::Collision() {
         type = std::make_unique<BlockCollision>();
         shape = std::make_unique<BoxShape>();

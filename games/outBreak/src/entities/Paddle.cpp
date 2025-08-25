@@ -1,6 +1,12 @@
 #include <pch.h>
 
 #include <entities/Paddle.h>
+#include <components/CollisionComponent.h>
+#include <collisions/types/BlockCollision.h>
+#include <collisions/shapes/BoxShape.h>
+
+using namespace engine::collisions::types;
+using namespace engine::collisions::shapes;
 
 namespace outBreak {
     void Paddle::init() {
@@ -9,8 +15,6 @@ namespace outBreak {
         auto* input = addComponent<InputComponent>();
         auto* collision = addComponent<CollisionComponent>();
 
-        // Set paddle size and position using logical coordinates
-        // Paddle width in logical space (50 units in 1600px base = 0.03125 ratio)
         const float LOGICAL_PADDLE_WIDTH = 100.0f;
         const float LOGICAL_PADDLE_HEIGHT = 20.0f;
         
@@ -21,6 +25,11 @@ namespace outBreak {
         transform->setPosition({800.0f - LOGICAL_PADDLE_WIDTH/2, 780.0f});
 
         renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f)); // Black
+
+        // Set up collision component - Paddle can be hit by Ball
+        collision->setCollisionType(std::make_unique<BlockCollision>());
+        collision->setCollisionShape(std::make_unique<BoxShape>());
+        collision->setParticipatesInQueries(true);
 
         // Set up input
         if (getSceneManager().getCurrentScene()->hasInputSystem()) {

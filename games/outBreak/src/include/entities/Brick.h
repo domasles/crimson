@@ -12,6 +12,7 @@ namespace outBreak {
             virtual ~Brick() = default;
 
             void init() override;
+            void init(const Vector2& position); // New init with position parameter
             void update(float deltaTime) override;
             void render() override;
 

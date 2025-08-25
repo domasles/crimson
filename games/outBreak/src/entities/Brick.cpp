@@ -1,21 +1,35 @@
 #include <pch.h>
 
 #include <entities/Brick.h>
+#include <components/CollisionComponent.h>
+#include <collisions/types/BlockCollision.h>
+#include <collisions/shapes/BoxShape.h>
+
+using namespace engine::collisions::types;
+using namespace engine::collisions::shapes;
 
 namespace outBreak {
-    // Constants for brick size (should match MainScene values)
     const float BRICK_WIDTH = 80.0f;
     const float BRICK_HEIGHT = 30.0f;
 
     void Brick::init() {
+        init(Vector2{0.0f, 0.0f});
+    }
+
+    void Brick::init(const Vector2& position) {
         auto* transform = addComponent<TransformComponent>();
         auto* renderer = addComponent<BoxRendererComponent>();
+        auto* collision = addComponent<CollisionComponent>();
 
+        transform->setPosition(position);
         transform->setSize({BRICK_WIDTH, BRICK_HEIGHT});
-        renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f)); // Black initially
-        
-        // Store position for wave calculations
-        m_Position = transform->getPosition();
+        renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f));
+
+        collision->setCollisionType(std::make_unique<BlockCollision>());
+        collision->setCollisionShape(std::make_unique<BoxShape>());
+        collision->setParticipatesInQueries(true);
+
+        m_Position = position;
     }
 
     void Brick::update(float deltaTime) {

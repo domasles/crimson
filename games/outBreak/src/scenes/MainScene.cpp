@@ -59,18 +59,16 @@ namespace outBreak {
         for (int row = 0; row < ROWS; ++row) {
             for (int col = 0; col < COLS; ++col) {
                 auto* brick = createEntity<Brick>();
-                brick->init();
+                
+                // Calculate position for this brick
+                float x = START_X + col * (BRICK_WIDTH + BRICK_SPACING);
+                float y = START_Y + row * (BRICK_HEIGHT + BRICK_SPACING);
+                
+                // Initialize brick with position - avoids collision interference
+                brick->init(Vector2{x, y});
                 
                 // Set grid position for wave calculations
                 brick->setGridPosition(row, col);
-                
-                auto* transform = brick->getComponent<TransformComponent>();
-                if (transform) {
-                    float x = START_X + col * (BRICK_WIDTH + BRICK_SPACING);
-                    float y = START_Y + row * (BRICK_HEIGHT + BRICK_SPACING);
-                    transform->setPosition({x, y});
-                    brick->setPosition({x, y}); // Store position for wave calculations
-                }
                 
                 m_Bricks.push_back(brick);
             }

@@ -9,6 +9,11 @@
 #include <components/TextureComponent.h>
 #include <components/InputComponent.h>
 
+#include <collisions/types/TriggerCollision.h>
+#include <collisions/types/BlockCollision.h>
+#include <collisions/types/NoneCollision.h>
+#include <collisions/shapes/BoxShape.h>
+
 #include <Component.h>
 #include <Resources.h>
 #include <Transform.h>

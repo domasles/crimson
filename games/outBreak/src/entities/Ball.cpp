@@ -2,14 +2,22 @@
 
 #include <entities/Ball.h>
 
+using namespace engine::collisions::types;
+using namespace engine::collisions::shapes;
+
 namespace outBreak {
     void Ball::init() {
         auto* transform = addComponent<TransformComponent>();
         auto* renderer = addComponent<BoxRendererComponent>();
+        auto* collision = addComponent<CollisionComponent>();
 
         transform->setPosition({800.0f - BALL_SIZE/2, 700.0f});
         transform->setSize({BALL_SIZE, BALL_SIZE});
-        renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f)); // Black
+        renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f));
+
+        collision->setCollisionType(std::make_unique<TriggerCollision>());
+        collision->setCollisionShape(std::make_unique<BoxShape>());
+        collision->setParticipatesInQueries(false);
     }
 
     void Ball::update(float deltaTime) {
@@ -18,10 +26,10 @@ namespace outBreak {
         auto* transform = getComponent<TransformComponent>();
         if (!transform) return;
 
-        // Use engine's TransformComponent movement system with normalized direction
         Vector2 velocity = m_Direction * BALL_SPEED;
         Vector2 movement = velocity * deltaTime;
-        transform->move(movement); // Use engine's move() function instead of addPosition()
+
+        transform->move(movement);
 
         // Get current position after engine movement
         Vector2 currentPos = transform->getPosition();
