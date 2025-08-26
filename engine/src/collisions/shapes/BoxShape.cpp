@@ -6,7 +6,13 @@
 
 namespace engine::collisions::shapes {
     CollisionResult BoxShape::checkCollision(const Vector2& myPos, const Vector2& mySize, const CollisionShape& other, const Vector2& otherPos, const Vector2& otherSize) const {
-        return other.checkCollisionWithBox(otherPos, otherSize, myPos, mySize);
+        auto result = other.checkCollisionWithBox(otherPos, otherSize, myPos, mySize);
+
+        if (result.hasCollision) {
+            result.contactNormal = Vector2(-result.contactNormal.getRawX(), -result.contactNormal.getRawY());
+        }
+
+        return result;
     }
 
     CollisionResult BoxShape::checkCollisionWithBox(const Vector2& myPos, const Vector2& mySize, const Vector2& boxPos, const Vector2& boxSize) const {

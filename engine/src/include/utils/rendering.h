@@ -55,7 +55,7 @@ namespace engine::utils::rendering {
 
     class Color {
         public:
-            Color(float r, float g, float b, float a = 1.0f) : r(r), g(g), b(b), a(a) {}
+            Color(float r, float g, float b, float a = 1.0f);
             float r, g, b, a;
     };
 }

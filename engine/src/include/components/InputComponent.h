@@ -14,10 +14,10 @@ namespace engine {
             virtual ~InputComponent() = default;
 
             void setInputSystem(InputSystem* inputSystem) { m_InputSystem = inputSystem; }
-            InputSystem* getInputSystem() const { return m_InputSystem; }
-
-            Vector2 getMovementVector() const;
             bool isActionPressed(const std::string& action) const;
+
+            InputSystem* getInputSystem() const { return m_InputSystem; }
+            Vector2 getMovementVector() const;
 
         private:
             InputSystem* m_InputSystem = nullptr;

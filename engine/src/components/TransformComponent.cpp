@@ -16,5 +16,4 @@ namespace engine {
         Vector2 newPosition = m_Transform.getPosition() + movement;
         setPosition(newPosition);
     }
-
 }

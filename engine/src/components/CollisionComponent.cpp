@@ -11,7 +11,6 @@
 using namespace engine::utils::logger;
 
 namespace engine {
-
     void CollisionComponent::init() {
         Component::init();
 
@@ -30,6 +29,7 @@ namespace engine {
 
     void CollisionComponent::updateFromTransform() {
         auto* transform = m_Entity->getComponent<TransformComponent>();
+
         if (!transform) {
             Logger::engine_warn("CollisionComponent: No Transform component found, using default size");
             m_Collision.size = {32, 32};
@@ -48,9 +48,7 @@ namespace engine {
             if (!otherCollision || !otherCollision->isEnabled()) continue;
 
             CollisionResult result = checkCollisionWithEntityAt(otherEntity, testPosition);
-            if (result.hasCollision) {
-                return result;
-            }
+            if (result.hasCollision) return result;
         }
 
         return CollisionResult{};
@@ -79,13 +77,12 @@ namespace engine {
             otherWorldPos, otherCollision->getCollision().size
         );
 
-        bool hasCollision = collisionResult.hasCollision;
-
         CollisionResult result;
-        result.hasCollision = hasCollision;
-        result.hitType = hasCollision ? otherCollision->getCollisionType() : nullptr;
-        result.hitEntity = hasCollision ? other : nullptr;
-        result.contactPoint = myWorldPos;
+
+        result.hasCollision = collisionResult.hasCollision;
+        result.hitType = collisionResult.hasCollision ? otherCollision->getCollisionType() : nullptr;
+        result.hitEntity = collisionResult.hasCollision ? other : nullptr;
+        result.contactPoint = collisionResult.contactPoint;
         result.contactNormal = collisionResult.contactNormal;
 
         return result;
@@ -138,5 +135,4 @@ namespace engine {
 
         return otherEntities;
     }
-
 }

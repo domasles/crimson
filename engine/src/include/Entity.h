@@ -43,12 +43,14 @@ namespace engine {
             template<typename T>
 
             bool hasComponent() const {
+                static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
                 return m_Components.find(std::type_index(typeid(T))) != m_Components.end();
             }
             
             template<typename T>
 
             void removeComponent() {
+                static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
                 auto it = m_Components.find(std::type_index(typeid(T)));
 
                 if (it != m_Components.end()) {
@@ -59,7 +61,6 @@ namespace engine {
 
         protected:
             std::unordered_map<std::type_index, std::unique_ptr<Component>> m_Components;
-
             void updateComponents(float deltaTime);
     };
 }

@@ -33,6 +33,7 @@ namespace engine {
             template<typename T>
 
             T* findEntity() {
+                static_assert(std::is_base_of_v<Entity, T>, "T must derive from Entity");
                 for (auto& entity : m_Entities) {
                     if (auto* typed = dynamic_cast<T*>(entity.get())) {
                         return typed;
@@ -50,16 +51,18 @@ namespace engine {
             }
 
             size_t getEntityCount() const { return m_Entities.size(); }
-
-            // Get all entities with CollisionComponent for collision checking
             template<typename T>
+
             std::vector<T*> getEntitiesWithComponent() {
+                static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
                 std::vector<T*> result;
+
                 for (auto& entity : m_Entities) {
                     if (auto* component = entity->getComponent<T>()) {
                         result.push_back(component);
                     }
                 }
+
                 return result;
             }
 
@@ -135,6 +138,7 @@ namespace engine {
     template<typename T>
 
     bool createScene(const std::string& name) {
+        static_assert(std::is_base_of_v<Scene, T>, "T must derive from Scene");
         return getSceneManager().registerScene(name, std::make_shared<T>());
     }
     

@@ -2,8 +2,8 @@
 
 #include <utils/collision.h>
 
-#include <collisions/shapes/BoxShape.h>
 #include <collisions/types/BlockCollision.h>
+#include <collisions/shapes/BoxShape.h>
 
 #include <Entity.h>
 
