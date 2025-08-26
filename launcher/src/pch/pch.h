@@ -21,10 +21,13 @@
     #include <wx/choicdlg.h>
 #endif
 
+#include <nlohmann/json.hpp>
+
 #include <filesystem>
 #include <iostream>
 #include <fstream>
 
+#include <utility>
 #include <format>
 #include <string>
 #include <vector>

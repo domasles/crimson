@@ -40,6 +40,7 @@ if(WASM)
                 src/include
                 src/pch
                 ../engine/src/include
+                ../vendor/json/include
         )
 
         target_link_libraries(${GAME_LAUNCHER_TARGET}
@@ -75,6 +76,7 @@ else()
             src/include
             src/pch
             ../engine/src/include
+            ../vendor/json/include
     )
 
     target_link_libraries(${LAUNCHER_TARGET}

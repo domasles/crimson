@@ -1,4 +1,5 @@
 #include <pch.h>
+
 #include <utils/game_selector.h>
 #include <utils/filesystem.h>
 
@@ -9,38 +10,33 @@
 
 namespace launcher::utils::game_selector {
     bool loadGameManifest(const std::string& manifestPath, GameInfo& gameInfo) {
-        std::ifstream file(manifestPath);
-        if (!file.is_open()) return false;
+        json jsonData;
 
-        std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        file.close();
+        if (!filesystem::loadJSONFile(manifestPath, &jsonData)) return false;
+        const auto& json = jsonData;
 
-        auto findValue = [&content](const std::string& key) -> std::string {
-            std::string searchKey = "\"" + key + "\"";
+        try {
+            if (json.contains("display_name") && json["display_name"].is_string()) {
+                gameInfo.displayName = json["display_name"];
+            }
+            
+            if (json.contains("version") && json["version"].is_string()) {
+                gameInfo.version = json["version"];
+            }
+            
+            if (json.contains("dll_name") && json["dll_name"].is_string()) {
+                gameInfo.dllName = json["dll_name"];
+            }
+            
+            gameInfo.manifestPath = manifestPath;
 
-            size_t keyPos = content.find(searchKey);
-            if (keyPos == std::string::npos) return "";
+            return !gameInfo.displayName.empty() && !gameInfo.dllName.empty();
+            
+        }
 
-            size_t colonPos = content.find(":", keyPos);
-            if (colonPos == std::string::npos) return "";
-
-            size_t startQuote = content.find("\"", colonPos);
-            if (startQuote == std::string::npos) return "";
-
-            startQuote++;
-
-            size_t endQuote = content.find("\"", startQuote);
-            if (endQuote == std::string::npos) return "";
-
-            return content.substr(startQuote, endQuote - startQuote);
-        };
-
-        gameInfo.displayName = findValue("display_name");
-        gameInfo.version = findValue("version");
-        gameInfo.dllName = findValue("dll_name");
-        gameInfo.manifestPath = manifestPath;
-
-        return !gameInfo.displayName.empty() && !gameInfo.dllName.empty();
+        catch (const std::exception& e) {
+            return false;
+        }
     }
 
     bool validateGameDll(const GameInfo& gameInfo) {

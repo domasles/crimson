@@ -3,6 +3,23 @@
 #include <utils/filesystem.h>
 
 namespace launcher::utils::filesystem {
+    const bool loadJSONFile(const std::string& filePath, json* jsonPtr) {
+        std::ifstream file(filePath);
+        
+        if (!file.is_open()) {
+            return false;
+        }
+
+        try {
+            file >> *jsonPtr;
+            return true;
+        }
+
+        catch (const std::exception& e) {
+            return false;
+        }
+    }
+
     bool fileExists(const std::string& path) {
         try {
             return std::filesystem::exists(path) && std::filesystem::is_regular_file(path);
