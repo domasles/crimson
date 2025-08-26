@@ -1,6 +1,9 @@
 #pragma once
 
 #include <utils/filesystem.h>
+#include <utils/collision.h>
+#include <utils/rendering.h>
+#include <utils/logger.h>
 #include <utils/math.h>
 
 #include <components/BoxRendererComponent.h>
@@ -13,6 +16,8 @@
 #include <collisions/types/BlockCollision.h>
 #include <collisions/types/NoneCollision.h>
 #include <collisions/shapes/BoxShape.h>
+
+#include <mapCollisionTiles/MapTile.h>
 
 #include <Component.h>
 #include <Resources.h>
@@ -33,6 +38,7 @@ namespace engine::utils {
     using namespace math;
     using namespace logger;
     using namespace collision;
+    using namespace rendering;
     using namespace filesystem;
 }
 

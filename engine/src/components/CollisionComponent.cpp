@@ -42,17 +42,6 @@ namespace engine {
     CollisionResult CollisionComponent::testCollisionAt(const Vector2& testPosition) const {
         if (!m_Enabled) return CollisionResult{};
 
-        // Test map collision first
-        if (testMapCollisionAt(testPosition)) {
-            CollisionResult result;
-            result.hasCollision = true;
-            result.hitType = nullptr; // Map collision doesn't have a specific type
-            result.hitEntity = nullptr;
-            result.contactPoint = testPosition;
-            return result;
-        }
-
-        // Test entity collisions
         auto otherEntities = getOtherCollisionEntities();
         for (auto* otherEntity : otherEntities) {
             auto* otherCollision = otherEntity->getComponent<CollisionComponent>();
@@ -60,11 +49,11 @@ namespace engine {
 
             CollisionResult result = checkCollisionWithEntityAt(otherEntity, testPosition);
             if (result.hasCollision) {
-                return result; // Return first collision found
+                return result;
             }
         }
 
-        return CollisionResult{}; // No collision
+        return CollisionResult{};
     }
 
     CollisionResult CollisionComponent::checkCollisionWithEntity(Entity* other) const {
@@ -96,6 +85,24 @@ namespace engine {
         result.hitEntity = hasCollision ? other : nullptr;
         result.contactPoint = myWorldPos;
 
+        // Calculate contact normal for box-to-box collision
+        if (hasCollision) {
+            Vector2 myCenterPos = myWorldPos + m_Collision.size * 0.5f;
+            Vector2 otherCenterPos = otherWorldPos + otherCollision->getCollision().size * 0.5f;
+            Vector2 delta = myCenterPos - otherCenterPos;
+
+            float overlapX = (m_Collision.size.getRawX() + otherCollision->getCollision().size.getRawX()) * 0.5f - std::abs(delta.getRawX());
+            float overlapY = (m_Collision.size.getRawY() + otherCollision->getCollision().size.getRawY()) * 0.5f - std::abs(delta.getRawY());
+
+            if (overlapX < overlapY) {
+                result.contactNormal = Vector2(delta.getRawX() > 0 ? 1.0f : -1.0f, 0.0f);
+            }
+            
+            else {
+                result.contactNormal = Vector2(0.0f, delta.getRawY() > 0 ? 1.0f : -1.0f);
+            }
+        }
+
         return result;
     }
 
@@ -104,17 +111,6 @@ namespace engine {
         
         if (!m_Enabled) return result;
 
-        // Test map collision
-        if (testMapCollisionAt(testPosition)) {
-            CollisionResult mapCollision;
-            mapCollision.hasCollision = true;
-            mapCollision.hitType = nullptr;
-            mapCollision.hitEntity = nullptr;
-            mapCollision.contactPoint = testPosition;
-            result.collisions.push_back(mapCollision);
-        }
-
-        // Test all entity collisions
         auto otherEntities = getOtherCollisionEntities();
         for (auto* otherEntity : otherEntities) {
             CollisionResult entityCollision = checkCollisionWithEntityAt(otherEntity, testPosition);
@@ -139,35 +135,6 @@ namespace engine {
         return {worldPos.getRawX() + m_Collision.offset.getRawX(), worldPos.getRawY() + m_Collision.offset.getRawY()};
     }
 
-    bool CollisionComponent::testMapCollisionAt(const Vector2& testPosition) const {
-        Map* currentMap = getCurrentMap();
-        if (!currentMap) return false;
-
-        Vector2 testWorldPos = {
-            testPosition.getRawX() + m_Collision.offset.getRawX(),
-            testPosition.getRawY() + m_Collision.offset.getRawY()
-        };
-
-        const auto& tiles = currentMap->getCollisionTiles();
-
-        for (const auto& tile : tiles) {
-            if (m_Collision.shape->checkCollisionWithTile(testWorldPos, m_Collision.size, tile)) return true;
-        }
-
-        return false;
-    }
-
-    Map* CollisionComponent::getCurrentMap() const {
-        auto& sceneManager = getSceneManager();
-        auto currentScene = sceneManager.getCurrentScene();
-
-        if (currentScene && currentScene->hasMap()) {
-            return currentScene->getMap();
-        }
-
-        return nullptr;
-    }
-
     std::vector<Entity*> CollisionComponent::getOtherCollisionEntities() const {
         auto& sceneManager = getSceneManager();
         auto currentScene = sceneManager.getCurrentScene();
@@ -178,12 +145,10 @@ namespace engine {
         std::vector<Entity*> otherEntities;
 
         for (auto* otherCollision : collisionComponents) {
-            if (otherCollision == this) continue; // Skip self
+            if (otherCollision == this) continue;
             if (!otherCollision->isEnabled()) continue;
-            
-            // Only include entities that participate in queries OR are blocking
-            if (otherCollision->getParticipatesInQueries() || 
-                (otherCollision->getCollisionType() && otherCollision->getCollisionType()->shouldBlock())) {
+
+            if (otherCollision->getParticipatesInQueries() || (otherCollision->getCollisionType() && otherCollision->getCollisionType()->shouldBlock())) {
                 otherEntities.push_back(otherCollision->getEntity());
             }
         }

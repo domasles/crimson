@@ -38,7 +38,6 @@ namespace engine {
             const CollisionType* getCollisionType() const { return m_Collision.type.get(); }
             const CollisionShape* getCollisionShape() const { return m_Collision.shape.get(); }
 
-            // New pure collision detection methods
             CollisionResult testCollisionAt(const Vector2& testPosition) const;
             CollisionResult checkCollisionWithEntity(Entity* other) const;
             CollisionResult checkCollisionWithEntityAt(Entity* other, const Vector2& testPosition) const;
@@ -48,13 +47,12 @@ namespace engine {
             Vector2 getCollisionWorldPosition() const;
 
         private:
-            Collision m_Collision;
             bool m_Enabled = true;
-            bool m_ParticipatesInQueries = false; // Explicit opt-in for scene queries
+            bool m_ParticipatesInQueries = false;
 
             void updateFromTransform();
-            class Map* getCurrentMap() const;
-            bool testMapCollisionAt(const Vector2& testPosition) const;
+
+            Collision m_Collision;
             std::vector<Entity*> getOtherCollisionEntities() const;
     };
 }

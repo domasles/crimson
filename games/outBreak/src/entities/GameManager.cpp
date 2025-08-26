@@ -1,64 +1,42 @@
 #include <pch.h>
 
 #include <entities/GameManager.h>
-#include <entities/Ball.h>
 #include <entities/Paddle.h>
 #include <entities/Brick.h>
-#include <components/CollisionComponent.h>
-#include <utils/collision.h>
+#include <entities/Ball.h>
 
 using namespace engine::utils::collision;
 
 namespace outBreak {
-    void GameManager::init() {
-        // GameManager doesn't need visual components
-    }
-
     void GameManager::update(float deltaTime) {
         updateComponents(deltaTime);
         
         checkCollisions();
         checkBallBounds();
 
-        // Check win condition
         if (allBricksDestroyed()) {
-            // Game won - reset everything
             resetGame();
         }
     }
 
-    void GameManager::render() {
-        // GameManager doesn't render anything visual
-    }
-
     void GameManager::resetGame() {
-        // Reset ball position and ensure predictable 45-degree angle
         if (m_Ball) {
             auto* transform = m_Ball->getComponent<TransformComponent>();
+
             if (transform) {
-                transform->setPosition({800.0f - 8.0f, 400.0f}); // Center horizontally, middle vertically
+                transform->setPosition(m_Ball->getInitialPosition());
             }
-            // Use new resetDirection method to ensure predictable 45-degree movement
+
             m_Ball->resetDirection();
         }
 
-        // Reset all bricks - make them alive again and reset all effects
         for (auto* brick : m_Bricks) {
             if (brick) {
                 brick->setDestroyed(false); // Make brick alive again
-                brick->setRainbowEffect(false);
-                brick->setRainbowTime(0.0f);
-                
-                // Re-enable collision when brick is reset
-                auto* brickCollision = brick->getComponent<CollisionComponent>();
-                if (brickCollision) {
-                    brickCollision->setEnabled(true);
-                }
-                
-                // Reset color to black
                 auto* renderer = brick->getComponent<BoxRendererComponent>();
+
                 if (renderer) {
-                    renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f)); // Back to black
+                    renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f));
                 }
             }
         }
@@ -77,7 +55,6 @@ namespace outBreak {
         
         if (!ballCollision || !ballTransform) return;
 
-        // Use engine's collision detection to check if ball hits paddle
         CollisionResult collision = ballCollision->checkCollisionWithEntity(m_Paddle);
         
         if (collision.hasCollision) {
@@ -85,45 +62,36 @@ namespace outBreak {
             Vector2 ballSize = ballTransform->getSize();
             
             auto* paddleTransform = m_Paddle->getComponent<TransformComponent>();
+
             Vector2 paddlePos = paddleTransform->getPosition();
             Vector2 paddleSize = paddleTransform->getSize();
 
-            // Get ball center and paddle center for collision direction calculation
-            float ballCenterX = ballPos.getRawX() + ballSize.getRawX() / 2.0f;
-            float ballCenterY = ballPos.getRawY() + ballSize.getRawY() / 2.0f;
-            float paddleCenterX = paddlePos.getRawX() + paddleSize.getRawX() / 2.0f;
-            float paddleCenterY = paddlePos.getRawY() + paddleSize.getRawY() / 2.0f;
+            Vector2 normal = collision.contactNormal;
 
-            // Calculate distances to determine collision side
-            float deltaX = ballCenterX - paddleCenterX;
-            float deltaY = ballCenterY - paddleCenterY;
-            
-            // Calculate overlap on each axis
-            float overlapX = (ballSize.getRawX() + paddleSize.getRawX()) / 2.0f - std::abs(deltaX);
-            float overlapY = (ballSize.getRawY() + paddleSize.getRawY()) / 2.0f - std::abs(deltaY);
+            if (std::abs(normal.getRawX()) > std::abs(normal.getRawY())) {
+                m_Ball->setDirectionX(normal.getRawX() > 0 ? 1.0f : -1.0f);
 
-            // Collision response based on smallest overlap (most likely collision direction)
-            if (overlapX < overlapY) {
-                // Horizontal collision (ball hit paddle from side)
-                m_Ball->reverseVelocityX();
-                // Push ball away from paddle to prevent gluing (5px)
-                if (deltaX > 0) {
+                if (normal.getRawX() > 0) {
                     ballPos = Vector2(paddlePos.getRawX() + paddleSize.getRawX() + 5.0f, ballPos.getRawY());
-                } else {
+                }
+
+                else {
                     ballPos = Vector2(paddlePos.getRawX() - ballSize.getRawX() - 5.0f, ballPos.getRawY());
                 }
-            } else {
-                // Vertical collision (ball hit paddle from top/bottom)
-                m_Ball->reverseVelocityY();
-                // Push ball away from paddle to prevent gluing (5px)
-                if (deltaY > 0) {
+            }
+
+            else {
+                m_Ball->setDirectionY(normal.getRawY() > 0 ? 1.0f : -1.0f);
+
+                if (normal.getRawY() > 0) {
                     ballPos = Vector2(ballPos.getRawX(), paddlePos.getRawY() + paddleSize.getRawY() + 5.0f);
-                } else {
+                }
+
+                else {
                     ballPos = Vector2(ballPos.getRawX(), paddlePos.getRawY() - ballSize.getRawY() - 5.0f);
                 }
             }
-            
-            // Update ball position to prevent getting stuck
+
             ballTransform->setPosition(ballPos);
         }
     }
@@ -133,6 +101,7 @@ namespace outBreak {
 
         auto* ballCollision = m_Ball->getComponent<CollisionComponent>();
         auto* ballTransform = m_Ball->getComponent<TransformComponent>();
+
         if (!ballCollision || !ballTransform) return;
 
         Vector2 ballPos = ballTransform->getPosition();
@@ -141,61 +110,48 @@ namespace outBreak {
         for (auto* brick : m_Bricks) {
             if (!brick || brick->isDestroyed()) continue;
 
-            // Use engine's collision detection to check if ball hits brick
             CollisionResult collision = ballCollision->checkCollisionWithEntity(brick);
             
             if (collision.hasCollision) {
-                // Collision detected - destroy brick and disable its collision
                 brick->setDestroyed(true);
-                
-                auto* brickCollision = brick->getComponent<CollisionComponent>();
-                if (brickCollision) {
-                    brickCollision->setEnabled(false);
-                }
 
                 auto* brickTransform = brick->getComponent<TransformComponent>();
+
                 Vector2 brickPos = brickTransform->getPosition();
                 Vector2 brickSize = brickTransform->getSize();
+                Vector2 normal = collision.contactNormal;
+                
+                // Set absolute direction based on collision normal
+                if (std::abs(normal.getRawX()) > std::abs(normal.getRawY())) {
+                    // Horizontal collision - set X direction based on normal
+                    m_Ball->setDirectionX(normal.getRawX() > 0 ? 1.0f : -1.0f);
 
-                // Calculate collision side for proper bounce
-                float ballCenterX = ballPos.getRawX() + ballSize.getRawX() / 2.0f;
-                float ballCenterY = ballPos.getRawY() + ballSize.getRawY() / 2.0f;
-                float brickCenterX = brickPos.getRawX() + brickSize.getRawX() / 2.0f;
-                float brickCenterY = brickPos.getRawY() + brickSize.getRawY() / 2.0f;
-
-                float deltaX = ballCenterX - brickCenterX;
-                float deltaY = ballCenterY - brickCenterY;
-
-                // Calculate overlap to determine collision direction more accurately
-                float overlapX = (ballSize.getRawX() + brickSize.getRawX()) / 2.0f - std::abs(deltaX);
-                float overlapY = (ballSize.getRawY() + brickSize.getRawY()) / 2.0f - std::abs(deltaY);
-
-                // Respond based on smallest overlap (most likely collision direction)
-                if (overlapX < overlapY) {
-                    // Hit from side - reverse X direction
-                    m_Ball->reverseVelocityX();
-                    // Push ball away from brick to prevent tunneling (5px)
-                    if (deltaX > 0) {
+                    if (normal.getRawX() > 0) {
                         ballPos = Vector2(brickPos.getRawX() + brickSize.getRawX() + 5.0f, ballPos.getRawY());
-                    } else {
+                    }
+
+                    else {
                         ballPos = Vector2(brickPos.getRawX() - ballSize.getRawX() - 5.0f, ballPos.getRawY());
                     }
-                } else {
-                    // Hit from top/bottom - reverse Y direction
-                    m_Ball->reverseVelocityY();
-                    // Push ball away from brick to prevent tunneling (5px)
-                    if (deltaY > 0) {
+                }
+
+                else {
+                    // Vertical collision - set Y direction based on normal
+                    m_Ball->setDirectionY(normal.getRawY() > 0 ? 1.0f : -1.0f);
+
+                    if (normal.getRawY() > 0) {
                         ballPos = Vector2(ballPos.getRawX(), brickPos.getRawY() + brickSize.getRawY() + 5.0f);
-                    } else {
+                    }
+
+                    else {
                         ballPos = Vector2(ballPos.getRawX(), brickPos.getRawY() - ballSize.getRawY() - 5.0f);
                     }
                 }
-                
-                // Update ball position to prevent tunneling
+
                 ballTransform->setPosition(ballPos);
 
                 // Trigger wave effect from this brick's center position
-                Vector2 brickCenter = brick->getPosition() + Vector2(25.0f, 15.0f); // Half brick size
+                Vector2 brickCenter = brick->getPosition() + Vector2(25.0f, 15.0f);
                 triggerWaveEffect(brickCenter);
 
                 break; // Only handle one collision per frame
@@ -210,26 +166,13 @@ namespace outBreak {
         if (!ballTransform) return;
 
         Vector2 ballPos = ballTransform->getPosition();
-        
-        // Check if ball fell off bottom
+
         if (ballPos.getRawY() > 850.0f) {
-            // Game over - reset everything
             resetGame();
         }
     }
 
-    void GameManager::triggerRainbowEffect() {
-        // Apply rainbow effect to all remaining bricks (old method - fallback)
-        for (auto* brick : m_Bricks) {
-            if (brick && !brick->isDestroyed()) {
-                brick->setRainbowEffect(true);
-                brick->setRainbowTime(0.0f);
-            }
-        }
-    }
-
     void GameManager::triggerWaveEffect(Vector2 origin) {
-        // Start wave effect from destroyed brick's position
         for (auto* brick : m_Bricks) {
             if (brick && !brick->isDestroyed()) {
                 brick->addWaveFromOrigin(origin);
@@ -243,6 +186,7 @@ namespace outBreak {
                 return false;
             }
         }
+
         return true;
     }
 }

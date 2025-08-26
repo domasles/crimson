@@ -14,9 +14,9 @@ namespace outBreak {
             GameManager() = default;
             virtual ~GameManager() = default;
 
-            void init() override;
+            void init() override {}
             void update(float deltaTime) override;
-            void render() override;
+            void render() override {}
 
             void setBall(Ball* ball) { m_Ball = ball; }
             void setPaddle(Paddle* paddle) { m_Paddle = paddle; }
@@ -32,7 +32,6 @@ namespace outBreak {
             void checkBallPaddleCollision();
             void checkBallBrickCollisions();
             void checkBallBounds();
-            void triggerRainbowEffect();
             void triggerWaveEffect(Vector2 origin);
             bool allBricksDestroyed();
     };

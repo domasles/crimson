@@ -31,44 +31,47 @@ namespace outBreak {
 
         transform->move(movement);
 
-        // Get current position after engine movement
         Vector2 currentPos = transform->getPosition();
-
-        // Handle screen boundaries
         Vector2 screenSize = getCore().getWindowSize();
+
         const float GAME_LEFT = 0.0f;   
         const float GAME_RIGHT = screenSize.getRawX(); 
         const float GAME_TOP = 0.0f;     
 
-        // Boundary collision detection and response
         if (currentPos.getRawX() <= GAME_LEFT || currentPos.getRawX() + BALL_SIZE >= GAME_RIGHT) {
-            reverseVelocityX();
+            if (currentPos.getRawX() <= GAME_LEFT) {
+                setDirectionX(1.0f);
+            }
             
-            // Use engine's setPosition for correction
-            Vector2 correctedPos(
-                currentPos.getRawX() <= GAME_LEFT ? GAME_LEFT : GAME_RIGHT - BALL_SIZE,
-                currentPos.getRawY()
-            );
+            else {
+                setDirectionX(-1.0f);
+            }
+
+            Vector2 correctedPos(currentPos.getRawX() <= GAME_LEFT ? GAME_LEFT : GAME_RIGHT - BALL_SIZE, currentPos.getRawY());
             transform->setPosition(correctedPos);
         }
 
-        // Check top boundary
         if (currentPos.getRawY() <= GAME_TOP) {
-            reverseVelocityY();
-            
-            // Use engine's setPosition for correction
+            setDirectionY(1.0f);
+
             Vector2 correctedPos(currentPos.getRawX(), GAME_TOP);
             transform->setPosition(correctedPos);
         }
-
-        // Ball position will be checked by GameManager for bottom boundary
     }
 
     void Ball::render() {
-        // Call render on the BoxRendererComponent
         auto* renderer = getComponent<BoxRendererComponent>();
+
         if (renderer) {
             renderer->render();
         }
+    }
+
+    void Ball::setDirectionX(float sign) { 
+        m_Direction = Vector2(sign * std::abs(m_Direction.getRawX()), m_Direction.getRawY()); 
+    }
+
+    void Ball::setDirectionY(float sign) { 
+        m_Direction = Vector2(m_Direction.getRawX(), sign * std::abs(m_Direction.getRawY())); 
     }
 }

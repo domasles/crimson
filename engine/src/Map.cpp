@@ -4,6 +4,7 @@
 #include <utils/logger.h>
 
 #include <Resources.h>
+#include <Scene.h>
 #include <Core.h>
 #include <Map.h>
 
@@ -33,7 +34,6 @@ namespace engine {
 
         loadTilesets();
         loadTiles();
-        loadCollisionData();
     }
 
     void Map::loadTiles() {
@@ -202,9 +202,9 @@ namespace engine {
         }
     }
 
-    void Map::loadCollisionData() {
-        m_CollisionTiles.clear();
-        parseIntGridLayers();
+    void Map::generateCollisionEntities(Scene* scene) {
+        m_MapTiles.clear();
+        parseIntGridLayers(scene);
 
         std::string relativePath = m_WorkingDir + "/" + m_FileName;
 
@@ -212,10 +212,10 @@ namespace engine {
             relativePath = relativePath.substr(7);
         }
 
-        ENGINE_LOG_INIT(("Map: Loaded " + std::to_string(m_CollisionTiles.size()) + " collision tiles from " + relativePath).c_str());
+        ENGINE_LOG_INIT(("Map: Generated " + std::to_string(m_MapTiles.size()) + " collision tile entities from " + relativePath).c_str());
     }
 
-    void Map::parseIntGridLayers() {
+    void Map::parseIntGridLayers(Scene* scene) {
         for (const auto& level : m_JsonFile["levels"]) {
             for (const auto& layer : level["layerInstances"]) {
                 if (layer["__type"] != "IntGrid") continue;
@@ -238,41 +238,28 @@ namespace engine {
                         int x = i % gridWidth;
                         int y = i / gridWidth;
 
-                        CollisionTile tile;
+                        Vector2 worldPosition;
+                        worldPosition.set(x * gridSize, y * gridSize);
+                        worldPosition *= m_DesiredTileSize / m_MinTileSize;
+                        worldPosition += m_Origin;
 
-                        tile.worldPosition.set(x * gridSize, y * gridSize);
-                        tile.worldPosition *= m_DesiredTileSize / m_MinTileSize;
-                        tile.worldPosition += m_Origin;
+                        Vector2 tileSize = m_DesiredTileSize / (m_MinTileSize / gridSize);
 
-                        tile.size = m_DesiredTileSize / (m_MinTileSize / gridSize);
-                        tile.collisionValue = value;
-                        tile.layerIdentifier = layerIdentifier;
+                        auto* mapTile = scene->createEntity<MapTile>();
+                        mapTile->init(worldPosition, tileSize);
 
-                        tile.type = getCollisionType(layerIdentifier, value);
-                        tile.shape = getCollisionShape(layerIdentifier, value);
+                        auto collisionType = getCollisionType(layerIdentifier, value);
+                        if (collisionType) {
+                            mapTile->setCollisionType(std::move(collisionType));
+                        }
 
-                        m_CollisionTiles.push_back(std::move(tile));
+                        m_MapTiles.push_back(mapTile);
                     }
                 }
 
                 Logger::engine_debug("Map: Found {} collision tiles in layer '{}'", std::count_if(csvData.begin(), csvData.end(), [](int val) { return val > 0; }), layerIdentifier);
             }
         }
-    }
-
-    bool Map::checkCollisionAt(const Collision& entityCollision, const Vector2& worldPos) const {
-        Vector2 entityWorldPos = {
-            worldPos.getRawX() + entityCollision.offset.getRawX(),
-            worldPos.getRawY() + entityCollision.offset.getRawY()
-        };
-
-        for (const auto& tile : m_CollisionTiles) {
-            if (entityCollision.shape->checkCollisionWithTile(entityWorldPos, entityCollision.size, tile)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     void Map::setLayerCollisionType(const std::string& layerIdentifier, std::unique_ptr<CollisionType> type) {

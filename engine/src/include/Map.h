@@ -3,22 +3,28 @@
 #include <utils/rendering.h>
 #include <utils/tileset.h>
 #include <utils/collision.h>
+
 #include <collisions/types/BlockCollision.h>
 #include <collisions/types/NoneCollision.h>
 #include <collisions/shapes/BoxShape.h>
 
+#include <mapCollisionTiles/MapTile.h>
+
 #include <Texture.h>
 #include <Core.h>
 
-using namespace engine::utils::rendering;
 using namespace engine::utils::tileset;
 using namespace engine::utils::collision;
+using namespace engine::utils::rendering;
+using namespace engine::mapCollisionTiles;
 using namespace engine::collisions::types;
 using namespace engine::collisions::shapes;
 
 using json = nlohmann::json;
 
 namespace engine {
+    class Scene;
+
     class Map {
         public:
             Map(const std::string& workingDir) : m_WorkingDir(workingDir) {}
@@ -26,7 +32,7 @@ namespace engine {
             
             void loadMap(const std::string& fileName, const Vector2& minTileSize, const Vector2& mapOrigin);
             void loadTiles();
-            void loadCollisionData();
+            void generateCollisionEntities(Scene* scene);
             void render();
 
             Vector2 getEntityPosition(std::string entityName) const;
@@ -40,10 +46,8 @@ namespace engine {
             void setValueCollisionShape(int value, std::unique_ptr<CollisionShape> shape);
             void setLayerValueCollisionShape(const std::string& layerIdentifier, int value, std::unique_ptr<CollisionShape> shape);
             
-            std::vector<CollisionTile> getCollisionTiles() const { return m_CollisionTiles; }
-            bool hasCollisionData() const { return !m_CollisionTiles.empty(); }
-
-            bool checkCollisionAt(const Collision& entityCollision, const Vector2& worldPos) const;
+            std::vector<MapTile*> getMapTiles() const { return m_MapTiles; }
+            bool hasCollisionData() const { return !m_MapTiles.empty(); }
         
         private:
             const bool loadTilesets();
@@ -69,9 +73,9 @@ namespace engine {
 
             std::shared_ptr<TileRenderQueue> textureQueue;
             std::unordered_map<std::string, Tileset> m_Tilesets;
-            std::vector<CollisionTile> m_CollisionTiles;
+            std::vector<MapTile*> m_MapTiles;
             
-            void parseIntGridLayers();
+            void parseIntGridLayers(Scene* scene);
 
             std::unordered_map<std::string, std::unique_ptr<CollisionType>> m_LayerCollisionTypes;
             std::unordered_map<int, std::unique_ptr<CollisionType>> m_ValueCollisionTypes;

@@ -12,8 +12,7 @@ namespace engine::utils::rendering {
         Fullscreen
     };
 
-    enum QueueDirection
-    {
+    enum QueueDirection {
         Normal,
         Reversed
     };

@@ -2,6 +2,10 @@
 
 #include <entities/Player2.h>
 
+using namespace engine::collisions::types;
+using namespace engine::collisions::shapes;
+using namespace engine::utils::collision;
+
 namespace crimson {
     void Player2::init() {
         auto* transform = addComponent<TransformComponent>();
@@ -10,6 +14,10 @@ namespace crimson {
 
         texture->setTexture(loadTexture("assets/tilesets", "TX Tileset Ground.png"));
         transform->setSize({100, 100});
+
+        collision->setCollisionType(std::make_unique<BlockCollision>());
+        collision->setCollisionShape(std::make_unique<BoxShape>());
+        collision->setParticipatesInQueries(true);
 
         if (getSceneManager().getCurrentScene()->hasMap()) {
             auto* transformComp = getComponent<TransformComponent>();
@@ -25,10 +33,18 @@ namespace crimson {
 
         auto* input = getComponent<InputComponent>();
         auto* transform = getComponent<TransformComponent>();
+        auto* collision = getComponent<CollisionComponent>();
 
-        if (input && transform && input->getInputSystem()) {
+        if (input && transform && collision && input->getInputSystem()) {
             Vector2 movement = input->getMovementVector();
-            transform->addPosition(movement * m_Speed * deltaTime);
+            Vector2 currentPos = transform->getPosition();
+            Vector2 newPosition = currentPos + (movement * m_Speed * deltaTime);
+
+            MultiCollisionResult collisions = collision->getAllCollisionsAt(newPosition);
+            
+            if (!collisions.hasBlockingCollision()) {
+                transform->setPosition(newPosition);
+            }
         }
     }
 

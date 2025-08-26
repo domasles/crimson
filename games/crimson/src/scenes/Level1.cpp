@@ -14,6 +14,7 @@ namespace crimson {
 
         if (hasMap()) {
             getMap()->loadMap("TestMap.ldtk", {100, 100}, {0, 0});
+            getMap()->generateCollisionEntities(this);
         }
 
         m_Player = createEntity<Player>();
