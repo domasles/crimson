@@ -73,35 +73,20 @@ namespace engine {
 
         Vector2 otherWorldPos = otherCollision->getCollisionWorldPosition();
 
-        bool hasCollision = m_Collision.shape->checkCollision(
+        auto collisionResult = m_Collision.shape->checkCollision(
             myWorldPos, m_Collision.size,
             *otherCollision->getCollision().shape,
             otherWorldPos, otherCollision->getCollision().size
         );
+
+        bool hasCollision = collisionResult.hasCollision;
 
         CollisionResult result;
         result.hasCollision = hasCollision;
         result.hitType = hasCollision ? otherCollision->getCollisionType() : nullptr;
         result.hitEntity = hasCollision ? other : nullptr;
         result.contactPoint = myWorldPos;
-
-        // Calculate contact normal for box-to-box collision
-        if (hasCollision) {
-            Vector2 myCenterPos = myWorldPos + m_Collision.size * 0.5f;
-            Vector2 otherCenterPos = otherWorldPos + otherCollision->getCollision().size * 0.5f;
-            Vector2 delta = myCenterPos - otherCenterPos;
-
-            float overlapX = (m_Collision.size.getRawX() + otherCollision->getCollision().size.getRawX()) * 0.5f - std::abs(delta.getRawX());
-            float overlapY = (m_Collision.size.getRawY() + otherCollision->getCollision().size.getRawY()) * 0.5f - std::abs(delta.getRawY());
-
-            if (overlapX < overlapY) {
-                result.contactNormal = Vector2(delta.getRawX() > 0 ? 1.0f : -1.0f, 0.0f);
-            }
-            
-            else {
-                result.contactNormal = Vector2(0.0f, delta.getRawY() > 0 ? 1.0f : -1.0f);
-            }
-        }
+        result.contactNormal = collisionResult.contactNormal;
 
         return result;
     }
@@ -110,8 +95,8 @@ namespace engine {
         MultiCollisionResult result;
         
         if (!m_Enabled) return result;
-
         auto otherEntities = getOtherCollisionEntities();
+
         for (auto* otherEntity : otherEntities) {
             CollisionResult entityCollision = checkCollisionWithEntityAt(otherEntity, testPosition);
             if (entityCollision.hasCollision) {
@@ -123,16 +108,14 @@ namespace engine {
     }
 
     Vector2 CollisionComponent::getWorldPosition() const {
-        if (auto transform = m_Entity->getComponent<TransformComponent>()) {
-            return transform->getPosition();
-        }
+        if (auto transform = m_Entity->getComponent<TransformComponent>()) return transform->getPosition();
 
         return {0, 0};
     }
 
     Vector2 CollisionComponent::getCollisionWorldPosition() const {
         Vector2 worldPos = getWorldPosition();
-        return {worldPos.getRawX() + m_Collision.offset.getRawX(), worldPos.getRawY() + m_Collision.offset.getRawY()};
+        return { worldPos.getRawX() + m_Collision.offset.getRawX(), worldPos.getRawY() + m_Collision.offset.getRawY() };
     }
 
     std::vector<Entity*> CollisionComponent::getOtherCollisionEntities() const {

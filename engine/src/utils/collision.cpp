@@ -86,28 +86,4 @@ namespace engine::utils::collision {
 
         return *this;
     }
-
-    CollisionTile::CollisionTile() {
-        type = std::make_unique<BlockCollision>();
-        shape = std::make_unique<BoxShape>();
-    }
-
-    CollisionTile::CollisionTile(const CollisionTile& other) : worldPosition(other.worldPosition), size(other.size), collisionValue(other.collisionValue), layerIdentifier(other.layerIdentifier) {
-        if (other.type) type = other.type->clone();
-        if (other.shape) shape = other.shape->clone();
-    }
-
-    CollisionTile& CollisionTile::operator=(const CollisionTile& other) {
-        if (this != &other) {
-            worldPosition = other.worldPosition;
-            size = other.size;
-            collisionValue = other.collisionValue;
-            layerIdentifier = other.layerIdentifier;
-
-            if (other.type) type = other.type->clone();
-            if (other.shape) shape = other.shape->clone();
-        }
-
-        return *this;
-    }
 }

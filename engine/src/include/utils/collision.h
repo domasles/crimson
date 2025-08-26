@@ -54,22 +54,4 @@ namespace engine::utils::collision {
         Collision(Collision&&) = default;
         Collision& operator=(Collision&&) = default;
     };
-
-    struct CollisionTile {
-        std::unique_ptr<CollisionType> type;
-        std::unique_ptr<CollisionShape> shape;
-        std::string layerIdentifier;
-
-        Vector2 worldPosition;
-        Vector2 size;
-
-        int collisionValue;
-        
-        CollisionTile();
-        CollisionTile(const CollisionTile& other);
-
-        CollisionTile& operator=(const CollisionTile& other);
-        CollisionTile(CollisionTile&&) = default;
-        CollisionTile& operator=(CollisionTile&&) = default;
-    };
 }
