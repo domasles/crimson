@@ -1,4 +1,9 @@
 ﻿cmake_minimum_required(VERSION 3.16)
+
+if(NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Available build types" FORCE)
+endif()
+
 project(outBreak LANGUAGES CXX)
 
 file(GLOB_RECURSE OUTBREAK_SOURCES

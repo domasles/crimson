@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
+
+if(NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Available build types" FORCE)
+endif()
+
 project(@GAME_NAME@ LANGUAGES CXX)
 
 file(GLOB_RECURSE @GAME_NAME_UPPER@_SOURCES
