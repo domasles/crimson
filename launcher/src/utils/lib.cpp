@@ -7,10 +7,8 @@ using namespace launcher::utils::filesystem;
 
 namespace launcher::utils::lib {
     void* loadLibrary(const std::string& fileName) {
-        const std::string& libraryPath = "/" + fileName;
-
         #ifdef LAUNCHER_PLATFORM_WINDOWS
-            int bufferSize = MultiByteToWideChar(CP_UTF8, 0, libraryPath.c_str(), -1, nullptr, 0);
+            int bufferSize = MultiByteToWideChar(CP_UTF8, 0, fileName.c_str(), -1, nullptr, 0);
 
             if (bufferSize == 0) {
                 std::cerr << "Failed to calculate buffer size!" << std::endl;
@@ -19,7 +17,7 @@ namespace launcher::utils::lib {
 
             std::vector<wchar_t> wideFileName(bufferSize);
 
-            MultiByteToWideChar(CP_UTF8, 0, libraryPath.c_str(), -1, wideFileName.data(), bufferSize);
+            MultiByteToWideChar(CP_UTF8, 0, fileName.c_str(), -1, wideFileName.data(), bufferSize);
 
             HMODULE hLib = LoadLibraryW(wideFileName.data());
 
@@ -30,7 +28,7 @@ namespace launcher::utils::lib {
             return hLib;
 
         #else
-            void* handle = dlopen(libraryPath.c_str(), RTLD_LAZY);
+            void* handle = dlopen(fileName.c_str(), RTLD_LAZY);
 
             if (!handle) {
                 std::cerr << "Failed to load the library: " << dlerror() << std::endl;

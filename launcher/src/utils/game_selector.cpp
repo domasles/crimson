@@ -53,7 +53,14 @@ namespace launcher::utils::game_selector {
 
     std::vector<GameInfo> scanAvailableGames() {
         std::vector<GameInfo> games;
-        std::string gamesDir = filesystem::getExecutableDirectory() + "/games";
+
+        #ifdef LAUNCHER_PLATFORM_WINDOWS
+            std::string gamesDir = filesystem::getExecutableDirectory() + "\\games";
+        #else
+            std::string gamesDir = filesystem::getExecutableDirectory() + "/games";
+        #endif
+
+        std::cout << "Scanning games in directory: " << gamesDir << std::endl;
 
         if (!filesystem::directoryExists(gamesDir)) {
             return games;
@@ -71,7 +78,7 @@ namespace launcher::utils::game_selector {
                 if (loadGameManifest(manifestPath, gameInfo)) {
                     if (loadGameManifest(manifestPath, gameInfo)) {
                         #ifdef LAUNCHER_PLATFORM_WINDOWS
-                            gameInfo.libPath = gamesDir + "/" + subdir + "/" + gameInfo.dllName;
+                            gameInfo.libPath = gamesDir + "\\" + subdir + "\\" + gameInfo.dllName;
                         #elif defined(LAUNCHER_PLATFORM_MACOS)
                             gameInfo.libPath = gamesDir + "/" + subdir + "/" + gameInfo.dylibName;
                         #else
