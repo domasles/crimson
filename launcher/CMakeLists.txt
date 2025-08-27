@@ -65,10 +65,27 @@ else()
         CXX_STANDARD_REQUIRED ON
     )
 
+    target_link_libraries(${LAUNCHER_TARGET}
+        PRIVATE
+            wx::core
+            wx::base
+    )
+
     if(WIN32)
         set_target_properties(launcher PROPERTIES WIN32_EXECUTABLE $<$<CONFIG:Release>:TRUE>)
     elseif(APPLE)
         set_target_properties(launcher PROPERTIES MACOSX_BUNDLE $<$<CONFIG:Release>:TRUE>)
+    elseif(UNIX AND NOT APPLE)
+        target_link_libraries(${LAUNCHER_TARGET} PRIVATE
+            X11
+            Xext
+            Xi
+            Xrandr
+            SM
+            ICE
+            pthread
+            dl
+        )
     endif()
 
     target_include_directories(${LAUNCHER_TARGET}
@@ -79,12 +96,6 @@ else()
             ../vendor/json/include
     )
 
-    target_link_libraries(${LAUNCHER_TARGET}
-        PRIVATE
-            wx::core
-            wx::base
-    )
-    
     target_precompile_headers(${LAUNCHER_TARGET} PRIVATE src/pch/pch.h)
 
     add_custom_command(TARGET ${LAUNCHER_TARGET} POST_BUILD

@@ -8,12 +8,12 @@ if [[ "$OS_TYPE" == "Darwin" ]]; then
         GENERATOR="Xcode"
         echo "Xcode detected - using Xcode generator"
     else
-        GENERATOR="Unix Makefiles"
-        echo "Xcode not found - using Unix Makefiles"
+        GENERATOR="Ninja Multi-Config"
+        echo "Xcode not found - using Ninja Multi-Config"
     fi
     CPU_COUNT=$(sysctl -n hw.ncpu)
 else
-    GENERATOR="Unix Makefiles"
+    GENERATOR="Ninja Multi-Config"
     CPU_COUNT=$(nproc)
 fi
 
@@ -27,13 +27,18 @@ fi
 
 echo ""
 echo "Project generation completed successfully!"
-echo "Build files are located in the 'build-native' directory."
+echo "Native build files are located in the 'build-native' directory."
+echo "WASM build files are located in the 'build-wasm' directory."
 echo ""
 
 if [[ "$GENERATOR" == "Xcode" ]]; then
     echo "To build the project:"
     echo "  cmake --build build-native --config Debug"
     echo "  cmake --build build-native --config Release"
+    echo ""
+    echo "WASM building:"
+    echo "  cmake --build build-wasm --config Debug"
+    echo "  cmake --build build-wasm --config Release"
     echo ""
     echo "To open in Xcode:"
     echo "  open build-native/Crimson.xcodeproj"
@@ -42,8 +47,9 @@ else
     echo "  cmake --build build-native --config Debug"
     echo "  cmake --build build-native --config Release"
     echo ""
-    echo "Alternative build commands:"
-    echo "  cd build-native && make -j$CPU_COUNT"
+    echo "WASM building:"
+    echo "  cmake --build build-wasm --config Debug"
+    echo "  cmake --build build-wasm --config Release"
 fi
 
 echo ""

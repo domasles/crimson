@@ -19,19 +19,27 @@ namespace launcher::utils::game_selector {
             if (json.contains("display_name") && json["display_name"].is_string()) {
                 gameInfo.displayName = json["display_name"];
             }
-            
+
             if (json.contains("version") && json["version"].is_string()) {
                 gameInfo.version = json["version"];
             }
-            
+
             if (json.contains("dll_name") && json["dll_name"].is_string()) {
                 gameInfo.dllName = json["dll_name"];
             }
-            
+
+            if (json.contains("so_name") && json["so_name"].is_string()) {
+                gameInfo.soName = json["so_name"];
+            }
+
+            if (json.contains("dylib_name") && json["dylib_name"].is_string()) {
+                gameInfo.dylibName = json["dylib_name"];
+            }
+
             gameInfo.manifestPath = manifestPath;
 
-            return !gameInfo.displayName.empty() && !gameInfo.dllName.empty();
-            
+            return !gameInfo.displayName.empty()
+                && (!gameInfo.dllName.empty() || !gameInfo.soName.empty() || !gameInfo.dylibName.empty());
         }
 
         catch (const std::exception& e) {
@@ -40,12 +48,12 @@ namespace launcher::utils::game_selector {
     }
 
     bool validateGameDll(const GameInfo& gameInfo) {
-        return filesystem::fileExists(gameInfo.dllPath);
+        return filesystem::fileExists(gameInfo.libPath);
     }
 
     std::vector<GameInfo> scanAvailableGames() {
         std::vector<GameInfo> games;
-        std::string gamesDir = "games";
+        std::string gamesDir = filesystem::getExecutableDirectory() + "/games";
 
         if (!filesystem::directoryExists(gamesDir)) {
             return games;
@@ -61,10 +69,18 @@ namespace launcher::utils::game_selector {
                 gameInfo.name = subdir;
 
                 if (loadGameManifest(manifestPath, gameInfo)) {
-                    gameInfo.dllPath = gamesDir + "/" + subdir + "/" + gameInfo.dllName;
+                    if (loadGameManifest(manifestPath, gameInfo)) {
+                        #ifdef LAUNCHER_PLATFORM_WINDOWS
+                            gameInfo.libPath = gamesDir + "/" + subdir + "/" + gameInfo.dllName;
+                        #elif defined(LAUNCHER_PLATFORM_MACOS)
+                            gameInfo.libPath = gamesDir + "/" + subdir + "/" + gameInfo.dylibName;
+                        #else
+                            gameInfo.libPath = gamesDir + "/" + subdir + "/" + gameInfo.soName;
+                        #endif
 
-                    if (validateGameDll(gameInfo)) {
-                        games.push_back(gameInfo);
+                        if (validateGameDll(gameInfo)) {
+                            games.push_back(gameInfo);
+                        }
                     }
                 }
             }

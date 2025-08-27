@@ -10,8 +10,10 @@ namespace launcher::utils::game_selector {
         std::string displayName;
         std::string version;
         std::string dllName;
+        std::string soName;
+        std::string dylibName;
         std::string manifestPath;
-        std::string dllPath;
+        std::string libPath;
     };
 
     bool loadGameManifest(const std::string& manifestPath, GameInfo& gameInfo);

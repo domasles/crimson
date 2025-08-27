@@ -48,7 +48,7 @@
             return -1;
         }
 
-        std::string fileName = selectedGame->dllPath;
+        std::string fileName = selectedGame->libPath;
 
         wxUninitialize();
 

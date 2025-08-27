@@ -1,5 +1,7 @@
 {
     "display_name": "OutBreak Classic",
     "version": "1.0.0",
-    "dll_name": "outBreak.dll"
+    "dll_name": "outBreak.dll",
+    "so_name": "liboutBreak.so",
+    "dylib_name": "liboutBreak.dylib"
 }

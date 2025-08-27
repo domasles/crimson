@@ -10,7 +10,8 @@
         "${workspaceFolder}/vendor/json/include/**",
         "${workspaceFolder}/vendor/sdl3/include/**",
         "${workspaceFolder}/vendor/sdl3-image/include/**",
-        "${workspaceFolder}/vendor/sdl3-mixer/include/**"
+        "${workspaceFolder}/vendor/sdl3-mixer/include/**",
+        "${workspaceFolder}/vendor/wxwidgets/include/**"
       ],
       "defines": [
         "_DEBUG",

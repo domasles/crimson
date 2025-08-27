@@ -165,39 +165,7 @@ if(BUILD_NATIVE)
 endif()
 
 if(BUILD_WASM)
-    message(STATUS "Configuring WASM build...")
-
-    if(WIN32)
-        set(EMSDK_CMD "${CMAKE_SOURCE_DIR}/vendor/emsdk/emsdk.bat")
-        set(EMCMAKE_CMD "${CMAKE_SOURCE_DIR}/vendor/emsdk/upstream/emscripten/emcmake.bat")
-    else()
-        set(EMSDK_CMD "${CMAKE_SOURCE_DIR}/vendor/emsdk/emsdk")
-        set(EMCMAKE_CMD "${CMAKE_SOURCE_DIR}/vendor/emsdk/upstream/emscripten/emcmake")
-    endif()
-
-    if(EXISTS "${EMSDK_CMD}")
-        message(STATUS "Found Emscripten SDK, setting up WASM build...")
-
-        set(WASM_BUILD_DIR "${CMAKE_SOURCE_DIR}/build-wasm")
-        file(MAKE_DIRECTORY "${WASM_BUILD_DIR}")
-
-        execute_process(
-            COMMAND "${EMSDK_CMD}" install latest
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/emsdk"
-        )
-        execute_process(
-            COMMAND "${EMSDK_CMD}" activate latest
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/vendor/emsdk"
-        )
-
-        execute_process(
-            COMMAND "${EMCMAKE_CMD}" cmake -B "${WASM_BUILD_DIR}" -S "${CMAKE_SOURCE_DIR}" -G "Ninja Multi-Config"
-            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-            RESULT_VARIABLE WASM_CONFIG_RESULT
-        )
-    else()
-        message(WARNING "Emscripten SDK not found. WASM build skipped.")
-    endif()
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_SOURCE_DIR}/vendor/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake")
 endif()
 
 include(configure_vscode)
