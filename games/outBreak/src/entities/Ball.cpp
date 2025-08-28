@@ -8,12 +8,12 @@ using namespace engine::collisions::shapes;
 namespace outBreak {
     void Ball::init() {
         auto* transform = addComponent<TransformComponent>();
-        auto* renderer = addComponent<BoxRendererComponent>();
+        auto* texture = addComponent<TextureComponent>();
         auto* collision = addComponent<CollisionComponent>();
 
+        texture->setTexture(loadTexture("assets", "fc1810.png"));
         transform->setSize({BALL_SIZE, BALL_SIZE});
         transform->setPosition(m_InitialPosition);
-        renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f));
 
         collision->setCollisionType(std::make_unique<TriggerCollision>());
         collision->setCollisionShape(std::make_unique<BoxShape>());
@@ -61,10 +61,10 @@ namespace outBreak {
     }
 
     void Ball::render() {
-        auto* renderer = getComponent<BoxRendererComponent>();
+        auto* texture = getComponent<TextureComponent>();
 
-        if (renderer) {
-            renderer->render();
+        if (texture && texture->hasTexture()) {
+            texture->render();
         }
     }
 

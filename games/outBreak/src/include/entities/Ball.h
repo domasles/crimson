@@ -26,7 +26,7 @@ namespace outBreak {
             Vector2 getVelocity() const { return m_Direction * BALL_SPEED; }
 
         private:
-            static constexpr float BALL_SIZE = 16.0f;
+            static constexpr float BALL_SIZE = 24.0f;
             static constexpr float BALL_SPEED = 300.0f;
 
             Vector2 m_InitialPosition{ getLogicalWindowSize().getRawX()/2 - BALL_SIZE/2, 700.0f };
