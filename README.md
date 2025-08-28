@@ -47,19 +47,11 @@ A simple, powerful 2D game engine designed for learning game development fundame
 ### Setup
 ```bash
 # Clone with all dependencies
-git clone --recursive https://github.com/domasles/crimson.git
+git clone ----recurse-submodules https://github.com/domasles/crimson.git
 cd crimson
 
-# If you forgot --recursive, run this:
+# If you forgot --recurse-submodules, run this:
 git submodule update --init --recursive
-```
-
-### WebAssembly Setup (Optional)
-For web deployment, activate Emscripten SDK:
-```bash
-# Run from project root directory:
-./vendor/emsdk/emsdk install latest
-./vendor/emsdk/emsdk activate latest
 ```
 
 ### Development Scripts

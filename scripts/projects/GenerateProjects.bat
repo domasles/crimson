@@ -1,9 +1,17 @@
 @echo off
 setlocal EnableDelayedExpansion
+SET SCRIPT_DIR=%~dp0
 
 echo Generating Visual Studio 2022 solution...
 
 cmake -G "Visual Studio 17 2022" -A x64 -B build-native
+
+pushd %SCRIPT_DIR%\..\..
+    call vendor\emsdk\emsdk install latest
+    call vendor\emsdk\emsdk activate latest
+
+    emcmake cmake -B build-wasm -G "Ninja Multi-Config" -DCMAKE_TOOLCHAIN_FILE=vendor\emsdk\upstream\emscripten\cmake\Modules\Platform\Emscripten.cmake
+popd
 
 if %ERRORLEVEL% NEQ 0 (
     echo Failed to generate project files!
@@ -23,5 +31,8 @@ echo.
 echo To build from command line:
 echo   cmake --build build-native --config Debug
 echo   cmake --build build-native --config Release
+echo WASM building:
+echo   cmake --build build-wasm --config Debug
+echo   cmake --build build-wasm --config Release
 echo.
 pause

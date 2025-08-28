@@ -1,6 +1,8 @@
 #!/bin/bash
 
 OS_TYPE="$(uname)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+
 echo "Generating build files for $OS_TYPE..."
 
 if [[ "$OS_TYPE" == "Darwin" ]]; then
@@ -11,15 +13,20 @@ if [[ "$OS_TYPE" == "Darwin" ]]; then
         GENERATOR="Ninja Multi-Config"
         echo "Xcode not found - using Ninja Multi-Config"
     fi
-    CPU_COUNT=$(sysctl -n hw.ncpu)
 else
     GENERATOR="Ninja Multi-Config"
-    CPU_COUNT=$(nproc)
 fi
 
-mkdir -p build-native
-
 cmake -B build-native -G "$GENERATOR" -DCMAKE_BUILD_TYPE=Debug
+
+$SCRIPT_DIR/../../vendor/emsdk/emsdk install latest
+$SCRIPT_DIR/../../vendor/emsdk/emsdk activate latest
+
+chmod +x $SCRIPT_DIR/../../vendor/emsdk/emsdk_env.sh
+source $SCRIPT_DIR/../../vendor/emsdk/emsdk_env.sh
+
+emcmake cmake -B build-wasm -G "Ninja Multi-Config" -DCMAKE_TOOLCHAIN_FILE=$SCRIPT_DIR/../../vendor/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+
 if [ $? -ne 0 ]; then
     echo "Failed to generate project files!"
     exit 1

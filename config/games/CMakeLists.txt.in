@@ -12,23 +12,25 @@ file(GLOB_RECURSE @GAME_NAME_UPPER@_SOURCES
 )
 
 if(WASM)
-    add_library(@GAME_NAME@ STATIC ${@GAME_NAME_UPPER@_SOURCES})
+    set(libName "@GAME_NAME@_lib")
+    add_library(${libName} STATIC ${@GAME_NAME_UPPER@_SOURCES})
 else()
-    add_library(@GAME_NAME@ SHARED ${@GAME_NAME_UPPER@_SOURCES})
+    set(libName "@GAME_NAME@")
+    add_library(${libName} SHARED ${@GAME_NAME_UPPER@_SOURCES})
 endif()
 
-set_target_properties(@GAME_NAME@ PROPERTIES
+set_target_properties(${libName} PROPERTIES
     CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
 )
 
 if(WASM)
-    set_target_properties(@GAME_NAME@ PROPERTIES
+    set_target_properties(${libName} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/games/@GAME_NAME@"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/games/@GAME_NAME@"
     )
 else()
-    set_target_properties(@GAME_NAME@ PROPERTIES
+    set_target_properties(${libName} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/@GAME_NAME@"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/games/@GAME_NAME@"
     )
@@ -37,7 +39,7 @@ else()
         foreach(config ${CMAKE_CONFIGURATION_TYPES})
             string(TOUPPER ${config} config_upper)
 
-            set_target_properties(@GAME_NAME@ PROPERTIES
+            set_target_properties(${libName} PROPERTIES
                 RUNTIME_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/@GAME_NAME@"
                 LIBRARY_OUTPUT_DIRECTORY_${config_upper} "${CMAKE_BINARY_DIR}/bin/${config}/games/@GAME_NAME@"
             )
@@ -47,7 +49,7 @@ else()
     endif()
 endif()
 
-target_include_directories(@GAME_NAME@
+target_include_directories(${libName}
     PRIVATE
         src/pch
         src/include
@@ -58,27 +60,27 @@ target_include_directories(@GAME_NAME@
         ../../vendor/sdl3-mixer/include
 )
 
-target_link_libraries(@GAME_NAME@
+target_link_libraries(${libName}
     PRIVATE
         engine
 )
 
 if(WASM)
-    target_compile_definitions(@GAME_NAME@ PRIVATE GAME_PLATFORM_EMSCRIPTEN)
+    target_compile_definitions(${libName} PRIVATE GAME_PLATFORM_EMSCRIPTEN)
 elseif(WIN32)
-    target_compile_definitions(@GAME_NAME@ PRIVATE GAME_PLATFORM_WINDOWS)
-    set_property(TARGET @GAME_NAME@ PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    target_compile_definitions(${libName} PRIVATE GAME_PLATFORM_WINDOWS)
+    set_property(TARGET ${libName} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 elseif(APPLE)
-    target_compile_definitions(@GAME_NAME@ PRIVATE GAME_PLATFORM_MACOS)
+    target_compile_definitions(${libName} PRIVATE GAME_PLATFORM_MACOS)
 
-    target_link_options(@GAME_NAME@ PRIVATE
+    target_link_options(${libName} PRIVATE
         -Wl,-rpath,@executable_path
         -Wl,-rpath,@executable_path/../..
     )
 elseif(UNIX)
-    target_compile_definitions(@GAME_NAME@ PRIVATE GAME_PLATFORM_LINUX)
+    target_compile_definitions(${libName} PRIVATE GAME_PLATFORM_LINUX)
 
-    target_link_options(@GAME_NAME@ PRIVATE
+    target_link_options(${libName} PRIVATE
         -Wl,-rpath,'$ORIGIN'
         -Wl,-rpath-link,'$ORIGIN'
         -Wl,-rpath,'$ORIGIN/../../'
@@ -86,27 +88,27 @@ elseif(UNIX)
     )
 endif()
 
-target_compile_definitions(@GAME_NAME@ PRIVATE
+target_compile_definitions(${libName} PRIVATE
     $<$<CONFIG:Debug>:GAME_DEBUG>
     $<$<CONFIG:Release>:GAME_RELEASE>
 )
 
-target_precompile_headers(@GAME_NAME@ PRIVATE src/pch/pch.h)
+target_precompile_headers(${libName} PRIVATE src/pch/pch.h)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/config")
-    add_custom_command(TARGET @GAME_NAME@ POST_BUILD
+    add_custom_command(TARGET ${libName} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/config"
-        "$<TARGET_FILE_DIR:@GAME_NAME@>/config"
+        "$<TARGET_FILE_DIR:${libName}>/config"
         COMMENT "Copying config directory to output"
     )
 endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
-    add_custom_command(TARGET @GAME_NAME@ POST_BUILD
+    add_custom_command(TARGET ${libName} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/assets"
-        "$<TARGET_FILE_DIR:@GAME_NAME@>/assets"
+        "$<TARGET_FILE_DIR:${libName}>/assets"
         COMMENT "Copying assets directory to output"
     )
 endif()

@@ -13,8 +13,10 @@ file(GLOB_RECURSE LAUNCHER_SOURCES
 
 if(WASM)
     foreach(game ${AVAILABLE_GAMES})
-        set(GAME_LAUNCHER_TARGET "${game}_launcher")
-        add_executable(${GAME_LAUNCHER_TARGET} ${LAUNCHER_SOURCES})
+        set(GAME_LIB "${game}_lib")
+        set(GAME_EXEC "${game}")
+
+        add_executable(${GAME_EXEC} ${LAUNCHER_SOURCES})
         set(PRELOAD_FLAGS_LIST "")
 
         if(EXISTS "${CMAKE_SOURCE_DIR}/games/${game}/assets")
@@ -31,7 +33,7 @@ if(WASM)
 
         string(JOIN " " PRELOAD_FLAGS_STR ${PRELOAD_FLAGS_LIST})
 
-        set_target_properties(${GAME_LAUNCHER_TARGET} PROPERTIES
+        set_target_properties(${GAME_EXEC} PROPERTIES
             CXX_STANDARD 20
             CXX_STANDARD_REQUIRED ON
             OUTPUT_NAME "index"
@@ -40,26 +42,22 @@ if(WASM)
             SUFFIX ".html"
         )
 
-        target_include_directories(${GAME_LAUNCHER_TARGET}
-            PRIVATE
-                src/include
-                src/pch
-                ../engine/src/include
-                ../vendor/json/include
+        target_include_directories(${GAME_EXEC} PRIVATE
+            src/include
+            src/pch
+            ../engine/src/include
+            ../vendor/json/include
         )
 
-        target_link_libraries(${GAME_LAUNCHER_TARGET}
-            PRIVATE
-                ${game}
-        )
+        target_link_libraries(${GAME_EXEC} PRIVATE ${GAME_LIB})
+        add_dependencies(${GAME_EXEC} ${GAME_LIB})
 
-        target_compile_definitions(${GAME_LAUNCHER_TARGET} PRIVATE 
+        target_compile_definitions(${GAME_EXEC} PRIVATE 
             LAUNCHER_PLATFORM_EMSCRIPTEN
             GAME_TARGET="${game}"
         )
 
-        target_precompile_headers(${GAME_LAUNCHER_TARGET} PRIVATE src/pch/pch.h)
-        add_dependencies(${GAME_LAUNCHER_TARGET} ${game})
+        target_precompile_headers(${GAME_EXEC} PRIVATE src/pch/pch.h)
     endforeach()
 else()
     add_executable(launcher ${LAUNCHER_SOURCES})
