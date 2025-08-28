@@ -9,7 +9,7 @@ namespace engine::collisions::shapes {
         auto result = other.checkCollisionWithBox(otherPos, otherSize, myPos, mySize);
 
         if (result.hasCollision) {
-            result.contactNormal = Vector2(-result.contactNormal.getRawX(), -result.contactNormal.getRawY());
+            result.contactNormal = Vector2{ -result.contactNormal.getRawX(), -result.contactNormal.getRawY() };
         }
 
         return result;
@@ -35,16 +35,16 @@ namespace engine::collisions::shapes {
 
         if (overlapX < overlapY) {
             // Horizontal collision
-            result.contactNormal = Vector2(delta.getRawX() > 0 ? 1.0f : -1.0f, 0.0f);
+            result.contactNormal = Vector2{ delta.getRawX() > 0 ? 1.0f : -1.0f, 0.0f };
             float contactX = delta.getRawX() > 0 ? boxPos.getRawX() + boxSize.getRawX() : boxPos.getRawX();
-            result.contactPoint = Vector2(contactX, std::max(myPos.getRawY(), boxPos.getRawY()));
+            result.contactPoint = Vector2{ contactX, std::max(myPos.getRawY(), boxPos.getRawY()) };
         }
 
         else {
             // Vertical collision
-            result.contactNormal = Vector2(0.0f, delta.getRawY() > 0 ? 1.0f : -1.0f);
+            result.contactNormal = Vector2{ 0.0f, delta.getRawY() > 0 ? 1.0f : -1.0f };
             float contactY = delta.getRawY() > 0 ? boxPos.getRawY() + boxSize.getRawY() : boxPos.getRawY();
-            result.contactPoint = Vector2(std::max(myPos.getRawX(), boxPos.getRawX()), contactY);
+            result.contactPoint = Vector2{ std::max(myPos.getRawX(), boxPos.getRawX()), contactY };
         }
 
         return result;

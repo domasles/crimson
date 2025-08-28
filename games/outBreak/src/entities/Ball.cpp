@@ -34,7 +34,7 @@ namespace outBreak {
 
             float game_width = getLogicalWindowSize().getRawX();
 
-            m_LocalOffset += Vector2(movement.getRawX(), 0.0f);
+            m_LocalOffset += Vector2{ movement.getRawX(), 0.0f };
 
             float finalX = (game_width / 2.0f) - (BALL_SIZE / 2.0f) + m_LocalOffset.getRawX();
             float finalY = currentPos.getRawY() + movement.getRawY();
@@ -42,13 +42,13 @@ namespace outBreak {
             if (finalX < 0.0f) {
                 finalX = 0.0f;
                 setDirectionX(1.0f);
-                m_LocalOffset = Vector2(finalX - (game_width / 2.0f - BALL_SIZE / 2.0f), m_LocalOffset.getRawY());
+                m_LocalOffset = Vector2{ finalX - (game_width / 2.0f - BALL_SIZE / 2.0f), m_LocalOffset.getRawY() };
             }
 
             else if (finalX + BALL_SIZE > game_width) {
                 finalX = game_width - BALL_SIZE;
                 setDirectionX(-1.0f);
-                m_LocalOffset = Vector2(finalX - (game_width / 2.0f - BALL_SIZE / 2.0f), m_LocalOffset.getRawY());
+                m_LocalOffset = Vector2{ finalX - (game_width / 2.0f - BALL_SIZE / 2.0f), m_LocalOffset.getRawY() };
             }
 
             if (finalY < 0.0f) {
@@ -56,7 +56,7 @@ namespace outBreak {
                 setDirectionY(1.0f);
             }
 
-            transform->setPosition(Vector2(finalX, finalY));
+            transform->setPosition(Vector2{ finalX, finalY });
         }
     }
 
@@ -69,18 +69,18 @@ namespace outBreak {
     }
 
     void Ball::setDirectionX(float sign) { 
-        m_Direction = Vector2(sign * std::abs(m_Direction.getRawX()), m_Direction.getRawY()); 
+        m_Direction = Vector2{ sign * std::abs(m_Direction.getRawX()), m_Direction.getRawY() }; 
     }
 
     void Ball::setDirectionY(float sign) { 
-        m_Direction = Vector2(m_Direction.getRawX(), sign * std::abs(m_Direction.getRawY())); 
+        m_Direction = Vector2{ m_Direction.getRawX(), sign * std::abs(m_Direction.getRawY()) }; 
     }
 
     void Ball::resetPosition() {
         auto* transform = getComponent<TransformComponent>();
 
         if (transform) {
-            m_LocalOffset = Vector2(0.0f, 0.0f);
+            m_LocalOffset = Vector2{ 0.0f, 0.0f };
             transform->setPosition(m_InitialPosition);
         }
     }

@@ -20,7 +20,7 @@ namespace engine {
             void addRotation(float delta) { m_Rotation += delta; }
 
             void setScale(const Vector2& scale) { m_Scale = scale; }
-            void setScale(float uniformScale) { m_Scale = Vector2(uniformScale, uniformScale); }
+            void setScale(float uniformScale) { m_Scale = Vector2{uniformScale, uniformScale}; }
 
             const Vector2& getPosition() const { return m_Position; }
             const Vector2& getSize() const { return m_Size; }

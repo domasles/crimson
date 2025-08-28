@@ -9,7 +9,7 @@ namespace engine {
     }
 
     Vector2 InputComponent::getMovementVector() const {
-        if (!m_InputSystem) return Vector2(0, 0);
+        if (!m_InputSystem) return Vector2{ 0, 0 };
         return m_InputSystem->getMovementVector();
     }
 }

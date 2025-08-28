@@ -50,7 +50,7 @@ namespace outBreak {
             float finalX = (game_width / 2.0f) - (brickWidth / 2.0f) + m_LocalOffset.getRawX();
             float finalY = currentPos.getRawY();
 
-            transform->setPosition(Vector2(finalX, finalY));
+            transform->setPosition(Vector2{ finalX, finalY });
         }
 
         std::vector<Color> waveColors;
@@ -106,7 +106,7 @@ namespace outBreak {
     void Brick::addWaveFromOrigin(Vector2 origin) {
         if (m_IsDestroyed) return;
 
-        Vector2 brickCenter = m_Position + Vector2(25.0f, 15.0f);
+        Vector2 brickCenter = m_Position + Vector2{ 25.0f, 15.0f };
         Vector2 diff = brickCenter - origin;
 
         float distance = std::sqrt(diff.getRawX() * diff.getRawX() + diff.getRawY() * diff.getRawY());

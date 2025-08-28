@@ -244,7 +244,7 @@ namespace engine {
         float w = std::max(m_WindowWidth, m_TargetWindowWidth);
         float h = std::max(m_WindowHeight, m_TargetWindowHeight);
 
-        return Vector2(static_cast<float>(w), static_cast<float>(h));
+        return Vector2{ static_cast<float>(w), static_cast<float>(h) };
     }
 
     Vector2 Core::getLogicalWindowSize() {
@@ -260,7 +260,7 @@ namespace engine {
             gameHeight = getWindowSize().getRawY() * (getTargetWindowSize().getRawX() / getWindowSize().getRawX());
         }
 
-        return Vector2(gameWidth, gameHeight);
+        return Vector2{ gameWidth, gameHeight };
     }
 
     bool Core::initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable) {

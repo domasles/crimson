@@ -71,11 +71,11 @@ namespace outBreak {
                 m_Ball->setDirectionX(normal.getRawX() > 0 ? 1.0f : -1.0f);
 
                 if (normal.getRawX() > 0) {
-                    ballPos = Vector2(paddlePos.getRawX() + paddleSize.getRawX() + 5.0f, ballPos.getRawY());
+                    ballPos = Vector2{ paddlePos.getRawX() + paddleSize.getRawX() + 5.0f, ballPos.getRawY() };
                 }
 
                 else {
-                    ballPos = Vector2(paddlePos.getRawX() - ballSize.getRawX() - 5.0f, ballPos.getRawY());
+                    ballPos = Vector2{ paddlePos.getRawX() - ballSize.getRawX() - 5.0f, ballPos.getRawY() };
                 }
             }
 
@@ -83,11 +83,11 @@ namespace outBreak {
                 m_Ball->setDirectionY(normal.getRawY() > 0 ? 1.0f : -1.0f);
 
                 if (normal.getRawY() > 0) {
-                    ballPos = Vector2(ballPos.getRawX(), paddlePos.getRawY() + paddleSize.getRawY() + 5.0f);
+                    ballPos = Vector2{ ballPos.getRawX(), paddlePos.getRawY() + paddleSize.getRawY() + 5.0f };
                 }
 
                 else {
-                    ballPos = Vector2(ballPos.getRawX(), paddlePos.getRawY() - ballSize.getRawY() - 5.0f);
+                    ballPos = Vector2{ ballPos.getRawX(), paddlePos.getRawY() - ballSize.getRawY() - 5.0f };
                 }
             }
 
@@ -126,11 +126,11 @@ namespace outBreak {
                     m_Ball->setDirectionX(normal.getRawX() > 0 ? 1.0f : -1.0f);
 
                     if (normal.getRawX() > 0) {
-                        ballPos = Vector2(brickPos.getRawX() + brickSize.getRawX() + 5.0f, ballPos.getRawY());
+                        ballPos = Vector2{ brickPos.getRawX() + brickSize.getRawX() + 5.0f, ballPos.getRawY() };
                     }
 
                     else {
-                        ballPos = Vector2(brickPos.getRawX() - ballSize.getRawX() - 5.0f, ballPos.getRawY());
+                        ballPos = Vector2{ brickPos.getRawX() - ballSize.getRawX() - 5.0f, ballPos.getRawY() };
                     }
                 }
 
@@ -139,18 +139,18 @@ namespace outBreak {
                     m_Ball->setDirectionY(normal.getRawY() > 0 ? 1.0f : -1.0f);
 
                     if (normal.getRawY() > 0) {
-                        ballPos = Vector2(ballPos.getRawX(), brickPos.getRawY() + brickSize.getRawY() + 5.0f);
+                        ballPos = Vector2{ ballPos.getRawX(), brickPos.getRawY() + brickSize.getRawY() + 5.0f };
                     }
 
                     else {
-                        ballPos = Vector2(ballPos.getRawX(), brickPos.getRawY() - ballSize.getRawY() - 5.0f);
+                        ballPos = Vector2{ ballPos.getRawX(), brickPos.getRawY() - ballSize.getRawY() - 5.0f };
                     }
                 }
 
                 ballTransform->setPosition(ballPos);
 
                 // Trigger wave effect from this brick's center position
-                Vector2 brickCenter = brick->getPosition() + Vector2(25.0f, 15.0f);
+                Vector2 brickCenter = brick->getPosition() + Vector2{ 25.0f, 15.0f };
                 triggerWaveEffect(brickCenter);
                 break; // Only handle one collision per frame
             }

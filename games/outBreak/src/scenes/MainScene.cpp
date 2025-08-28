@@ -61,7 +61,7 @@ namespace outBreak {
                 brick->setGridPosition(row, col);
 
                 // Store offset relative to grid center
-                brick->setLocalOffset(Vector2(x - (totalWidth / 2.0f - BRICK_WIDTH / 2.0f), 0.0f));
+                brick->setLocalOffset(Vector2{ x - (totalWidth / 2.0f - BRICK_WIDTH / 2.0f), 0.0f });
                 m_Bricks.push_back(brick);
             }
         }

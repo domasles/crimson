@@ -57,7 +57,7 @@ namespace engine {
             SDL_Window* getWindow() const;
 
             Vector2 getWindowSize();
-            Vector2 getTargetWindowSize() const { return Vector2(static_cast<float>(m_TargetWindowWidth), static_cast<float>(m_TargetWindowHeight)); }
+            Vector2 getTargetWindowSize() const { return Vector2{static_cast<float>(m_TargetWindowWidth), static_cast<float>(m_TargetWindowHeight)}; }
             Vector2 getLogicalWindowSize();
 
         private:

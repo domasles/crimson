@@ -51,15 +51,15 @@ namespace outBreak {
 
             if (finalX < 0.0f) {
                 finalX = 0.0f;
-                m_LocalOffset = Vector2(finalX - (game_width / 2.0f - paddleWidth / 2.0f), m_LocalOffset.getRawY());
+                m_LocalOffset = Vector2{ finalX - (game_width / 2.0f - paddleWidth / 2.0f), m_LocalOffset.getRawY() };
             }
 
             else if (finalX + paddleWidth > game_width) {
                 finalX = game_width - paddleWidth;
-                m_LocalOffset = Vector2(finalX - (game_width / 2.0f - paddleWidth / 2.0f), m_LocalOffset.getRawY());
+                m_LocalOffset = Vector2{ finalX - (game_width / 2.0f - paddleWidth / 2.0f), m_LocalOffset.getRawY() };
             }
 
-            transform->setPosition(Vector2(finalX, finalY));
+            transform->setPosition(Vector2{ finalX, finalY });
         }
     }
 
