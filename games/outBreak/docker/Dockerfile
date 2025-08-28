@@ -23,8 +23,8 @@ FROM nginx:alpine
 COPY --from=builder /app/build-wasm/bin/Release/outBreak/ /usr/share/nginx/html/
 
 # Copy nginx configuration
-COPY games/outBreak/docker/nginx.conf /etc/nginx/conf.d/default.conf
-COPY games/outBreak/docker/entrypoint.sh /entrypoint.sh
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY entrypoint.sh /entrypoint.sh
 
 # Expose the web app port
 EXPOSE 80
