@@ -31,23 +31,37 @@ namespace outBreak {
 
     void Brick::update(float deltaTime) {
         updateComponents(deltaTime);
-
         m_GlobalTime += deltaTime;
+
         auto* renderer = getComponent<BoxRendererComponent>();
 
         if (!renderer) return;
         if (m_IsDestroyed) return;
 
+        auto* transform = getComponent<TransformComponent>();
+
+        if (transform) {
+            Vector2 brickSize = transform->getSize();
+            float brickWidth = brickSize.getRawX();
+
+            float game_width = getLogicalWindowSize().getRawX();
+            Vector2 currentPos = transform->getPosition();
+
+            float finalX = (game_width / 2.0f) - (brickWidth / 2.0f) + m_LocalOffset.getRawX();
+            float finalY = currentPos.getRawY();
+
+            transform->setPosition(Vector2(finalX, finalY));
+        }
+
         std::vector<Color> waveColors;
 
         for (auto it = m_ActiveWaves.begin(); it != m_ActiveWaves.end();) {
             WaveData& wave = *it;
- 
+
             float waveArrivalTime = wave.startTime + (wave.distanceFromOrigin / m_WaveSpeed);
             float timeSinceWaveArrival = m_GlobalTime - waveArrivalTime;
 
             if (timeSinceWaveArrival >= 0.0f && timeSinceWaveArrival < m_WaveDuration) {
-                // Wave is currently passing through this brick
                 float wavePhase = timeSinceWaveArrival / m_WaveDuration;
                 waveColors.push_back(calculateWaveColor(wavePhase));
                 ++it;
@@ -65,7 +79,7 @@ namespace outBreak {
         if (!waveColors.empty()) {
             renderer->setColor(blendWaveColors(waveColors));
         }
-        
+
         else {
             renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f));
         }

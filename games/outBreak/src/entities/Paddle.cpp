@@ -12,11 +12,8 @@ namespace outBreak {
         auto* input = addComponent<InputComponent>();
         auto* collision = addComponent<CollisionComponent>();
 
-        const float LOGICAL_PADDLE_WIDTH = 100.0f;
-        const float LOGICAL_PADDLE_HEIGHT = 20.0f;
-        
-        transform->setSize({LOGICAL_PADDLE_WIDTH, LOGICAL_PADDLE_HEIGHT});
-        transform->setPosition({800.0f - LOGICAL_PADDLE_WIDTH/2, 780.0f});
+        transform->setSize({PADDLE_WIDTH, PADDLE_HEIGHT});
+        transform->setPosition({800.0f - PADDLE_WIDTH/2, 780.0f});
 
         renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f));
 
@@ -38,25 +35,31 @@ namespace outBreak {
         if (input && transform && input->getInputSystem()) {
             Vector2 movement = input->getMovementVector();
             Vector2 currentPos = transform->getPosition();
-            Vector2 newPos = currentPos + (movement * m_Speed * deltaTime);
 
             Vector2 paddleSize = transform->getSize();
             float paddleWidth = paddleSize.getRawX();
 
             Vector2 screenSize = getWindowSize();
+            Vector2 targetScreenSize = getTargetWindowSize();
 
-            const float GAME_LEFT = 0.0f;
-            const float GAME_RIGHT = screenSize.getRawX();
+            float game_width = getLogicalWindowSize().getRawX();
 
-            if (newPos.getRawX() < GAME_LEFT) {
-                newPos = Vector2(GAME_LEFT, newPos.getRawY());
+            m_LocalOffset += movement * m_Speed * deltaTime;
+
+            float finalX = (game_width / 2.0f) - (paddleWidth / 2.0f) + m_LocalOffset.getRawX();
+            float finalY = currentPos.getRawY();
+
+            if (finalX < 0.0f) {
+                finalX = 0.0f;
+                m_LocalOffset = Vector2(finalX - (game_width / 2.0f - paddleWidth / 2.0f), m_LocalOffset.getRawY());
             }
 
-            else if (newPos.getRawX() + paddleWidth > GAME_RIGHT) {
-                newPos = Vector2(GAME_RIGHT - paddleWidth, newPos.getRawY());
+            else if (finalX + paddleWidth > game_width) {
+                finalX = game_width - paddleWidth;
+                m_LocalOffset = Vector2(finalX - (game_width / 2.0f - paddleWidth / 2.0f), m_LocalOffset.getRawY());
             }
 
-            transform->setPosition(newPos);
+            transform->setPosition(Vector2(finalX, finalY));
         }
     }
 

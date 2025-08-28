@@ -57,6 +57,8 @@ namespace engine {
             SDL_Window* getWindow() const;
 
             Vector2 getWindowSize();
+            Vector2 getTargetWindowSize() const { return Vector2(static_cast<float>(m_TargetWindowWidth), static_cast<float>(m_TargetWindowHeight)); }
+            Vector2 getLogicalWindowSize();
 
         private:
             Core() : m_Window(nullptr, SDL_DestroyWindow), m_Renderer(nullptr, SDL_DestroyRenderer) {}
@@ -100,4 +102,6 @@ namespace engine {
     inline SDL_Renderer* getRenderer() { return getCore().getRenderer(); }
     inline SDL_Window* getWindow() { return getCore().getWindow(); }
     inline Vector2 getWindowSize() { return getCore().getWindowSize(); }
+    inline Vector2 getTargetWindowSize() { return getCore().getTargetWindowSize(); }
+    inline Vector2 getLogicalWindowSize() { return getCore().getLogicalWindowSize(); }
 }

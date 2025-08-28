@@ -247,6 +247,22 @@ namespace engine {
         return Vector2(static_cast<float>(w), static_cast<float>(h));
     }
 
+    Vector2 Core::getLogicalWindowSize() {
+        float gameWidth = getWindowSize().getRawX();
+        float gameHeight = getWindowSize().getRawY();
+
+        if (getWindowSize().getRawY() / getWindowSize().getRawX() <
+            getTargetWindowSize().getRawY() / getTargetWindowSize().getRawX()) {
+            gameWidth = getWindowSize().getRawX() * (getTargetWindowSize().getRawY() / getWindowSize().getRawY());
+        }
+        
+        else {
+            gameHeight = getWindowSize().getRawY() * (getTargetWindowSize().getRawX() / getWindowSize().getRawX());
+        }
+
+        return Vector2(gameWidth, gameHeight);
+    }
+
     bool Core::initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable) {
         #ifdef ENGINE_PLATFORM_EMSCRIPTEN
             m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_RESIZABLE), SDL_DestroyWindow);

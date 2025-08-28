@@ -160,6 +160,5 @@ function(configure_vscode_workspace)
 
 endfunction()
 
-if(CMAKE_EXPORT_COMPILE_COMMANDS OR DEFINED ENV{VSCODE_PID})
-    configure_vscode_workspace()
-endif()
+message(STATUS "Updating .vscode workspace files for current generator...")
+configure_vscode_workspace()

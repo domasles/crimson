@@ -16,7 +16,10 @@ namespace outBreak {
 
         private:
             float m_Speed = 600.0f; // pixels per second
+
             static constexpr float PADDLE_WIDTH = 120.0f;
             static constexpr float PADDLE_HEIGHT = 20.0f;
+
+            Vector2 m_LocalOffset{ 0.0f, 0.0f };
     };
 }

@@ -30,7 +30,7 @@ namespace engine {
 
             template<typename T>
 
-            T* getComponent() {
+            T* getComponent() const {
                 static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
                 auto it = m_Components.find(std::type_index(typeid(T)));
 

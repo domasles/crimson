@@ -1,9 +1,11 @@
 #!/bin/bash
 
 OS_TYPE="$(uname)"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 
-echo "Generating build files for $OS_TYPE..."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
+EMSDK_DIR="$(cd "$SCRIPT_DIR/../../vendor/emsdk" &> /dev/null && pwd)"
+
+echo "Generating build files for $OS_TYPE and Emscripten build files..."
 
 if [[ "$OS_TYPE" == "Darwin" ]]; then
     if command -v xcodebuild &> /dev/null; then
@@ -17,15 +19,18 @@ else
     GENERATOR="Ninja Multi-Config"
 fi
 
+
+(
+    $EMSDK_DIR/emsdk install latest
+    $EMSDK_DIR/emsdk activate latest
+
+    chmod +x $EMSDK_DIR/emsdk_env.sh
+    source $EMSDK_DIR/emsdk_env.sh
+
+    emcmake cmake -B build-wasm -G "Ninja Multi-Config" -DCMAKE_TOOLCHAIN_FILE=$EMSDK_DIR/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+)
+
 cmake -B build-native -G "$GENERATOR" -DCMAKE_BUILD_TYPE=Debug
-
-$SCRIPT_DIR/../../vendor/emsdk/emsdk install latest
-$SCRIPT_DIR/../../vendor/emsdk/emsdk activate latest
-
-chmod +x $SCRIPT_DIR/../../vendor/emsdk/emsdk_env.sh
-source $SCRIPT_DIR/../../vendor/emsdk/emsdk_env.sh
-
-emcmake cmake -B build-wasm -G "Ninja Multi-Config" -DCMAKE_TOOLCHAIN_FILE=$SCRIPT_DIR/../../vendor/emsdk/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
 
 if [ $? -ne 0 ]; then
     echo "Failed to generate project files!"

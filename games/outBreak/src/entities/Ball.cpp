@@ -11,8 +11,8 @@ namespace outBreak {
         auto* renderer = addComponent<BoxRendererComponent>();
         auto* collision = addComponent<CollisionComponent>();
 
-        transform->setPosition({800.0f - BALL_SIZE/2, 700.0f});
         transform->setSize({BALL_SIZE, BALL_SIZE});
+        transform->setPosition(m_InitialPosition);
         renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f));
 
         collision->setCollisionType(std::make_unique<TriggerCollision>());
@@ -24,38 +24,39 @@ namespace outBreak {
         updateComponents(deltaTime);
 
         auto* transform = getComponent<TransformComponent>();
-        if (!transform) return;
+        if (transform) {
+            Vector2 currentPos = transform->getPosition();
+            Vector2 velocity = m_Direction * BALL_SPEED;
+            Vector2 movement = velocity * deltaTime;
 
-        Vector2 velocity = m_Direction * BALL_SPEED;
-        Vector2 movement = velocity * deltaTime;
+            Vector2 screenSize = getWindowSize();
+            Vector2 targetScreenSize = getTargetWindowSize();
 
-        transform->move(movement);
+            float game_width = getLogicalWindowSize().getRawX();
 
-        Vector2 currentPos = transform->getPosition();
-        Vector2 screenSize = getWindowSize();
+            m_LocalOffset += Vector2(movement.getRawX(), 0.0f);
 
-        const float GAME_LEFT = 0.0f;   
-        const float GAME_RIGHT = screenSize.getRawX(); 
-        const float GAME_TOP = 0.0f;     
+            float finalX = (game_width / 2.0f) - (BALL_SIZE / 2.0f) + m_LocalOffset.getRawX();
+            float finalY = currentPos.getRawY() + movement.getRawY();
 
-        if (currentPos.getRawX() <= GAME_LEFT || currentPos.getRawX() + BALL_SIZE >= GAME_RIGHT) {
-            if (currentPos.getRawX() <= GAME_LEFT) {
+            if (finalX < 0.0f) {
+                finalX = 0.0f;
                 setDirectionX(1.0f);
+                m_LocalOffset = Vector2(finalX - (game_width / 2.0f - BALL_SIZE / 2.0f), m_LocalOffset.getRawY());
             }
-            
-            else {
+
+            else if (finalX + BALL_SIZE > game_width) {
+                finalX = game_width - BALL_SIZE;
                 setDirectionX(-1.0f);
+                m_LocalOffset = Vector2(finalX - (game_width / 2.0f - BALL_SIZE / 2.0f), m_LocalOffset.getRawY());
             }
 
-            Vector2 correctedPos(currentPos.getRawX() <= GAME_LEFT ? GAME_LEFT : GAME_RIGHT - BALL_SIZE, currentPos.getRawY());
-            transform->setPosition(correctedPos);
-        }
+            if (finalY < 0.0f) {
+                finalY = 0.0f;
+                setDirectionY(1.0f);
+            }
 
-        if (currentPos.getRawY() <= GAME_TOP) {
-            setDirectionY(1.0f);
-
-            Vector2 correctedPos(currentPos.getRawX(), GAME_TOP);
-            transform->setPosition(correctedPos);
+            transform->setPosition(Vector2(finalX, finalY));
         }
     }
 
@@ -73,5 +74,14 @@ namespace outBreak {
 
     void Ball::setDirectionY(float sign) { 
         m_Direction = Vector2(m_Direction.getRawX(), sign * std::abs(m_Direction.getRawY())); 
+    }
+
+    void Ball::resetPosition() {
+        auto* transform = getComponent<TransformComponent>();
+
+        if (transform) {
+            m_LocalOffset = Vector2(0.0f, 0.0f);
+            transform->setPosition(m_InitialPosition);
+        }
     }
 }

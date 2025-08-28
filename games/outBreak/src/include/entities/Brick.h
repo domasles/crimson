@@ -25,6 +25,7 @@ namespace outBreak {
 
             void setPosition(Vector2 position) { m_Position = position; }
             void addWaveFromOrigin(Vector2 origin);
+            void setLocalOffset(const Vector2& offset) { m_LocalOffset = offset; }
 
             Vector2 getPosition() const { return m_Position; }
 
@@ -43,7 +44,9 @@ namespace outBreak {
             float m_WaveDuration = 1.0f;
             float m_GlobalTime = 0.0f;
 
-            Vector2 m_Position = Vector2(0.0f, 0.0f);
+            Vector2 m_Position{ 0.0f, 0.0f };
+            Vector2 m_LocalOffset{ 0.0f, 0.0f };
+            
             std::vector<WaveData> m_ActiveWaves;
 
             Color calculateWaveColor(float wavePhase);

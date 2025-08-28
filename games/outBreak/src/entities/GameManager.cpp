@@ -24,10 +24,9 @@ namespace outBreak {
             auto* transform = m_Ball->getComponent<TransformComponent>();
 
             if (transform) {
-                transform->setPosition(m_Ball->getInitialPosition());
+                m_Ball->resetPosition();
+                m_Ball->resetDirection();
             }
-
-            m_Ball->resetDirection();
         }
 
         for (auto* brick : m_Bricks) {
@@ -153,7 +152,6 @@ namespace outBreak {
                 // Trigger wave effect from this brick's center position
                 Vector2 brickCenter = brick->getPosition() + Vector2(25.0f, 15.0f);
                 triggerWaveEffect(brickCenter);
-
                 break; // Only handle one collision per frame
             }
         }
@@ -167,7 +165,7 @@ namespace outBreak {
 
         Vector2 ballPos = ballTransform->getPosition();
 
-        if (ballPos.getRawY() > 850.0f) {
+        if (ballPos.getRawY() > 900.0f) {
             resetGame();
         }
     }

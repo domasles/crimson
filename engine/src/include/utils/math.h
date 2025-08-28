@@ -37,7 +37,6 @@ namespace engine::utils::math {
             static void updateAll();
 
             Vector2 getRawVector() const { return Vector2{ getRawX(), getRawY() }; }
-
             Vector2 normalize() const;
 
         private:
