@@ -176,12 +176,10 @@ engine/
 ## Creating Your First Game
 
 ### Game Setup
-1. **Create game directory**: `games/my-game/`.
-2. **Add CMakeLists.txt**: Link against engine library.
-3. **Create manifest.json**: Game metadata for launcher.
-4. **Set up standard directories**: `src/`, `assets/`, `config/`.
-5. **Include Engine.h**: Add `#include <Engine.h>` to your source files.
-6. **Enjoy creating with Crimson!**
+1. **Run Game Generation Script**: Execute `./scripts/games/GenerateGame <game_name> [display_name]` to create the initial game structure.
+2. **Set up standard directories**: `src/`, `assets/`, `config/`. It's advised to **NOT** remove or modify auto-generated `Manifest.json` as without it the game may not be recognized by the launcher.
+3. **Include Engine.h**: Add `#include <Engine.h>` to your source files to use engine dependencies.
+4. **Enjoy creating with Crimson!**
 
 ### Level Design with LDtk
 1. **Install LDtk**: Download from [ldtk.io](https://ldtk.io).
