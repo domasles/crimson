@@ -19,6 +19,9 @@ A simple, powerful 2D game engine designed for learning game development fundame
 - **Advanced Collision System**: Physics-accurate collision detection with shape-based collision primitives.
 - **JSON-Driven Configuration**: Maps, settings, input bindings - everything configurable via JSON.
 - **Cross-Platform Input**: Unified input handling.
+- **Modular Architecture**: Easily extendable and maintainable codebase.
+- **Scene Management**: Efficient handling of game scenes and transitions.
+- **Texture and audio support**: Comprehensive support for various image and audio formats.
 
 ### Multi-Game Framework
 - **One Launcher, Multiple Games**: Professional game selection interface with metadata support.
@@ -83,16 +86,16 @@ cmake --build build-native --target outBreak --config Debug
 ## Daily Development Workflow
 
 ### VS Code (Recommended)
-1. **Open workspace**: `code .` in project root
-2. **Auto-configure**: CMake Tools extension detects project automatically
-3. **Build & Debug**: Press **F5** - builds and launches with debugger attached
-4. **Build only**: **Ctrl+Shift+P** → `Tasks: Run Task` → `CMake: Build`
-5. **Clean build**: **Ctrl+Shift+P** → `Tasks: Run Task` → `CMake: Clean`
+1. **Open workspace**: `code .` in project root.
+2. **Auto-configure**: CMake Tools extension detects project automatically.
+3. **Build & Debug**: Press **F5** - builds and launches with debugger attached.
+4. **Build only**: **Ctrl+Shift+P** → `Tasks: Run Task` → `CMake: Build`.
+5. **Clean build**: **Ctrl+Shift+P** → `Tasks: Run Task` → `CMake: Clean`.
 
 ### Visual Studio (Windows)
-1. **Open solution**: `build-native\Crimson.sln`
-2. **Build & Run**: Press **F5**
-3. **Configuration**: Switch between Debug/Release in toolbar
+1. **Open solution**: `build-native\Crimson.sln`.
+2. **Build & Run**: Press **F5**.
+3. **Configuration**: Switch between Debug/Release in toolbar.
 
 ### Command Line Development
 ```bash
@@ -173,44 +176,26 @@ engine/
 ## Creating Your First Game
 
 ### Game Setup
-1. **Create game directory**: `games/my-game/`
-2. **Add CMakeLists.txt**: Link against engine library
-3. **Create manifest.json**: Game metadata for launcher
-4. **Set up standard directories**: `src/`, `assets/`, `config/`
-5. **Include Engine.h**: Add `#include <Engine.h>` to your source files
+1. **Create game directory**: `games/my-game/`.
+2. **Add CMakeLists.txt**: Link against engine library.
+3. **Create manifest.json**: Game metadata for launcher.
+4. **Set up standard directories**: `src/`, `assets/`, `config/`.
+5. **Include Engine.h**: Add `#include <Engine.h>` to your source files.
 6. **Enjoy creating with Crimson!**
 
 ### Level Design with LDtk
-1. **Install LDtk**: Download from [ldtk.io](https://ldtk.io)
-2. **Create levels**: Design levels visually with tiles and entities
-3. **Export to assets/maps/**: Save `.ldtk` files in your game's maps directory
-4. **Automatic integration**: Engine loads levels and generates collision boundaries
-
-### Component Usage Example
-```cpp
-// Create an entity with transform and texture
-auto entity = scene.createEntity();
-entity.addComponent<TransformComponent>();
-entity.addComponent<TextureComponent>();
-entity.addComponent<CollisionComponent>();
-```
+1. **Install LDtk**: Download from [ldtk.io](https://ldtk.io).
+2. **Create levels**: Design levels visually with tiles and entities.
+3. **Export to assets/maps/**: Save `.ldtk` files in your game's maps directory.
+4. **Automatic integration**: Engine loads levels and generates collision boundaries.
 
 ## Build Configuration
 
-### Platform Selection
-```bash
-# Native only (faster development iteration)
-cmake -B build-native -DWASM=OFF
-
-# WebAssembly only (web deployment focus)
-cmake -B build-wasm -DWASM=ON
-```
-
 ### Platform Support Status
-- **Windows**: Fully supported and tested
-- **Linux**: Fully supported and tested  
-- **macOS**: Supported but not extensively tested
-- **WebAssembly**: Fully supported for web deployment
+- **Windows**: Fully supported and tested.
+- **Linux**: Fully supported and tested.
+- **macOS**: Supported but not extensively tested.
+- **WebAssembly**: Fully supported for web deployment.
 
 ## Dependencies & Technology
 
@@ -277,10 +262,10 @@ cmake --build build-native
 - **Platform-agnostic code**: Engine abstracts platform differences.
 
 ### Development Workflow
-1. **Make small, frequent commits** with clear messages
-2. **Test on target platforms** before major releases
-3. **Use branches** for experimental features
-4. **Profile performance** in Release builds only
+1. **Make small, frequent commits** with clear messages.
+2. **Test on target platforms** before major releases.
+3. **Use branches** for experimental features.
+4. **Profile performance** in Release builds only.
 
 ## External Submodule Dependencies
 

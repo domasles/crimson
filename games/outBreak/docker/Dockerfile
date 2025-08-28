@@ -20,7 +20,7 @@ RUN cmake --build build-wasm --target outBreak --config Release
 FROM nginx:alpine
 
 # Copy built WebAssembly game
-COPY --from=builder /app/build-wasm/bin/Release/games/outBreak/ /usr/share/nginx/html/
+COPY --from=builder /app/build-wasm/bin/Release/outBreak/ /usr/share/nginx/html/
 
 # Copy nginx configuration
 COPY games/outBreak/docker/nginx.conf /etc/nginx/conf.d/default.conf
