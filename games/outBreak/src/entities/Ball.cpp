@@ -32,7 +32,7 @@ namespace outBreak {
         transform->move(movement);
 
         Vector2 currentPos = transform->getPosition();
-        Vector2 screenSize = getCore().getWindowSize();
+        Vector2 screenSize = getWindowSize();
 
         const float GAME_LEFT = 0.0f;   
         const float GAME_RIGHT = screenSize.getRawX(); 

@@ -120,8 +120,8 @@ namespace engine {
                 windowSuccess = initWindowedWindow(title, width, height, resizable);
 
                 if (windowSuccess) {
-                    m_WindowWidth = m_TargetWindowWidth = width;
-                    m_WindowHeight = m_TargetWindowHeight = height;
+                    m_TargetWindowWidth = width;
+                    m_TargetWindowHeight = height;
 
                     ENGINE_LOG_INIT("Windowed Window");
                 }
@@ -132,10 +132,10 @@ namespace engine {
                 windowSuccess = initFullScreenWindow(title);
 
                 if (windowSuccess) {
-                    SDL_GetWindowSize(getWindow(), &m_WindowWidth, &m_WindowHeight);
+                    Vector2 windowSize = getWindowSize();
 
-                    m_TargetWindowWidth = m_WindowWidth;
-                    m_TargetWindowHeight = m_WindowHeight;
+                    m_TargetWindowWidth = windowSize.getRawX();
+                    m_TargetWindowHeight = windowSize.getRawY();
 
                     ENGINE_LOG_INIT("Fullscreen Window");
                 }
@@ -237,11 +237,17 @@ namespace engine {
 
         return m_Window.get();
     }
-    
-    bool Core::initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable) {
-        m_WindowWidth = width;
-        m_WindowHeight = height;
 
+    Vector2 Core::getWindowSize() {
+        SDL_GetWindowSize(getWindow(), &m_WindowWidth, &m_WindowHeight);
+
+        float w = std::max(m_WindowWidth, m_TargetWindowWidth);
+        float h = std::max(m_WindowHeight, m_TargetWindowHeight);
+
+        return Vector2(static_cast<float>(w), static_cast<float>(h));
+    }
+
+    bool Core::initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable) {
         #ifdef ENGINE_PLATFORM_EMSCRIPTEN
             m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_RESIZABLE), SDL_DestroyWindow);
         #else
@@ -275,12 +281,12 @@ namespace engine {
             return false;
         }
         
-#ifndef ENGINE_PLATFORM_EMSCRIPTEN
-        // VSync can interfere with Emscripten's main loop timing
-        if (!SDL_SetRenderVSync(getRenderer(), true)) {
-            Logger::engine_error("SDL_SetRenderVSync failed: {}", SDL_GetError());
-        }
-#endif
+        #ifndef ENGINE_PLATFORM_EMSCRIPTEN
+            // VSync can interfere with Emscripten's main loop timing
+            if (!SDL_SetRenderVSync(getRenderer(), true)) {
+                Logger::engine_error("SDL_SetRenderVSync failed: {}", SDL_GetError());
+            }
+        #endif
         
         return true;
     }

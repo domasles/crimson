@@ -56,7 +56,7 @@ namespace engine {
             SDL_Renderer* getRenderer() const;
             SDL_Window* getWindow() const;
 
-            Vector2 getWindowSize() const { return Vector2{ static_cast<float>(m_WindowWidth), static_cast<float>(m_WindowHeight) }; }
+            Vector2 getWindowSize();
 
         private:
             Core() : m_Window(nullptr, SDL_DestroyWindow), m_Renderer(nullptr, SDL_DestroyRenderer) {}

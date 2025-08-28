@@ -43,7 +43,7 @@ namespace outBreak {
             Vector2 paddleSize = transform->getSize();
             float paddleWidth = paddleSize.getRawX();
 
-            Vector2 screenSize = getCore().getWindowSize();
+            Vector2 screenSize = getWindowSize();
 
             const float GAME_LEFT = 0.0f;
             const float GAME_RIGHT = screenSize.getRawX();
