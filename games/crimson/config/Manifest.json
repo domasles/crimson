@@ -1,7 +1,0 @@
-{
-    "display_name": "Crimson Engine Demo",
-    "version": "1.0.0",
-    "dll_name": "crimson.dll",
-    "so_name": "libcrimson.so",
-    "dylib_name": "libcrimson.dylib"
-}
