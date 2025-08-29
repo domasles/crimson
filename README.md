@@ -114,7 +114,7 @@ cmake --build build-native --target clean
 # Work on individual games
 cmake --build build-native --target crimson
 cmake --build build-native --target outBreak
-cmake --build build-native --target launcher   # Game launcher
+cmake --build build-native --target launcher   # Game launcher also builds all games with itself
 
 # WebAssembly deployment
 cmake --build build-wasm --target crimson --config Release

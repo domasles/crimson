@@ -74,6 +74,8 @@ else()
             wx::base
     )
 
+    add_dependencies(${LAUNCHER_TARGET} ${AVAILABLE_GAMES})
+
     if(WIN32)
         set_target_properties(launcher PROPERTIES WIN32_EXECUTABLE $<$<CONFIG:Release>:TRUE>)
     elseif(APPLE)
