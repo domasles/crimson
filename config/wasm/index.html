@@ -1,89 +1,129 @@
 <!doctype html>
 <html lang="en-us">
-<head>
-  <meta charset="utf-8">
-  <title>Crimson Game</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: #000;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100vw;
-      height: 100vh;
-    }
-    
-    .emscripten {
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
-      width: 100vw;
-      height: 100vh;
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-    
-    .spinner {
-      height: 50px;
-      width: 50px;
-      border: 5px solid #333;
-      border-top: 5px solid #fff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
-</head>
-<body>
-  <div class="spinner" id="spinner"></div>
-  <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
-  
-  <script type='text/javascript'>
-    var Module = {
-      preRun: [],
-      postRun: [],
-      print: function(text) {
-        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-        console.log(text);
-      },
-      canvas: (function() {
-        var canvas = document.getElementById('canvas');
-        canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
-        return canvas;
-      })(),
-      setStatus: function(text) {
-        if (text) {
-          Module.setStatus.last = { time: Date.now(), text: text };
-        } else {
-          var canvas = Module.canvas;
-          canvas.style.display = "block";
-          document.getElementById('spinner').style.display = 'none';
-        }
-      },
-      totalDependencies: 0,
-      monitorRunDependencies: function(left) {
-        this.totalDependencies = Math.max(this.totalDependencies, left);
-        Module.setStatus(left ? 'Loading...' : '');
-      }
-    };
-    
-    Module.setStatus('Downloading...');
-    
-    window.onerror = function() {
-      Module.setStatus('Exception thrown, see JavaScript console');
-      document.getElementById('spinner').style.display = 'none';
-      Module.setStatus = function(text) {
-        if (text) console.error('[post-exception status] ' + text);
-      };
-    };
-  </script>
-  {{{ SCRIPT }}}
-</body>
+    <head>
+        <meta charset="utf-8">
+        <title>Crimson Game</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+                background: #242424;
+                overflow: hidden;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100vw;
+                height: 100vh;
+            }
+            
+            .emscripten {
+                image-rendering: pixelated;
+                image-rendering: crisp-edges;
+                width: 100vw;
+                height: 100vh;
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            }
+
+            .mobile-warning {
+                display: none;
+                background: #1d1d1d;
+                color: #111;
+                padding: 4rem 5rem;
+                border-radius: 25px;
+                text-align: center;
+                max-width: 95%;
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+            }
+
+            .mobile-warning h1 {
+                font-size: 3rem;
+                font-weight: bold;
+                margin: 0 0 1.5rem 0;
+                color: #ffffff;
+            }
+
+            .mobile-warning p {
+                font-size: 1.5rem;
+                line-height: 1.6;
+                margin: 0;
+                color: #ffffff;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+        <div class="mobile-warning" id="mobile-warning">
+            <h1>Uh oh!</h1>
+            <p>This is not compatible with mobile devices.<br>
+            Open it up on a desktop browser and try out the game!</p>
+        </div>
+
+        <!-- Emscripten script is injected here -->
+        <div id="emscripten-container">
+            {{{ SCRIPT }}}
+        </div>
+
+        <script type='text/javascript'>
+            function isMobile() {
+                return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.innerWidth < 768);
+            }
+
+            if (isMobile()) {
+                // Mobile: show warning, hide canvas
+                document.getElementById('mobile-warning').style.display = 'block';
+                document.getElementById('canvas').style.display = 'none';
+
+                // Remove Emscripten script to prevent execution
+                document.getElementById('emscripten-container').innerHTML = '';
+            }
+
+            else {
+                document.getElementById('canvas').style.display = 'block';
+
+                var Module = {
+                    preRun: [],
+                    postRun: [],
+
+                    print: function(text) {
+                        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+                        console.log(text);
+                    },
+
+                    canvas: (function() {
+                        var canvas = document.getElementById('canvas');
+                        canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+                        return canvas;
+                    })(),
+
+                    setStatus: function(text) {
+                        if (text) {
+                            Module.setStatus.last = { time: Date.now(), text: text };
+                        }
+
+                        else {
+                            var canvas = Module.canvas;
+                            canvas.style.display = "block";
+                        }
+                    },
+
+                    totalDependencies: 0,
+
+                    monitorRunDependencies: function(left) {
+                        this.totalDependencies = Math.max(this.totalDependencies, left);
+                        Module.setStatus(left ? 'Loading...' : '');
+                    }
+                };
+                
+                Module.setStatus('Downloading...');
+                
+                window.onerror = function() {
+                    Module.setStatus('Exception thrown, see JavaScript console');
+                    Module.setStatus = function(text) { if (text) console.error('[post-exception status] ' + text); };
+                };
+            }
+        </script>
+    </body>
 </html>
