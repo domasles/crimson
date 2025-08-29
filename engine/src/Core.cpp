@@ -83,12 +83,12 @@ namespace engine {
             Logger::engine_error("Flag 'fullscreen' must be set to true!");
             return false;
         }
+
         return initInternal(workingDir, title, WindowMode::Fullscreen);
     }
 
     const bool Core::initInternal(const std::string& workingDir, const std::string& title, WindowMode mode, int width, int height, bool resizable) {
         m_ParentFolder = workingDir;
-
         SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
 
         if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
@@ -134,8 +134,8 @@ namespace engine {
                 if (windowSuccess) {
                     Vector2 windowSize = getWindowSize();
 
-                    m_TargetWindowWidth = windowSize.getRawX();
-                    m_TargetWindowHeight = windowSize.getRawY();
+                    m_TargetWindowWidth = m_DefaultWindowWidth;
+                    m_TargetWindowHeight = m_DefaultWindowHeight;
 
                     ENGINE_LOG_INIT("Fullscreen Window");
                 }
@@ -248,17 +248,8 @@ namespace engine {
     }
 
     Vector2 Core::getLogicalWindowSize() {
-        float gameWidth = getWindowSize().getRawX();
-        float gameHeight = getWindowSize().getRawY();
-
-        if (getWindowSize().getRawY() / getWindowSize().getRawX() <
-            getTargetWindowSize().getRawY() / getTargetWindowSize().getRawX()) {
-            gameWidth = getWindowSize().getRawX() * (getTargetWindowSize().getRawY() / getWindowSize().getRawY());
-        }
-        
-        else {
-            gameHeight = getWindowSize().getRawY() * (getTargetWindowSize().getRawX() / getWindowSize().getRawX());
-        }
+        float gameWidth = getWindowSize().getRawX() * (getTargetWindowSize().getRawY() / getWindowSize().getRawY());
+        float gameHeight = getWindowSize().getRawY() * (getTargetWindowSize().getRawX() / getWindowSize().getRawX());
 
         return Vector2{ gameWidth, gameHeight };
     }
