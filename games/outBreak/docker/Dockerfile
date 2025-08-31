@@ -10,10 +10,8 @@ RUN apt update && apt install -y ninja-build
 # Clone the git repository with submodules
 RUN git clone --depth 1 --shallow-submodules --recurse-submodules https://github.com/domasles/crimson .
 
-# Configure CMake for WebAssembly build
-RUN emcmake cmake -B build-wasm -G "Ninja Multi-Config"
-
-# Build only the outBreak game target
+# Configure and run CMake for OutBreak's WebAssembly build
+RUN export BUILD_HASH=$(git rev-parse --short HEAD) && emcmake cmake -B build-wasm -G "Ninja Multi-Config" -DOUTPUT_NAME=$BUILD_HASH
 RUN cmake --build build-wasm --target outBreak --config Release
 
 # Production stage with Nginx

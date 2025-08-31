@@ -12,6 +12,8 @@ file(GLOB_RECURSE LAUNCHER_SOURCES
 )
 
 if(WASM)
+    set(OUTPUT_NAME "index" CACHE STRING "Executable output name (default: index)")
+
     foreach(game ${AVAILABLE_GAMES})
         set(GAME_LIB "${game}_lib")
         set(GAME_EXEC "${game}")
@@ -37,7 +39,7 @@ if(WASM)
         set_target_properties(${GAME_EXEC} PROPERTIES
             CXX_STANDARD 20
             CXX_STANDARD_REQUIRED ON
-            OUTPUT_NAME "index"
+            OUTPUT_NAME "${OUTPUT_NAME}"
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/${game}"
             SUFFIX ".html"
         )
