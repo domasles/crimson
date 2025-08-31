@@ -59,3 +59,6 @@ jobs:
         no-cache: true
         cache-from: type=gha
         cache-to: type=gha,mode=max
+        build-args: |
+          BUILD_HASH=${{ github.sha }}
+
