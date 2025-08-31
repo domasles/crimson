@@ -17,28 +17,28 @@ if(WASM)
         set(GAME_EXEC "${game}")
 
         add_executable(${GAME_EXEC} ${LAUNCHER_SOURCES})
-        set(PRELOAD_FLAGS_LIST "")
 
         if(EXISTS "${CMAKE_SOURCE_DIR}/games/${game}/assets")
-            list(APPEND PRELOAD_FLAGS_LIST
-                "--preload-file=${CMAKE_SOURCE_DIR}/games/${game}/assets@assets"
-            )
+            target_link_options(${GAME_EXEC} PRIVATE "--preload-file=${CMAKE_SOURCE_DIR}/games/${game}/assets@assets")
         endif()
 
         if(EXISTS "${CMAKE_SOURCE_DIR}/games/${game}/config")
-            list(APPEND PRELOAD_FLAGS_LIST
-                "--preload-file=${CMAKE_SOURCE_DIR}/games/${game}/config@config"
-            )
+            target_link_options(${GAME_EXEC} PRIVATE "--preload-file=${CMAKE_SOURCE_DIR}/games/${game}/config@config")
         endif()
 
-        string(JOIN " " PRELOAD_FLAGS_STR ${PRELOAD_FLAGS_LIST})
+        target_link_options(${GAME_EXEC} PRIVATE
+            "-sWASM=1"
+            "-sUSE_SDL=2"
+            "-sALLOW_MEMORY_GROWTH=1"
+            "-sNO_DISABLE_EXCEPTION_CATCHING=1"
+            "--shell-file=${CMAKE_SOURCE_DIR}/config/wasm/index.html"
+        )
 
         set_target_properties(${GAME_EXEC} PROPERTIES
             CXX_STANDARD 20
             CXX_STANDARD_REQUIRED ON
             OUTPUT_NAME "index"
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/${game}"
-            LINK_FLAGS "-s WASM=1 -s USE_SDL=2 ${PRELOAD_FLAGS_STR} -s ALLOW_MEMORY_GROWTH=1 -s NO_DISABLE_EXCEPTION_CATCHING=1 --shell-file ${CMAKE_SOURCE_DIR}/config/wasm/index.html"
             SUFFIX ".html"
         )
 

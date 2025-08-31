@@ -22,8 +22,8 @@ namespace outBreak {
 
     void Ball::update(float deltaTime) {
         updateComponents(deltaTime);
-
         auto* transform = getComponent<TransformComponent>();
+
         if (transform) {
             Vector2 currentPos = transform->getPosition();
             Vector2 velocity = m_Direction * BALL_SPEED;
@@ -69,11 +69,23 @@ namespace outBreak {
     }
 
     void Ball::setDirectionX(float sign) { 
-        m_Direction = Vector2{ sign * std::abs(m_Direction.getRawX()), m_Direction.getRawY() }; 
+        float randomX = Random::getFloat(0.7f, 1.3f);
+        float randomY = Random::getFloat(0.7f, 1.3f);
+        float ySign = (m_Direction.getRawY() > 0) ? 1.0f : -1.0f;
+
+        Vector2 newDirection{ sign * randomX, ySign * randomY };
+
+        m_Direction = newDirection.normalize();
     }
 
-    void Ball::setDirectionY(float sign) { 
-        m_Direction = Vector2{ m_Direction.getRawX(), sign * std::abs(m_Direction.getRawY()) }; 
+    void Ball::setDirectionY(float sign) {
+        float randomX = Random::getFloat(0.7f, 1.3f);
+        float randomY = Random::getFloat(0.7f, 1.3f);
+        float xSign = (m_Direction.getRawX() > 0) ? 1.0f : -1.0f;
+
+        Vector2 newDirection{ xSign * randomX, sign * randomY };
+
+        m_Direction = newDirection.normalize();
     }
 
     void Ball::resetPosition() {

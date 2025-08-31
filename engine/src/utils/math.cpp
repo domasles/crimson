@@ -104,4 +104,22 @@ namespace engine::utils::math {
             return Vector2{ 0.0f, 0.0f };
         }
     }
+
+    int Random::getInt(int min, int max) {
+        static std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
+        std::uniform_int_distribution<int> dist(min, max);
+        return dist(rng);
+    }
+
+    float Random::getFloat(float min, float max) {
+        static std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
+        std::uniform_real_distribution<float> dist(min, max);
+        return dist(rng);
+    }
+
+    bool Random::chance(float probability) {
+        static std::mt19937 rng(std::chrono::steady_clock::now().time_since_epoch().count());
+        std::bernoulli_distribution dist(probability);
+        return dist(rng);
+    }
 }

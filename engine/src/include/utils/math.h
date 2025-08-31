@@ -51,4 +51,11 @@ namespace engine::utils::math {
             inline static float s_GlobalScaleX = 0.0f;
             inline static float s_GlobalScaleY = 0.0f;
     };
+
+    class Random {
+        public:
+            static int getInt(int min, int max);
+            static float getFloat(float min, float max);
+            static bool chance(float probability);
+    };
 }

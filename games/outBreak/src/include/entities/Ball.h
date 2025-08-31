@@ -14,8 +14,6 @@ namespace outBreak {
             void update(float deltaTime) override;
             void render() override;
 
-            void setVelocity(const Vector2& velocity) { m_Direction = velocity.normalize(); }
-
             void setDirectionX(float sign);
             void setDirectionY(float sign);
 
@@ -27,7 +25,7 @@ namespace outBreak {
 
         private:
             static constexpr float BALL_SIZE = 24.0f;
-            static constexpr float BALL_SPEED = 300.0f;
+            static constexpr float BALL_SPEED = 450.0f;
 
             Vector2 m_InitialPosition{ getLogicalWindowSize().getRawX()/2 - BALL_SIZE/2, 700.0f };
             Vector2 m_Direction{ Vector2{1.0f, -1.0f}.normalize() };
