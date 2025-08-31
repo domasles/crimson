@@ -3,9 +3,16 @@
 set -e
 cd /usr/share/nginx/html
 
-# Find hash-named HTML
-HASHED_HTML=$(ls *.html | head -n 1)
+# Read hash from file
+if [ -f build_hash.txt ]; then
+  HASHED_HTML=$(cat build_hash.txt).html
+else
+  echo "build_hash.txt not found, defaulting to index.html"
+  HASHED_HTML="index.html"
+fi
 
-# Symlink to index.html
+# Symlink it
 ln -sf "$HASHED_HTML" index.html
+
+# Start nginx
 nginx -g "daemon off;"
