@@ -50,7 +50,7 @@ A simple, powerful 2D game engine designed for learning game development fundame
 ### Setup
 ```bash
 # Clone with all dependencies
-git clone ----recurse-submodules https://github.com/domasles/crimson.git
+git clone --recurse-submodules https://github.com/domasles/crimson.git
 cd crimson
 
 # If you forgot --recurse-submodules, run this:
