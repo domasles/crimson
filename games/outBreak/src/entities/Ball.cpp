@@ -16,7 +16,7 @@ namespace outBreak {
         transform->setPosition(m_InitialPosition);
 
         collision->setCollisionType(std::make_unique<TriggerCollision>());
-        collision->setCollisionShape(std::make_unique<BoxShape>());
+        collision->setCollisionShape(std::make_unique<CircleShape>());
         collision->setParticipatesInQueries(false);
     }
 

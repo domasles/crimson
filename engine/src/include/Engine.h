@@ -15,6 +15,8 @@
 #include <collisions/types/TriggerCollision.h>
 #include <collisions/types/BlockCollision.h>
 #include <collisions/types/NoneCollision.h>
+
+#include <collisions/shapes/CircleShape.h>
 #include <collisions/shapes/BoxShape.h>
 
 #include <mapCollisionTiles/MapTile.h>

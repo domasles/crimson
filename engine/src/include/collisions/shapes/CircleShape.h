@@ -9,12 +9,12 @@ namespace engine::utils::collision {
 using namespace engine::utils::collision;
 
 namespace engine::collisions::shapes {
-    class BoxShape : public CollisionShape {
+    class CircleShape : public CollisionShape {
         public:
             CollisionResult checkCollision(const Vector2& myPos, const Vector2& mySize, const CollisionShape& other, const Vector2& otherPos, const Vector2& otherSize) const override;
             CollisionResult checkCollisionWithBox(const Vector2& myPos, const Vector2& mySize, const Vector2& boxPos, const Vector2& boxSize) const override;
             CollisionResult checkCollisionWithCircle(const Vector2& myPos, const Vector2& mySize, const Vector2& circlePos, const Vector2& circleSize) const override;
             
-            std::unique_ptr<CollisionShape> clone() const override { return std::make_unique<BoxShape>(*this); }
+            std::unique_ptr<CollisionShape> clone() const override { return std::make_unique<CircleShape>(*this); }
     };
 }

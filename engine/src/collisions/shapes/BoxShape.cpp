@@ -7,11 +7,6 @@
 namespace engine::collisions::shapes {
     CollisionResult BoxShape::checkCollision(const Vector2& myPos, const Vector2& mySize, const CollisionShape& other, const Vector2& otherPos, const Vector2& otherSize) const {
         auto result = other.checkCollisionWithBox(otherPos, otherSize, myPos, mySize);
-
-        if (result.hasCollision) {
-            result.contactNormal = Vector2{ -result.contactNormal.getRawX(), -result.contactNormal.getRawY() };
-        }
-
         return result;
     }
 
@@ -45,6 +40,57 @@ namespace engine::collisions::shapes {
             result.contactNormal = Vector2{ 0.0f, delta.getRawY() > 0 ? 1.0f : -1.0f };
             float contactY = delta.getRawY() > 0 ? boxPos.getRawY() + boxSize.getRawY() : boxPos.getRawY();
             result.contactPoint = Vector2{ std::max(myPos.getRawX(), boxPos.getRawX()), contactY };
+        }
+
+        return result;
+    }
+
+    CollisionResult BoxShape::checkCollisionWithCircle(const Vector2& myPos, const Vector2& mySize, const Vector2& circlePos, const Vector2& circleSize) const {
+        CollisionResult result;
+
+        Vector2 circleCenter = circlePos + circleSize * 0.5f;
+        Vector2 boxCenter = myPos + mySize * 0.5f;
+        Vector2 halfExtents = mySize * 0.5f;
+
+        Vector2 closest = Vector2{
+            std::max(myPos.getRawX(), std::min(circleCenter.getRawX(), myPos.getRawX() + mySize.getRawX())),
+            std::max(myPos.getRawY(), std::min(circleCenter.getRawY(), myPos.getRawY() + mySize.getRawY()))
+        };
+
+        // Calculate relative position for ellipse test
+        Vector2 diff = circleCenter - closest;
+        Vector2 ellipseRadii = circleSize * 0.5f;
+
+        // Normalize difference by ellipse radii to test if point is inside unit circle
+        float normalizedX = ellipseRadii.getRawX() > 0.0f ? diff.getRawX() / ellipseRadii.getRawX() : 0.0f;
+        float normalizedY = ellipseRadii.getRawY() > 0.0f ? diff.getRawY() / ellipseRadii.getRawY() : 0.0f;
+        float distanceSquared = normalizedX * normalizedX + normalizedY * normalizedY;
+
+        result.hasCollision = distanceSquared <= 1.0f;
+
+        if (result.hasCollision) {
+            if (distanceSquared > 0.0f) {
+                float distance = std::sqrt(distanceSquared);
+
+                result.contactNormal = Vector2{ normalizedX / distance, normalizedY / distance };
+                result.contactPoint = closest;
+            }
+
+            else {
+                Vector2 toCenter = circleCenter - boxCenter;
+                Vector2 absToCenter = Vector2{ std::abs(toCenter.getRawX()), std::abs(toCenter.getRawY()) };
+                Vector2 overlap = halfExtents - absToCenter;
+
+                if (overlap.getRawX() < overlap.getRawY()) {
+                    result.contactNormal = Vector2{ toCenter.getRawX() > 0 ? 1.0f : -1.0f, 0.0f };
+                    result.contactPoint = Vector2{ toCenter.getRawX() > 0 ? myPos.getRawX() + mySize.getRawX() : myPos.getRawX(), circleCenter.getRawY() };
+                }
+
+                else {
+                    result.contactNormal = Vector2{ 0.0f, toCenter.getRawY() > 0 ? 1.0f : -1.0f };
+                    result.contactPoint = Vector2{ circleCenter.getRawX(), toCenter.getRawY() > 0 ? myPos.getRawY() + mySize.getRawY() : myPos.getRawY() };
+                }
+            }
         }
 
         return result;
