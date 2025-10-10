@@ -65,10 +65,13 @@ Use the automation scripts in the `scripts/` directory (running these works for 
 
 # Generate a game from sample
 ./scripts/projects/GenerateGame
-
-# Serve WebAssembly builds locally
-./scripts/wasm/ServeWasm
 ```
+
+**NOTE:** The recommended way of serving WebAssembly builds is to use either:
+- Python HTTP server(s)
+- Node HTTP server(s)
+
+Live Server extension for VS Code works great, but solutions listed above tend to be faster.
 
 ### Build Options
 ```bash

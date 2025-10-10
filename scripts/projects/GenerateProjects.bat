@@ -8,8 +8,8 @@ pushd %SCRIPT_DIR%\..\..
     call vendor\emsdk\emsdk install latest
     call vendor\emsdk\emsdk activate latest
 
-    call emcmake cmake -B build-wasm -G "Ninja Multi-Config" -DCMAKE_TOOLCHAIN_FILE=vendor\emsdk\upstream\emscripten\cmake\Modules\Platform\Emscripten.cmake
-    call cmake -G "Visual Studio 17 2022" -A x64 -B build-native
+    call emcmake cmake -B build-wasm -G "Ninja Multi-Config"
+    call cmake -B build-native -G "Visual Studio 17 2022"
 popd
 
 if %ERRORLEVEL% NEQ 0 (

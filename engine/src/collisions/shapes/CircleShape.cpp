@@ -84,7 +84,7 @@ namespace engine::collisions::shapes {
             float normalizedDistance = std::sqrt(normalizedDistanceSquared);
 
             result.contactNormal = Vector2{ normalizedDx / normalizedDistance, normalizedDy / normalizedDistance };
-            
+
             // Contact point is on the surface of my ellipse
             float contactX = myCenter.getRawX() + result.contactNormal.getRawX() * myRadii.getRawX();
             float contactY = myCenter.getRawY() + result.contactNormal.getRawY() * myRadii.getRawY();

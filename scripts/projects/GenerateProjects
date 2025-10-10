@@ -19,7 +19,6 @@ else
     GENERATOR="Ninja Multi-Config"
 fi
 
-
 (
     $EMSDK_DIR/emsdk install latest
     $EMSDK_DIR/emsdk activate latest
@@ -27,7 +26,7 @@ fi
     chmod +x $EMSDK_DIR/emsdk_env.sh
     source $EMSDK_DIR/emsdk_env.sh
 
-    emcmake cmake -B build-wasm -G "Ninja Multi-Config" -DCMAKE_TOOLCHAIN_FILE=$EMSDK_DIR/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+    emcmake cmake -B build-wasm -G "Ninja Multi-Config"
 )
 
 cmake -B build-native -G "$GENERATOR" -DCMAKE_BUILD_TYPE=Debug
