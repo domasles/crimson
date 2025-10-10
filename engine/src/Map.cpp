@@ -99,7 +99,7 @@ namespace engine {
             const float spacing = tileset["spacing"];
             const float padding = tileset["padding"];
 
-            std::shared_ptr<Texture> tilesetTexture = loadTexture(relPath, fileName);
+            auto tilesetTexture = loadTexture(relPath, fileName);
 
             m_Tilesets[fileName] = Tileset{};
 

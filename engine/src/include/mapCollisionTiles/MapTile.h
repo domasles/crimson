@@ -11,7 +11,7 @@ namespace engine::mapCollisionTiles {
             void init() override;
             void init(const Vector2& position) override;
             void init(const Vector2& position, const Vector2& size);
-            void render() override;
+            void render() override {}
 
             void setTileSize(const Vector2& size);
 

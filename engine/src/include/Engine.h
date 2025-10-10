@@ -26,6 +26,7 @@
 #include <Transform.h>
 #include <Texture.h>
 #include <Entity.h>
+#include <Gizmos.h>
 #include <Sound.h>
 
 #include <Scene.h>

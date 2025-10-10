@@ -22,6 +22,8 @@ GAME_API bool start() {
     // Set white background
     engineCore.setBackgroundColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
 
+    Gizmos::enableAll();
+
     registrateComponents();
     registrateScenes();
 

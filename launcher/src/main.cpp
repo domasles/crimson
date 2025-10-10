@@ -24,9 +24,7 @@
     
     class GameLauncherApp : public wxApp {
         public:
-            bool OnInit() override {
-                return true;
-            }
+            bool OnInit() override { return true; }
     };
     
     wxIMPLEMENT_APP_NO_MAIN(GameLauncherApp);

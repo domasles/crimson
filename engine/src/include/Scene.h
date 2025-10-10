@@ -34,6 +34,7 @@ namespace engine {
 
             T* findEntity() {
                 static_assert(std::is_base_of_v<Entity, T>, "T must derive from Entity");
+
                 for (auto& entity : m_Entities) {
                     if (auto* typed = dynamic_cast<T*>(entity.get())) {
                         return typed;
@@ -51,6 +52,8 @@ namespace engine {
             }
 
             size_t getEntityCount() const { return m_Entities.size(); }
+            const std::vector<std::unique_ptr<Entity>>& getEntities() const { return m_Entities; }
+            
             template<typename T>
 
             std::vector<T*> getEntitiesWithComponent() {

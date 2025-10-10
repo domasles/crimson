@@ -39,7 +39,4 @@ namespace engine::mapCollisionTiles {
             collision->setParticipatesInQueries(true);
         }
     }
-
-    void MapTile::render() {
-    }
 }

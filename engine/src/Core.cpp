@@ -3,6 +3,7 @@
 #include <utils/logger.h>
 #include <utils/math.h>
 
+#include <Gizmos.h>
 #include <Scene.h>
 #include <Core.h>
 
@@ -44,6 +45,7 @@ using namespace engine;
 
         SceneManager::getInstance().update();
         SceneManager::getInstance().render();
+        Gizmos::renderGizmos();
 
         SDL_RenderPresent(core.getRenderer());
     }
@@ -201,6 +203,7 @@ namespace engine {
 
                 SceneManager::getInstance().update();
                 SceneManager::getInstance().render();
+                Gizmos::renderGizmos();
 
                 SDL_RenderPresent(getRenderer());
             }

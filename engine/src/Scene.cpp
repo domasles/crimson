@@ -57,7 +57,7 @@ namespace engine {
             return false;
         }
 
-        std::shared_ptr<Scene> newScene = sceneIt->second;
+        auto newScene = sceneIt->second;
 
         m_PreviousScene = m_CurrentScene;
         m_CurrentScene = newScene;
