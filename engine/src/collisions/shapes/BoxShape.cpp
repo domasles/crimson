@@ -95,4 +95,15 @@ namespace engine::collisions::shapes {
 
         return result;
     }
+
+    void BoxShape::renderGizmo(SDL_Renderer* renderer, const Vector2& position, const Vector2& size) const {
+        SDL_FRect rect = {
+            position.getRawX(),
+            position.getRawY(),
+            size.getRawX(),
+            size.getRawY()
+        };
+
+        SDL_RenderRect(renderer, &rect);
+    }
 }

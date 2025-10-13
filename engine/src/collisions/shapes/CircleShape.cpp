@@ -94,4 +94,27 @@ namespace engine::collisions::shapes {
 
         return result;
     }
+
+    void CircleShape::renderGizmo(SDL_Renderer* renderer, const Vector2& position, const Vector2& size) const {
+        const int segments = 16;
+        const float PI = 3.14159265359f;
+
+        float centerX = position.getRawX() + size.getRawX() * 0.5f;
+        float centerY = position.getRawY() + size.getRawY() * 0.5f;
+
+        float radiusX = size.getRawX() * 0.5f;
+        float radiusY = size.getRawY() * 0.5f;
+
+        for (int i = 0; i < segments; ++i) {
+            float angle1 = (2.0f * PI * i) / segments;
+            float angle2 = (2.0f * PI * (i + 1)) / segments;
+
+            float x1 = centerX + radiusX * cos(angle1);
+            float y1 = centerY + radiusY * sin(angle1);
+            float x2 = centerX + radiusX * cos(angle2);
+            float y2 = centerY + radiusY * sin(angle2);
+
+            SDL_RenderLine(renderer, (int)x1, (int)y1, (int)x2, (int)y2);
+        }
+    }
 }
