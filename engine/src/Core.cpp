@@ -71,8 +71,20 @@ namespace engine {
     }
 
     Core::~Core() {
-        Mix_CloseAudio();
-        Mix_Quit();
+        for (MIX_Track* track : m_Tracks) {
+            if (track) {
+                MIX_DestroyTrack(track);
+            }
+        }
+
+        m_Tracks.clear();
+
+        if (m_Mixer) {
+            MIX_DestroyMixer(m_Mixer);
+            m_Mixer = nullptr;
+        }
+
+        MIX_Quit();
         SDL_Quit();
     }
 
@@ -100,19 +112,27 @@ namespace engine {
 
         ENGINE_LOG_INIT("SDL");
 
-        const int mixFlags = MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_FLAC;
-
-        if ((Mix_Init(mixFlags) & mixFlags) != mixFlags) {
-            Logger::engine_error("Mix_Init missing codec support: {}", SDL_GetError());
+        if (!MIX_Init()) {
+            Logger::engine_error("MIX_Init failed: {}", SDL_GetError());
             return false;
         }
 
-        if (!Mix_OpenAudio(0, nullptr)) {
-            Logger::engine_error("Mix_OpenAudio failed: {}", SDL_GetError());
+        m_Mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
+        if (!m_Mixer) {
+            Logger::engine_error("MIX_CreateMixerDevice failed: {}", SDL_GetError());
             return false;
         }
 
-        Mix_AllocateChannels(32);
+        // Create 32 tracks (like old channel allocation)
+        m_Tracks.reserve(32);
+
+        for (int i = 0; i < 32; ++i) {
+            MIX_Track* track = MIX_CreateTrack(m_Mixer);
+            if (track) {
+                m_Tracks.push_back(track);
+            }
+        }
+
         ENGINE_LOG_INIT("Audio");
 
         bool windowSuccess = false;
@@ -343,5 +363,16 @@ namespace engine {
         float scaleY = static_cast<float>(height) / baseHeight;
 
         return std::min(scaleX, scaleY);
+    }
+
+    MIX_Track* Core::getFreeTrack() {
+        // Find a track that's not playing
+        for (MIX_Track* track : m_Tracks) {
+            if (track && !MIX_TrackPlaying(track)) {
+                return track;
+            }
+        }
+        // All tracks busy, return first one (will interrupt)
+        return m_Tracks.empty() ? nullptr : m_Tracks[0];
     }
 }

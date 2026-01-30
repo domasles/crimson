@@ -10,16 +10,29 @@ using namespace engine::utils::filesystem;
 using namespace engine::utils::logger;
 
 namespace engine {
+    Sound::~Sound() {
+        if (m_Audio) {
+            MIX_DestroyAudio(m_Audio);
+            m_Audio = nullptr;
+        }
+    }
+
     const bool Sound::loadSound(const std::string& fileName) {
         std::string filePath = getGamePath() + "/" + m_WorkingDir + "/" + fileName;
-        Mix_Chunk* chunk = Mix_LoadWAV(filePath.c_str());
+        MIX_Mixer* mixer = Core::getInstance().getMixer();
 
-        if (!chunk) {
-            Logger::engine_error("Mix_LoadWAV Error: {}", SDL_GetError());
+        if (!mixer) {
+            Logger::engine_error("Mixer not initialized");
             return false;
         }
 
-        m_Sound = std::unique_ptr<Mix_Chunk, void(*)(Mix_Chunk*)>(chunk, Mix_FreeChunk);
+        m_Audio = MIX_LoadAudio(mixer, filePath.c_str(), false);
+
+        if (!m_Audio) {
+            Logger::engine_error("MIX_LoadAudio Error: {}", SDL_GetError());
+            return false;
+        }
+
         std::string relativePath = m_WorkingDir + "/" + fileName;
 
         if (relativePath.find("assets/") == 0) {
@@ -31,20 +44,29 @@ namespace engine {
     }
 
     const bool Sound::play(int loops) {
-        if (!m_Sound) {
+        if (!m_Audio) {
             Logger::engine_error("Sound not loaded!");
             return false;
         }
 
-        if (Mix_PlayChannel(-1, m_Sound.get(), loops) == -1) {
-            Logger::engine_error("Mix_PlayChannel Error: {}", SDL_GetError());
+        MIX_Track* track = Core::getInstance().getFreeTrack();
+
+        if (!track) {
+            Logger::engine_error("No available track to play sound");
             return false;
         }
 
-        return true;
-    }
+        MIX_SetTrackAudio(track, m_Audio);
+        SDL_PropertiesID props = SDL_CreateProperties();
+        SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, loops);
 
-    Mix_Chunk* Sound::getSound() const {
-        return m_Sound.get();
+        if (!MIX_PlayTrack(track, props)) {
+            SDL_DestroyProperties(props);
+            Logger::engine_error("MIX_PlayTrack Error: {}", SDL_GetError());
+            return false;
+        }
+
+        SDL_DestroyProperties(props);
+        return true;
     }
 }
