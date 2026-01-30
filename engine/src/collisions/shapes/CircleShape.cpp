@@ -99,11 +99,11 @@ namespace engine::collisions::shapes {
         const int segments = 16;
         const float PI = 3.14159265359f;
 
-        float centerX = position.getRawX() + size.getRawX() * 0.5f;
-        float centerY = position.getRawY() + size.getRawY() * 0.5f;
+        float centerX = position.getX() + size.getX() * 0.5f;
+        float centerY = position.getY() + size.getY() * 0.5f;
 
-        float radiusX = size.getRawX() * 0.5f;
-        float radiusY = size.getRawY() * 0.5f;
+        float radiusX = size.getX() * 0.5f;
+        float radiusY = size.getY() * 0.5f;
 
         for (int i = 0; i < segments; ++i) {
             float angle1 = (2.0f * PI * i) / segments;
