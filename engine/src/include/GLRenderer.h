@@ -1,0 +1,74 @@
+#pragma once
+
+#include <memory>
+#include <array>
+
+#ifdef ENGINE_PLATFORM_EMSCRIPTEN
+    #include <GLES3/gl3.h>
+#else
+    #ifdef ENGINE_PLATFORM_WINDOWS
+        #include <glad/glad.h>
+    #else
+        #include <GLES3/gl3.h>
+    #endif
+#endif
+
+#include <utils/math.h>
+#include <Shader.h>
+
+using namespace engine::utils::math;
+
+namespace engine {
+    class GLRenderer {
+        public:
+            GLRenderer() = default;
+            ~GLRenderer();
+
+            bool init();
+            void shutdown();
+
+            void beginFrame() {}
+            void endFrame();
+
+            void clear(const Color& color);
+            void setViewport(int x, int y, int width, int height);
+
+            // Sprite rendering
+            void drawQuad(const Vector2& position, const Vector2& size, GLuint textureID, const Color& tint = {1.0f, 1.0f, 1.0f, 1.0f});
+            void drawQuad(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color& tint = {1.0f, 1.0f, 1.0f, 1.0f});
+
+            // Debug rendering
+            void drawRect(const Vector2& position, const Vector2& size, const Color& color);
+            void drawLine(const Vector2& start, const Vector2& end, const Color& color);
+
+            // Projection management
+            void setProjectionMatrix(const float* matrix);
+            void setOrthographicProjection(float left, float right, float bottom, float top);
+
+            Shader* getDefaultShader() { return &m_SpriteShader; }
+
+        private:
+            bool m_Initialized = false;
+
+            Shader m_SpriteShader;
+
+            // Quad rendering
+            GLuint m_QuadVAO = 0;
+            GLuint m_QuadVBO = 0;
+            GLuint m_QuadEBO = 0;
+
+            // Line rendering
+            GLuint m_LineVAO = 0;
+            GLuint m_LineVBO = 0;
+
+            std::array<float, 16> m_ProjectionMatrix{};
+            std::array<float, 16> m_ViewMatrix{};
+
+            void createQuadBuffers();
+            void createLineBuffers();
+            void destroyBuffers();
+
+            void createOrthographicMatrix(float left, float right, float bottom, float top, float* out);
+            void createIdentityMatrix(float* out);
+    };
+}
