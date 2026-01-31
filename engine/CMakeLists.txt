@@ -22,10 +22,13 @@ target_include_directories(engine
     PUBLIC
         src/include
         ${CMAKE_SOURCE_DIR}/vendor/json/include
-        ${CMAKE_SOURCE_DIR}/vendor/glad/include
     PRIVATE
         src/pch
 )
+
+if(WIN32)
+    target_include_directories(engine PUBLIC ${CMAKE_SOURCE_DIR}/vendor/glad/include)
+endif()
 
 if(WASM)
     target_link_libraries(engine
