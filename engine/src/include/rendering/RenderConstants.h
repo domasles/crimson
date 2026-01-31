@@ -4,8 +4,10 @@
 #include <cstdint>
 
 #include <utils/math.h>
+#include <utils/rendering.h>
 
 using namespace engine::utils::math;
+using namespace engine::utils::rendering;
 
 namespace engine::rendering {
     struct Vertex2D {
@@ -13,14 +15,14 @@ namespace engine::rendering {
         Vector2 texCoord;
         Color color;
 
-        constexpr Vertex2D(const Vector2& pos, const Vector2& tex, const Color& col) : position(pos), texCoord(tex), color(col) {}
+        Vertex2D(const Vector2& pos, const Vector2& tex, const Color& col) : position(pos), texCoord(tex), color(col) {}
     };
 
     struct LineVertex {
         Vector2 position;
         Color color;
 
-        constexpr LineVertex(const Vector2& pos, const Color& col) : position(pos), color(col) {}
+        LineVertex(const Vector2& pos, const Color& col) : position(pos), color(col) {}
     };
 
     // Vertex data layout information
@@ -31,7 +33,7 @@ namespace engine::rendering {
     constexpr size_t VERTEX2D_COLOR_OFFSET = sizeof(float) * 4;
 
     // Unit quad template (0,0 to 1,1) - will be scaled and positioned dynamically
-    constexpr std::array<Vertex2D, 4> UNIT_QUAD_VERTICES = {{
+    inline const std::array<Vertex2D, 4> UNIT_QUAD_VERTICES = {{
         Vertex2D({0.0f, 0.0f}, {0.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}), // Bottom-left
         Vertex2D({1.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f, 1.0f, 1.0f}), // Bottom-right
         Vertex2D({1.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}), // Top-right

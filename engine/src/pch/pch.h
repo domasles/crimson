@@ -8,6 +8,8 @@
     #include <TargetConditionals.h>
 #endif
 
+#include <GLES3/gl3.h>
+
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_mixer/SDL_mixer.h>
 #include <SDL3/SDL_surface.h>

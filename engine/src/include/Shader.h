@@ -1,18 +1,5 @@
 #pragma once
 
-#include <string>
-#include <unordered_map>
-
-#ifdef ENGINE_PLATFORM_EMSCRIPTEN
-    #include <GLES3/gl3.h>
-#else
-    #ifdef ENGINE_PLATFORM_WINDOWS
-        #include <glad/glad.h>
-    #else
-        #include <GLES3/gl3.h>
-    #endif
-#endif
-
 #include <utils/math.h>
 
 using namespace engine::utils::math;

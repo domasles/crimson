@@ -162,6 +162,7 @@ if(NOT WASM)
     set(wxBUILD_TESTS OFF CACHE BOOL "Disable wxWidgets tests" FORCE)
 
     add_subdirectory(vendor/wxwidgets)
+    add_subdirectory(vendor/glad)
 endif()
 
 add_subdirectory(vendor/sdl3)

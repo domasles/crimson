@@ -53,4 +53,18 @@ namespace engine::utils::filesystem {
     std::string normalizePath(const std::string& path) {
         return std::filesystem::path(path).lexically_normal().string();
     }
+
+    std::string readFileToString(const std::string& filePath) {
+        std::ifstream file(filePath, std::ios::in | std::ios::binary);
+
+        if (!file.is_open()) {
+            Logger::engine_error("Failed to open file: {}", filePath);
+            return "";
+        }
+
+        std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        file.close();
+
+        return content;
+    }
 }
