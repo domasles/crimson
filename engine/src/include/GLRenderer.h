@@ -1,10 +1,12 @@
 #pragma once
 
+#include <GLES3/gl3.h>
 #include <utils/math.h>
 
 #include <Shader.h>
 
 using namespace engine::utils::math;
+using namespace engine::utils::rendering;
 
 namespace engine {
     class GLRenderer {
@@ -21,17 +23,21 @@ namespace engine {
             void clear(const Color& color);
             void setViewport(int x, int y, int width, int height);
 
-            // Sprite rendering
-            void drawQuad(const Vector2& position, const Vector2& size, GLuint textureID, const Color& tint = {1.0f, 1.0f, 1.0f, 1.0f});
-            void drawQuad(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color& tint = {1.0f, 1.0f, 1.0f, 1.0f});
+            void drawQuad(const Vector2& position, const Vector2& size, GLuint textureID, const Color& tint = Color(1.0f, 1.0f, 1.0f, 1.0f));
+            void drawQuad(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color tint = Color(1.0f, 1.0f, 1.0f, 1.0f));
 
-            // Debug rendering
             void drawRect(const Vector2& position, const Vector2& size, const Color& color);
             void drawLine(const Vector2& start, const Vector2& end, const Color& color);
 
-            // Projection management
             void setProjectionMatrix(const float* matrix);
             void setOrthographicProjection(float left, float right, float bottom, float top);
+
+            GLuint getQuadVAO() { return m_QuadVAO; }
+            GLuint getQuadVBO() { return m_QuadVBO; }
+            GLuint getQuadEBO() { return m_QuadEBO; }
+
+            GLuint getLineVAO() { return m_QuadVAO; }
+            GLuint getLineVBO() { return m_LineVBO; }
 
             Shader* getDefaultShader() { return &m_SpriteShader; }
 

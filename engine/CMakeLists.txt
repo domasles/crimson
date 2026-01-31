@@ -22,6 +22,7 @@ target_include_directories(engine
     PUBLIC
         src/include
         ${CMAKE_SOURCE_DIR}/vendor/json/include
+        ${CMAKE_SOURCE_DIR}/vendor/glad/include
     PRIVATE
         src/pch
 )

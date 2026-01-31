@@ -1,12 +1,15 @@
 #include <pch.h>
 
 #include <utils/logger.h>
+#include <utils/rendering.h>
+
 #include <rendering/RenderConstants.h>
 
 #include <GLRenderer.h>
 
-using namespace engine::utils::logger;
 using namespace engine::rendering;
+using namespace engine::utils::logger;
+using namespace engine::utils::rendering;
 
 namespace engine {
     GLRenderer::~GLRenderer() {
@@ -73,7 +76,7 @@ namespace engine {
         drawQuad(position, size, {0.0f, 0.0f}, {1.0f, 1.0f}, textureID, tint);
     }
 
-    void GLRenderer::drawQuad(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color& tint) {
+    void GLRenderer::drawQuad(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color tint) {
         m_SpriteShader.use();
         m_SpriteShader.setMat4("u_Projection", m_ProjectionMatrix.data());
         m_SpriteShader.setMat4("u_View", m_ViewMatrix.data());
@@ -101,8 +104,8 @@ namespace engine {
         // Convert to flat array for OpenGL
         auto vertices = verticesToFloatArray(quadVertices);
 
-        glBindVertexArray(m_QuadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
+        glBindVertexArray(getQuadVAO());
+        glBindBuffer(GL_ARRAY_BUFFER, getQuadVBO());
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

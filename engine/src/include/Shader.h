@@ -1,5 +1,6 @@
 #pragma once
 
+#include <GLES3/gl3.h>
 #include <utils/math.h>
 
 using namespace engine::utils::math;

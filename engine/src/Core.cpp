@@ -84,6 +84,13 @@ namespace engine {
             m_Mixer = nullptr;
         }
 
+        m_GLRenderer.shutdown();
+        
+        if (m_GLContext) {
+            SDL_GL_DestroyContext(m_GLContext);
+            m_GLContext = nullptr;
+        }
+
         MIX_Quit();
         SDL_Quit();
     }
@@ -136,6 +143,15 @@ namespace engine {
         ENGINE_LOG_INIT("Audio");
 
         bool windowSuccess = false;
+
+        #ifndef ENGINE_PLATFORM_EMSCRIPTEN
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+        #endif
+        
+        SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
         switch (mode) {
             case WindowMode::Windowed:
@@ -279,9 +295,9 @@ namespace engine {
 
     bool Core::initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable) {
         #ifdef ENGINE_PLATFORM_EMSCRIPTEN
-            m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_RESIZABLE), SDL_DestroyWindow);
+            m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE), SDL_DestroyWindow);
         #else
-            m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, resizable ? SDL_WINDOW_RESIZABLE : SDL_WINDOW_EXTERNAL), SDL_DestroyWindow);
+            m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_OPENGL | (resizable ? SDL_WINDOW_RESIZABLE : 0)), SDL_DestroyWindow);
         #endif
 
         if (!m_Window) {
@@ -293,7 +309,7 @@ namespace engine {
     }
 
     bool Core::initFullScreenWindow(const std::string& title) {
-        m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), m_DefaultWindowWidth, m_DefaultWindowHeight, true), SDL_DestroyWindow);
+        m_Window = std::unique_ptr<SDL_Window, void(*)(SDL_Window*)>(SDL_CreateWindow(title.c_str(), m_DefaultWindowWidth, m_DefaultWindowHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN), SDL_DestroyWindow);
       
         if (!m_Window) {
             Logger::engine_error("SDL_CreateWindow failed: {}", SDL_GetError());
@@ -304,6 +320,32 @@ namespace engine {
     }
 
     bool Core::initRenderer() {
+        m_GLContext = SDL_GL_CreateContext(m_Window.get());
+
+        if (!m_GLContext) {
+            Logger::engine_error("SDL_GL_CreateContext failed: {}", SDL_GetError());
+            return false;
+        }
+
+        #ifndef ENGINE_PLATFORM_EMSCRIPTEN
+            if (!SDL_GL_SetSwapInterval(1)) {
+                Logger::engine_warn("SDL_GL_SetSwapInterval failed: {}", SDL_GetError());
+            }
+        #endif
+
+        if (!m_GLRenderer.init()) {
+            Logger::engine_error("GLRenderer initialization failed");
+            return false;
+        }
+
+        int windowWidth = 0;
+        int windowHeight = 0;
+
+        SDL_GetWindowSize(m_Window.get(), &windowWidth, &windowHeight);
+
+        m_GLRenderer.setViewport(0, 0, windowWidth, windowHeight);
+        m_GLRenderer.setOrthographicProjection(0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight), 0.0f);
+
         m_Renderer = std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)>(SDL_CreateRenderer(m_Window.get(), nullptr), SDL_DestroyRenderer);
 
         if (!m_Renderer) {

@@ -28,6 +28,7 @@
 #include <utils/rendering.h>
 
 #include <Input.h>
+#include <GLRenderer.h>
 
 using namespace engine::utils::rendering;
 
@@ -57,6 +58,7 @@ namespace engine {
             Color getBackgroundColor() const { return m_BackgroundColor; }
 
             SDL_Renderer* getRenderer() const;
+            GLRenderer* getGLRenderer() { return &m_GLRenderer; }
             SDL_Window* getWindow() const;
 
             Vector2 getWindowSize();
@@ -97,6 +99,8 @@ namespace engine {
 
             std::unique_ptr<SDL_Window, void(*)(SDL_Window*)> m_Window;
             std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)> m_Renderer;
+            GLRenderer m_GLRenderer;
+            SDL_GLContext m_GLContext = nullptr;
 
             std::queue<SDL_Event> m_EventQueue;
             
@@ -106,6 +110,7 @@ namespace engine {
 
     inline Core& getCore() { return Core::getInstance(); }
     inline SDL_Renderer* getRenderer() { return getCore().getRenderer(); }
+    inline GLRenderer* getGLRenderer() { return getCore().getGLRenderer(); }
     inline SDL_Window* getWindow() { return getCore().getWindow(); }
     inline Vector2 getWindowSize() { return getCore().getWindowSize(); }
     inline Vector2 getTargetWindowSize() { return getCore().getTargetWindowSize(); }
