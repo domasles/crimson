@@ -33,7 +33,7 @@ namespace engine {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glDisable(GL_DEPTH_TEST);
 
-        if (!m_SpriteShader.loadFromFile("engine/shaders/sprite.vert", "engine/shaders/sprite.frag")) {
+        if (!m_SpriteShader.loadFromFile("shaders/engine/sprite.vert", "shaders/engine/sprite.frag")) {
             Logger::engine_error("Failed to load sprite shader");
             return false;
         }

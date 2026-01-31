@@ -31,8 +31,8 @@ namespace engine {
     }
 
     bool Shader::loadFromFile(const std::string& vertexPath, const std::string& fragmentPath) {
-        std::string vertexSource = readFileToString(vertexPath);
-        std::string fragmentSource = readFileToString(fragmentPath);
+        std::string vertexSource = readFileToString(getGamePath() + "/" + vertexPath);
+        std::string fragmentSource = readFileToString(getGamePath() + "/" + fragmentPath);
 
         if (vertexSource.empty() || fragmentSource.empty()) {
             Logger::engine_error("Failed to read shader files: {} and {}", vertexPath, fragmentPath);

@@ -26,16 +26,7 @@ using namespace engine;
             return;
         }
 
-        float r = getCore().getBackgroundColor().r * 255;
-        float g = getCore().getBackgroundColor().g * 255;
-        float b = getCore().getBackgroundColor().b * 255;
-        float a = getCore().getBackgroundColor().a * 255;
-
-        SDL_SetRenderDrawColor(getCore().getRenderer(), r, g, b, a);
-
-        if (!SDL_RenderClear(core.getRenderer())) {
-            Logger::engine_error("SDL_RenderClear failed: {}", SDL_GetError());
-        }
+        core.getGLRenderer()->clear(getCore().getBackgroundColor());
 
         core.updateVectorScale();
 
@@ -47,7 +38,8 @@ using namespace engine;
         SceneManager::getInstance().render();
         Gizmos::renderGizmos();
 
-        SDL_RenderPresent(core.getRenderer());
+        SDL_GL_SwapWindow(core.getWindow());
+        core.getGLRenderer()->endFrame();
     }
 #endif
 
@@ -220,16 +212,7 @@ namespace engine {
             emscripten_set_main_loop(emscripten_main_loop, 0, 1);
         #else
             while (processEvents()) {
-                float r = getCore().getBackgroundColor().r * 255;
-                float g = getCore().getBackgroundColor().g * 255;
-                float b = getCore().getBackgroundColor().b * 255;
-                float a = getCore().getBackgroundColor().a * 255;
-
-                SDL_SetRenderDrawColor(getCore().getRenderer(), r, g, b, a);
-
-                if (!SDL_RenderClear(getRenderer())) {
-                    Logger::engine_error("SDL_RenderClear failed: {}", SDL_GetError());
-                }
+                m_GLRenderer.clear(m_BackgroundColor);
 
                 updateVectorScale();
 
@@ -241,7 +224,8 @@ namespace engine {
                 SceneManager::getInstance().render();
                 Gizmos::renderGizmos();
 
-                SDL_RenderPresent(getRenderer());
+                SDL_GL_SwapWindow(m_Window.get());
+                m_GLRenderer.endFrame();
             }
         #endif
     }
@@ -367,7 +351,10 @@ namespace engine {
         int prevWidth = 0;
         int prevHeight = 0;
 
-        SDL_GetCurrentRenderOutputSize(getRenderer(), &prevWidth, &prevHeight);
+        SDL_GetWindowSize(m_Window.get(), &prevWidth, &prevHeight);
+
+        m_GLRenderer.setViewport(0, 0, prevWidth, prevHeight);
+        m_GLRenderer.setOrthographicProjection(0.0f, static_cast<float>(prevWidth), static_cast<float>(prevHeight), 0.0f);
 
         float baseWidth = 0.0f;
         float baseHeight = 0.0f;
@@ -390,9 +377,12 @@ namespace engine {
         int currentWidth = 0;
         int currentHeight = 0;
 
-        SDL_GetCurrentRenderOutputSize(getRenderer(), &currentWidth, &currentHeight);
+        SDL_GetWindowSize(m_Window.get(), &currentWidth, &currentHeight);
 
         if (currentWidth != prevWidth || currentHeight != prevHeight) {
+            m_GLRenderer.setViewport(0, 0, currentWidth, currentHeight);
+            m_GLRenderer.setOrthographicProjection(0.0f, static_cast<float>(currentWidth), static_cast<float>(currentHeight), 0.0f);
+
             float updatedScale = calculateUniformScale(currentWidth, currentHeight, baseWidth, baseHeight);
 
             Vector2::setGlobalScale(updatedScale, updatedScale);
@@ -408,13 +398,11 @@ namespace engine {
     }
 
     MIX_Track* Core::getFreeTrack() {
-        // Find a track that's not playing
         for (MIX_Track* track : m_Tracks) {
             if (track && !MIX_TrackPlaying(track)) {
                 return track;
             }
         }
-        // All tracks busy, return first one (will interrupt)
         return m_Tracks.empty() ? nullptr : m_Tracks[0];
     }
 }

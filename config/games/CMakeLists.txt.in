@@ -112,3 +112,21 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
         COMMENT "Copying assets directory to output"
     )
 endif()
+
+# Copy engine shaders
+add_custom_command(TARGET ${libName} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CMAKE_SOURCE_DIR}/engine/shaders/engine"
+    "$<TARGET_FILE_DIR:${libName}>/shaders"
+    COMMENT "Copying engine shaders to output"
+)
+
+# Copy game-specific shaders
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/shaders")
+    add_custom_command(TARGET ${libName} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/shaders"
+        "$<TARGET_FILE_DIR:${libName}>/shaders"
+        COMMENT "Copying game-specific shaders to output"
+    )
+endif()
