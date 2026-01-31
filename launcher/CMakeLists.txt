@@ -28,9 +28,15 @@ if(WASM)
             target_link_options(${GAME_EXEC} PRIVATE "--preload-file=${CMAKE_SOURCE_DIR}/games/${game}/config@config")
         endif()
 
+        if(EXISTS "${CMAKE_SOURCE_DIR}/engine/shaders")
+            target_link_options(${GAME_EXEC} PRIVATE "--preload-file=${CMAKE_SOURCE_DIR}/engine/shaders@shaders/engine")
+        endif()
+
         target_link_options(${GAME_EXEC} PRIVATE
             "-sWASM=1"
-            "-sUSE_SDL=2"
+            "-sUSE_SDL=3"
+            "-sFULL_ES3=1"
+            "-sMAX_WEBGL_VERSION=2"
             "-sALLOW_MEMORY_GROWTH=1"
             "-sNO_DISABLE_EXCEPTION_CATCHING=1"
             "--shell-file=${CMAKE_SOURCE_DIR}/config/wasm/index.html"
