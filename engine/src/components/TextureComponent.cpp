@@ -4,6 +4,7 @@
 #include <components/TextureComponent.h>
 
 #include <Entity.h>
+#include <GLRenderer.h>
 
 namespace engine {
     void TextureComponent::render() {
@@ -38,14 +39,7 @@ namespace engine {
         m_Texture->render(destSize, destPosition, cropSize, cropPosition);
     }
 
-    void TextureComponent::renderGizmo(SDL_Renderer* renderer, const Vector2& position, const Vector2& size) const {
-        SDL_FRect rect = {
-            position.getX(),
-            position.getY(),
-            size.getX(),
-            size.getY()
-        };
-
-        SDL_RenderRect(renderer, &rect);
+    void TextureComponent::renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color) const {
+        renderer->drawRect(position, size, color);
     }
 }

@@ -48,12 +48,8 @@ namespace engine {
     }
 
     void Gizmos::renderGizmos() {
-        SDL_Renderer* renderer = getCore().getRenderer();
+        GLRenderer* renderer = getCore().getGLRenderer();
         if (!renderer) return;
-
-        // Save current draw color
-        Uint8 oldR, oldG, oldB, oldA;
-        SDL_GetRenderDrawColor(renderer, &oldR, &oldG, &oldB, &oldA);
 
         auto currentScene = getSceneManager().getCurrentScene();
         if (!currentScene) return;
@@ -79,11 +75,11 @@ namespace engine {
                         Vector2 collisionPos = collision->getCollisionWorldPosition();
                         Vector2 collisionSize = collision->getCollision().size;
 
-                        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Red for collision
-
+                        Color red{1.0f, 0.0f, 0.0f, 1.0f}; // Red for collision
                         const CollisionShape* shape = collision->getCollisionShape();
+
                         if (shape) {
-                            shape->renderGizmo(renderer, collisionPos, collisionSize);
+                            shape->renderGizmo(renderer, collisionPos, collisionSize, red);
                         }
                     }
                 }
@@ -91,14 +87,13 @@ namespace engine {
                 // Draw texture bounds
                 if (s_TextureBoundsEnabled) {
                     auto* texture = entity->getComponent<TextureComponent>();
+        
                     if (texture && texture->hasTexture()) {
-                        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Green for textures
-                        texture->renderGizmo(renderer, position, size);
+                        Color green{0.0f, 1.0f, 0.0f, 1.0f}; // Green for textures
+                        texture->renderGizmo(renderer, position, size, green);
                     }
                 }
             #endif
         }
-
-        SDL_SetRenderDrawColor(renderer, oldR, oldG, oldB, oldA);
     }
 }

@@ -1,11 +1,14 @@
 #pragma once
 
 #include <utils/math.h>
+#include <utils/rendering.h>
 
+#include <GLRenderer.h>
 #include <Component.h>
 #include <Texture.h>
 
 using namespace engine::utils::math;
+using namespace engine::utils::rendering;
 
 namespace engine {
     class TextureComponent : public Component {
@@ -22,7 +25,7 @@ namespace engine {
             void render(const SDL_FRect& cropRegion);
             void render(const SDL_FRect& cropRegion, const SDL_FRect& destinationRegion);
             
-            void renderGizmo(SDL_Renderer* renderer, const Vector2& position, const Vector2& size) const;
+            void renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color) const;
 
         private:
             std::shared_ptr<Texture> m_Texture = nullptr;

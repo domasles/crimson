@@ -1,8 +1,9 @@
 #include <pch.h>
 
 #include <utils/collision.h>
-
 #include <collisions/shapes/CircleShape.h>
+
+#include <GLRenderer.h>
 
 namespace engine::collisions::shapes {
     CollisionResult CircleShape::checkCollision(const Vector2& myPos, const Vector2& mySize, const CollisionShape& other, const Vector2& otherPos, const Vector2& otherSize) const {
@@ -95,7 +96,7 @@ namespace engine::collisions::shapes {
         return result;
     }
 
-    void CircleShape::renderGizmo(SDL_Renderer* renderer, const Vector2& position, const Vector2& size) const {
+    void CircleShape::renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color) const {
         const int segments = 16;
         const float PI = 3.14159265359f;
 
@@ -114,7 +115,7 @@ namespace engine::collisions::shapes {
             float x2 = centerX + radiusX * cos(angle2);
             float y2 = centerY + radiusY * sin(angle2);
 
-            SDL_RenderLine(renderer, (int)x1, (int)y1, (int)x2, (int)y2);
+            renderer->drawLine(Vector2{x1, y1}, Vector2{x2, y2}, color);
         }
     }
 }

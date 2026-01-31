@@ -1,7 +1,6 @@
 #include <pch.h>
 
 #include <utils/collision.h>
-
 #include <collisions/shapes/BoxShape.h>
 
 namespace engine::collisions::shapes {
@@ -96,14 +95,7 @@ namespace engine::collisions::shapes {
         return result;
     }
 
-    void BoxShape::renderGizmo(SDL_Renderer* renderer, const Vector2& position, const Vector2& size) const {
-        SDL_FRect rect = {
-            position.getX(),
-            position.getY(),
-            size.getX(),
-            size.getY()
-        };
-
-        SDL_RenderRect(renderer, &rect);
+    void BoxShape::renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color) const {
+        renderer->drawRect(position, size, color);
     }
 }
