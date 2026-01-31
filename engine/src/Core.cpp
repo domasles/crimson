@@ -26,7 +26,7 @@ using namespace engine;
             return;
         }
 
-        core.getGLRenderer()->clear(getCore().getBackgroundColor());
+        core.getRenderer()->clear(getCore().getBackgroundColor());
 
         core.updateVectorScale();
 
@@ -39,7 +39,7 @@ using namespace engine;
         Gizmos::renderGizmos();
 
         SDL_GL_SwapWindow(core.getWindow());
-        core.getGLRenderer()->endFrame();
+        core.getRenderer()->endFrame();
     }
 #endif
 
@@ -76,7 +76,7 @@ namespace engine {
             m_Mixer = nullptr;
         }
 
-        m_GLRenderer.shutdown();
+        m_Renderer->shutdown();
         
         if (m_GLContext) {
             SDL_GL_DestroyContext(m_GLContext);
@@ -117,6 +117,7 @@ namespace engine {
         }
 
         m_Mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
+
         if (!m_Mixer) {
             Logger::engine_error("MIX_CreateMixerDevice failed: {}", SDL_GetError());
             return false;
@@ -211,7 +212,7 @@ namespace engine {
             emscripten_set_main_loop(emscripten_main_loop, 0, 1);
         #else
             while (processEvents()) {
-                m_GLRenderer.clear(m_BackgroundColor);
+                m_Renderer->clear(m_BackgroundColor);
 
                 updateVectorScale();
 
@@ -224,7 +225,7 @@ namespace engine {
                 Gizmos::renderGizmos();
 
                 SDL_GL_SwapWindow(m_Window.get());
-                m_GLRenderer.endFrame();
+                m_Renderer->endFrame();
             }
         #endif
     }
@@ -242,7 +243,7 @@ namespace engine {
         m_DefaultVectorScale = useDefaultScale;
     }
 
-    SDL_Renderer* Core::getRenderer() const {
+    GLRenderer* Core::getRenderer() const {
         if (!m_Renderer) {
             Logger::engine_error("Renderer is not initialized yet!");
             return nullptr;
@@ -316,7 +317,9 @@ namespace engine {
             }
         #endif
 
-        if (!m_GLRenderer.init()) {
+        m_Renderer = std::make_unique<GLRenderer>();
+
+        if (!m_Renderer->init()) {
             Logger::engine_error("GLRenderer initialization failed");
             return false;
         }
@@ -326,22 +329,8 @@ namespace engine {
 
         SDL_GetWindowSize(m_Window.get(), &windowWidth, &windowHeight);
 
-        m_GLRenderer.setViewport(0, 0, windowWidth, windowHeight);
-        m_GLRenderer.setOrthographicProjection(0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight), 0.0f);
-
-        m_Renderer = std::unique_ptr<SDL_Renderer, void(*)(SDL_Renderer*)>(SDL_CreateRenderer(m_Window.get(), nullptr), SDL_DestroyRenderer);
-
-        if (!m_Renderer) {
-            Logger::engine_error("SDL_CreateRenderer failed: {}", SDL_GetError());
-            return false;
-        }
-        
-        #ifndef ENGINE_PLATFORM_EMSCRIPTEN
-            // VSync can interfere with Emscripten's main loop timing
-            if (!SDL_SetRenderVSync(getRenderer(), true)) {
-                Logger::engine_error("SDL_SetRenderVSync failed: {}", SDL_GetError());
-            }
-        #endif
+        m_Renderer->setViewport(0, 0, windowWidth, windowHeight);
+        m_Renderer->setOrthographicProjection(0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight), 0.0f);
         
         return true;
     }
@@ -352,8 +341,8 @@ namespace engine {
 
         SDL_GetWindowSize(m_Window.get(), &prevWidth, &prevHeight);
 
-        m_GLRenderer.setViewport(0, 0, prevWidth, prevHeight);
-        m_GLRenderer.setOrthographicProjection(0.0f, static_cast<float>(prevWidth), static_cast<float>(prevHeight), 0.0f);
+        m_Renderer->setViewport(0, 0, prevWidth, prevHeight);
+        m_Renderer->setOrthographicProjection(0.0f, static_cast<float>(prevWidth), static_cast<float>(prevHeight), 0.0f);
 
         float baseWidth = 0.0f;
         float baseHeight = 0.0f;
@@ -379,8 +368,8 @@ namespace engine {
         SDL_GetWindowSize(m_Window.get(), &currentWidth, &currentHeight);
 
         if (currentWidth != prevWidth || currentHeight != prevHeight) {
-            m_GLRenderer.setViewport(0, 0, currentWidth, currentHeight);
-            m_GLRenderer.setOrthographicProjection(0.0f, static_cast<float>(currentWidth), static_cast<float>(currentHeight), 0.0f);
+            m_Renderer->setViewport(0, 0, currentWidth, currentHeight);
+            m_Renderer->setOrthographicProjection(0.0f, static_cast<float>(currentWidth), static_cast<float>(currentHeight), 0.0f);
 
             float updatedScale = calculateUniformScale(currentWidth, currentHeight, baseWidth, baseHeight);
 

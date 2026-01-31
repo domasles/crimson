@@ -32,13 +32,6 @@ namespace engine {
             void setProjectionMatrix(const float* matrix);
             void setOrthographicProjection(float left, float right, float bottom, float top);
 
-            GLuint getQuadVAO() { return m_QuadVAO; }
-            GLuint getQuadVBO() { return m_QuadVBO; }
-            GLuint getQuadEBO() { return m_QuadEBO; }
-
-            GLuint getLineVAO() { return m_QuadVAO; }
-            GLuint getLineVBO() { return m_LineVBO; }
-
             Shader* getDefaultShader() { return &m_SpriteShader; }
 
         private:

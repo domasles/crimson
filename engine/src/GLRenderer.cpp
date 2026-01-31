@@ -104,8 +104,8 @@ namespace engine {
         // Convert to flat array for OpenGL
         auto vertices = verticesToFloatArray(quadVertices);
 
-        glBindVertexArray(getQuadVAO());
-        glBindBuffer(GL_ARRAY_BUFFER, getQuadVBO());
+        glBindVertexArray(m_QuadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

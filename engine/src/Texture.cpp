@@ -23,7 +23,7 @@ namespace engine {
             return false;
         }
 
-        Core::getInstance().getGLRenderer()->drawQuad(position, size, m_TextureID);
+        Core::getInstance().getRenderer()->drawQuad(position, size, m_TextureID);
         return true;
     }
 
@@ -42,7 +42,7 @@ namespace engine {
         float u1 = (cropPosition.getRawX() + cropSize.getRawX()) / static_cast<float>(m_Width);
         float v1 = (cropPosition.getRawY() + cropSize.getRawY()) / static_cast<float>(m_Height);
 
-        Core::getInstance().getGLRenderer()->drawQuad(position, size, Vector2{u0, v0}, Vector2{u1, v1}, m_TextureID);
+        Core::getInstance().getRenderer()->drawQuad(position, size, Vector2{u0, v0}, Vector2{u1, v1}, m_TextureID);
         return true;
     }
 

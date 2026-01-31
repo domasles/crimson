@@ -11,8 +11,7 @@ namespace engine {
         auto* transform = getEntity()->getComponent<TransformComponent>();
         if (!transform) return;
 
-        GLRenderer* renderer = getCore().getGLRenderer();
-        if (!renderer) return;
+        GLRenderer* renderer = getCore().getRenderer();
 
         renderer->drawQuad(
             transform->getPosition(),

@@ -48,7 +48,7 @@ namespace engine {
     }
 
     void Gizmos::renderGizmos() {
-        GLRenderer* renderer = getCore().getGLRenderer();
+        GLRenderer* renderer = getCore().getRenderer();
         if (!renderer) return;
 
         auto currentScene = getSceneManager().getCurrentScene();
