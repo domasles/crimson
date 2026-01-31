@@ -125,6 +125,12 @@ set(SDLIMAGE_PNG ON CACHE BOOL "Enable PNG support")
 set(SDLIMAGE_JPG ON CACHE BOOL "Enable JPG support")
 set(SDLIMAGE_BACKEND_STB ON CACHE BOOL "Use stb_image for JPEG/PNG loading")
 
+set(SDLIMAGE_PNG_VENDORED OFF CACHE BOOL "Don't use vendored libpng (STB handles PNG)")
+set(SDLIMAGE_PNG_LIBPNG OFF CACHE BOOL "Don't use libpng (STB handles PNG)")
+
+set(SKIP_INSTALL_ALL ON CACHE BOOL "Skip zlib install" FORCE)
+set(SKIP_INSTALL_FILES ON CACHE BOOL "Skip zlib file install" FORCE)
+
 set(SDLMIXER_VENDORED OFF CACHE BOOL "Don't use vendored SDL3_mixer libraries")
 
 set(SDLMIXER_WAVE ON CACHE BOOL "Enable WAV support")
