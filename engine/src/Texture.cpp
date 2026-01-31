@@ -10,55 +10,86 @@ using namespace engine::utils::filesystem;
 using namespace engine::utils::logger;
 
 namespace engine {
-    const bool Texture::render(const Vector2& size, const Vector2& position) {
-        SDL_FRect destRect{ position.getX(), position.getY(), size.getX(), size.getY() };
+    Texture::~Texture() {
+        if (m_TextureID != 0) {
+            glDeleteTextures(1, &m_TextureID);
+            m_TextureID = 0;
+        }
+    }
 
-        if (!SDL_RenderTexture(Core::getInstance().getRenderer(), getTexture(), nullptr, &destRect)) {
-            Logger::engine_error("SDL_RenderTexture Error: {}", SDL_GetError());
+    const bool Texture::render(const Vector2& size, const Vector2& position) {
+        if (m_TextureID == 0) {
+            Logger::engine_error("Texture not loaded");
             return false;
         }
 
+        Core::getInstance().getGLRenderer()->drawQuad(position, size, m_TextureID);
         return true;
     }
 
     const bool Texture::render(const Vector2& size, const Vector2& position, const Vector2& cropSize, const Vector2& cropPosition) {
         if (cropSize == Vector2{ 0.0f, 0.0f }) {
-            render(size, position);
-            return true;
+            return render(size, position);
         }
 
-        SDL_FRect destRect{ position.getX(), position.getY(), size.getX(), size.getY() };
-        SDL_FRect cropRect{ cropPosition.getRawX(), cropPosition.getRawY(), cropSize.getRawX(), cropSize.getRawY() };
-
-        if (!SDL_RenderTexture(Core::getInstance().getRenderer(), getTexture(), &cropRect, &destRect)) {
-            Logger::engine_error("SDL_RenderTexture (cropped) Error: {}", SDL_GetError());
+        if (m_TextureID == 0) {
+            Logger::engine_error("Texture not loaded");
             return false;
         }
 
+        float u0 = cropPosition.getRawX() / static_cast<float>(m_Width);
+        float v0 = cropPosition.getRawY() / static_cast<float>(m_Height);
+        float u1 = (cropPosition.getRawX() + cropSize.getRawX()) / static_cast<float>(m_Width);
+        float v1 = (cropPosition.getRawY() + cropSize.getRawY()) / static_cast<float>(m_Height);
+
+        Core::getInstance().getGLRenderer()->drawQuad(position, size, Vector2{u0, v0}, Vector2{u1, v1}, m_TextureID);
         return true;
     }
 
-    SDL_Texture* Texture::getTexture() const {
-        if (!m_Texture) {
-            Logger::engine_error("Texture is not initialized yet!");
-            return nullptr;
-        }
+    const bool Texture::loadTexture(const std::string& fileName, bool linearFiltering) {
+        const std::string& filePath = getGamePath() + "/" + m_WorkingDir + "/" + fileName;
 
-        return m_Texture.get();
-    }
+        SDL_Surface* surface = IMG_Load(filePath.c_str());
 
-    const bool Texture::loadTexture(const std::string& fileName, SDL_ScaleMode scaleMode) {
-        const std::string& filePath = getGamePath()  + "/" + m_WorkingDir + "/" + fileName;
-
-        SDL_Texture* texture = IMG_LoadTexture(Core::getInstance().getRenderer(), filePath.c_str());
-
-        if (!texture) {
-            Logger::engine_error("IMG_LoadTexture Error: {}", SDL_GetError());
+        if (!surface) {
+            Logger::engine_error("IMG_Load Error: {}", SDL_GetError());
             return false;
         }
 
-        SDL_SetTextureScaleMode(texture, scaleMode);
-        m_Texture = std::unique_ptr<SDL_Texture, void(*)(SDL_Texture*)>(texture, SDL_DestroyTexture);
+        m_Width = surface->w;
+        m_Height = surface->h;
+
+        // Convert surface to RGBA format if needed
+        SDL_Surface* rgbaSurface = nullptr;
+        if (surface->format != SDL_PIXELFORMAT_RGBA32) {
+            rgbaSurface = SDL_ConvertSurface(surface, SDL_PIXELFORMAT_RGBA32);
+            SDL_DestroySurface(surface);
+
+            if (!rgbaSurface) {
+                Logger::engine_error("SDL_ConvertSurface Error: {}", SDL_GetError());
+                return false;
+            }
+            surface = rgbaSurface;
+        }
+
+        // Generate OpenGL texture
+        glGenTextures(1, &m_TextureID);
+        glBindTexture(GL_TEXTURE_2D, m_TextureID);
+
+        // Set texture parameters
+        GLint filterMode = linearFiltering ? GL_LINEAR : GL_NEAREST;
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterMode);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterMode);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        // Upload texture data
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+
+        SDL_DestroySurface(surface);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
         std::string relativePath = m_WorkingDir + "/" + fileName;
 
         if (relativePath.find("assets/") == 0) {
