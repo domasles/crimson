@@ -56,6 +56,12 @@ namespace engine {
 
         const auto& entities = currentScene->getEntities();
 
+        // Get viewport bounds for culling
+        Vector2 logicalSize = getCore().getLogicalWindowSize();
+
+        float viewportMaxX = logicalSize.getRawX();
+        float viewportMaxY = logicalSize.getRawY();
+
         for (const auto& entityPtr : entities) {
             Entity* entity = entityPtr.get();
             if (!entity) continue;
@@ -65,6 +71,12 @@ namespace engine {
 
             Vector2 position = transform->getPosition();
             Vector2 size = transform->getSize();
+
+            // Quick AABB viewport culling - skip if completely off-screen
+            if (position.getRawX() + size.getRawX() < 0 || position.getRawX() > viewportMaxX ||
+                position.getRawY() + size.getRawY() < 0 || position.getRawY() > viewportMaxY) {
+                continue;
+            }
 
             #ifdef ENGINE_DEBUG
                 // Draw collision bounds

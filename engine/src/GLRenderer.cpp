@@ -102,16 +102,7 @@ namespace engine {
     }
 
     void GLRenderer::drawRect(const Vector2& position, const Vector2& size, const Color& color) {
-        float x = position.getX();
-        float y = position.getY();
-        float w = size.getX();
-        float h = size.getY();
-
-        // Add line vertices to batch
-        addLineToBatch({x,     y    }, {x + w, y    }, color); // Bottom
-        addLineToBatch({x + w, y    }, {x + w, y + h}, color); // Right
-        addLineToBatch({x + w, y + h}, {x,     y + h}, color); // Top
-        addLineToBatch({x,     y + h}, {x,     y    }, color); // Left
+        addRectToBatch(position.getX(), position.getY(), size.getX(), size.getY(), color);
     }
 
     void GLRenderer::drawLine(const Vector2& start, const Vector2& end, const Color& color) {
@@ -135,8 +126,6 @@ namespace engine {
     }
 
     void GLRenderer::createQuadBuffers() {
-        auto vertices = verticesToFloatArray(UNIT_QUAD_VERTICES);
-
         glGenVertexArrays(1, &m_QuadVAO);
         glGenBuffers(1, &m_QuadVBO);
         glGenBuffers(1, &m_QuadEBO);
@@ -346,29 +335,71 @@ namespace engine {
             flushLineBatch();
         }
 
-        // Add line vertices (2 vertices per line, 6 floats each: x, y, r, g, b, a)
+        size_t offset = m_LineBatchVertices.size();
+        m_LineBatchVertices.resize(offset + 12);  // 2 vertices × 6 floats each
+
+        float* data = m_LineBatchVertices.data() + offset;
+
+        // Get coordinates once
         float x1 = start.getX();
         float y1 = start.getY();
         float x2 = end.getX();
         float y2 = end.getY();
 
-        // Start vertex
-        m_LineBatchVertices.push_back(x1);
-        m_LineBatchVertices.push_back(y1);
-        m_LineBatchVertices.push_back(color.r);
-        m_LineBatchVertices.push_back(color.g);
-        m_LineBatchVertices.push_back(color.b);
-        m_LineBatchVertices.push_back(color.a);
+        // Start vertex (x, y, r, g, b, a)
+        data[0] = x1;
+        data[1] = y1;
+        data[2] = color.r;
+        data[3] = color.g;
+        data[4] = color.b;
+        data[5] = color.a;
 
-        // End vertex
-        m_LineBatchVertices.push_back(x2);
-        m_LineBatchVertices.push_back(y2);
-        m_LineBatchVertices.push_back(color.r);
-        m_LineBatchVertices.push_back(color.g);
-        m_LineBatchVertices.push_back(color.b);
-        m_LineBatchVertices.push_back(color.a);
+        // End vertex (x, y, r, g, b, a)
+        data[6] = x2;
+        data[7] = y2;
+        data[8] = color.r;
+        data[9] = color.g;
+        data[10] = color.b;
+        data[11] = color.a;
 
         m_LineBatchCount++;
+    }
+
+    void GLRenderer::addRectToBatch(float x, float y, float w, float h, const Color& color) {
+        if (m_LineBatchCount + 4 > MAX_LINES_PER_BATCH) {
+            flushLineBatch();
+        }
+
+        size_t offset = m_LineBatchVertices.size();
+        m_LineBatchVertices.resize(offset + 48);  // 4 lines × 2 vertices × 6 floats
+
+        float* data = m_LineBatchVertices.data() + offset;
+
+        // Bottom line (x, y) → (x+w, y)
+        data[0] = x;       data[1] = y;
+        data[2] = color.r; data[3] = color.g; data[4] = color.b; data[5] = color.a;
+        data[6] = x + w;   data[7] = y;
+        data[8] = color.r; data[9] = color.g; data[10] = color.b; data[11] = color.a;
+
+        // Right line (x+w, y) → (x+w, y+h)
+        data[12] = x + w;  data[13] = y;
+        data[14] = color.r; data[15] = color.g; data[16] = color.b; data[17] = color.a;
+        data[18] = x + w;  data[19] = y + h;
+        data[20] = color.r; data[21] = color.g; data[22] = color.b; data[23] = color.a;
+
+        // Top line (x+w, y+h) → (x, y+h)
+        data[24] = x + w;  data[25] = y + h;
+        data[26] = color.r; data[27] = color.g; data[28] = color.b; data[29] = color.a;
+        data[30] = x;      data[31] = y + h;
+        data[32] = color.r; data[33] = color.g; data[34] = color.b; data[35] = color.a;
+
+        // Left line (x, y+h) → (x, y)
+        data[36] = x;      data[37] = y + h;
+        data[38] = color.r; data[39] = color.g; data[40] = color.b; data[41] = color.a;
+        data[42] = x;      data[43] = y;
+        data[44] = color.r; data[45] = color.g; data[46] = color.b; data[47] = color.a;
+
+        m_LineBatchCount += 4;
     }
 
     void GLRenderer::flushLineBatch() {

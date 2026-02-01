@@ -103,6 +103,8 @@ namespace engine {
             void flushQuadBatch();
 
             void addLineToBatch(const Vector2& start, const Vector2& end, const Color& color);
+            void addRectToBatch(float x, float y, float w, float h, const Color& color);
+
             void flushLineBatch();
     };
 }
