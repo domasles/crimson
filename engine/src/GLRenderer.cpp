@@ -265,31 +265,52 @@ namespace engine {
 
         m_CurrentBatchTexture = textureID;
 
-        // Build quad vertices using SCALED coordinates
+        // Pre-calculate all coordinates once
         float x = position.getX();
         float y = position.getY();
         float w = size.getX();
         float h = size.getY();
 
-        std::array<Vertex2D, 4> quadVertices = {{
-            Vertex2D({x,     y    }, {texCoordMin.getX(), texCoordMin.getY()}, tint),
-            Vertex2D({x + w, y    }, {texCoordMax.getX(), texCoordMin.getY()}, tint),
-            Vertex2D({x + w, y + h}, {texCoordMax.getX(), texCoordMax.getY()}, tint),
-            Vertex2D({x,     y + h}, {texCoordMin.getX(), texCoordMax.getY()}, tint),
-        }};
+        float u0 = texCoordMin.getX();
+        float v0 = texCoordMin.getY();
+        float u1 = texCoordMax.getX();
+        float v1 = texCoordMax.getY();
 
-        // Convert to flat array and append to batch
-        auto vertices = verticesToFloatArray(quadVertices);
-        m_QuadBatchVertices.insert(m_QuadBatchVertices.end(), vertices.begin(), vertices.end());
+        // Resize both arrays once for this quad
+        size_t vertOffset = m_QuadBatchVertices.size();
+        size_t indexOffset = m_QuadBatchIndices.size();
+
+        m_QuadBatchVertices.resize(vertOffset + 32); // 4 vertices × 8 floats each
+        m_QuadBatchIndices.resize(indexOffset + 6);  // 6 indices (2 triangles)
+
+        float* vData = m_QuadBatchVertices.data() + vertOffset;
+        uint32_t* iData = m_QuadBatchIndices.data() + indexOffset;
 
         uint32_t baseVertex = static_cast<uint32_t>(m_QuadBatchCount * 4);
 
-        std::array<uint32_t, 6> quadIndices = {{
-            baseVertex + 0, baseVertex + 1, baseVertex + 2,
-            baseVertex + 2, baseVertex + 3, baseVertex + 0
-        }};
+        // Vertex 0: bottom-left (x, y, u0, v0, r, g, b, a)
+        vData[0] = x;      vData[1] = y;
+        vData[2] = u0;     vData[3] = v0;
+        vData[4] = tint.r; vData[5] = tint.g; vData[6] = tint.b; vData[7] = tint.a;
 
-        m_QuadBatchIndices.insert(m_QuadBatchIndices.end(), quadIndices.begin(), quadIndices.end());
+        // Vertex 1: bottom-right (x+w, y, u1, v0, r, g, b, a)
+        vData[8] = x + w;  vData[9] = y;
+        vData[10] = u1;    vData[11] = v0;
+        vData[12] = tint.r; vData[13] = tint.g; vData[14] = tint.b; vData[15] = tint.a;
+
+        // Vertex 2: top-right (x+w, y+h, u1, v1, r, g, b, a)
+        vData[16] = x + w; vData[17] = y + h;
+        vData[18] = u1;    vData[19] = v1;
+        vData[20] = tint.r; vData[21] = tint.g; vData[22] = tint.b; vData[23] = tint.a;
+
+        // Vertex 3: top-left (x, y+h, u0, v1, r, g, b, a)
+        vData[24] = x;     vData[25] = y + h;
+        vData[26] = u0;    vData[27] = v1;
+        vData[28] = tint.r; vData[29] = tint.g; vData[30] = tint.b; vData[31] = tint.a;
+
+        // Indices (two triangles: 0-1-2 and 2-3-0)
+        iData[0] = baseVertex + 0; iData[1] = baseVertex + 1; iData[2] = baseVertex + 2;
+        iData[3] = baseVertex + 2; iData[4] = baseVertex + 3; iData[5] = baseVertex + 0;
 
         m_QuadBatchCount++;
     }
@@ -309,22 +330,22 @@ namespace engine {
         else bindTexture(0);
 
         bindVAO(m_QuadVAO);
+        
+        // Must bind buffers before glBufferSubData
         glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
-
         size_t vertexBytes = m_QuadBatchVertices.size() * sizeof(float);
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertexBytes, m_QuadBatchVertices.data());
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_QuadEBO);
-
         size_t indexBytes = m_QuadBatchIndices.size() * sizeof(uint32_t);
         glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indexBytes, m_QuadBatchIndices.data());
 
         // Draw all quads in one call
         glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_QuadBatchIndices.size()), GL_UNSIGNED_INT, 0);
 
-        // Clear batch
-        m_QuadBatchVertices.clear();
-        m_QuadBatchIndices.clear();
+        // Reset batch
+        m_QuadBatchVertices.resize(0);
+        m_QuadBatchIndices.resize(0);
 
         m_QuadBatchCount = 0;
         m_CurrentBatchTexture = 0;
