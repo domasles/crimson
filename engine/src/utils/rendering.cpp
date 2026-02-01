@@ -46,10 +46,7 @@ namespace engine::utils::rendering {
     
     void RenderQueueManager::render(const std::shared_ptr<TileRenderQueue>& queue) {
         for (const auto& [texture, size, position, cropSize, cropPosition] : queue->getItems()) {
-            auto actualSize = size.getRawVector();
-            auto actualPosition = position.getRawVector();
-
-            texture->render(actualSize, actualPosition, cropSize, cropPosition);
+            texture->render(size, position, cropSize, cropPosition);
         }
     }
 

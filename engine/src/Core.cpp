@@ -29,7 +29,7 @@ using namespace engine;
         core.getRenderer()->clear(getCore().getBackgroundColor());
 
         if (core.m_WindowResized) {
-            core.updateVectorScale();
+            core.updateViewport();
         }
 
         if (s_WASMUpdate) {
@@ -193,9 +193,6 @@ namespace engine {
             return false;
         }
 
-        Vector2::setGlobalScale(1.0f, 1.0f);
-        Vector2::updateAll();
-
         ENGINE_LOG_INIT("Renderer");
         return true;
     }
@@ -233,7 +230,7 @@ namespace engine {
                 m_Renderer->clear(m_BackgroundColor);
 
                 if (m_WindowResized) {
-                    updateVectorScale();
+                    updateViewport();
                 }
 
                 if (customUpdate) {
@@ -361,12 +358,12 @@ namespace engine {
         m_Renderer->setOrthographicProjection(0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight), 0.0f);
 
         m_WindowResized = true;
-        updateVectorScale();
+        updateViewport();
         
         return true;
     }
 
-    void Core::updateVectorScale() {
+    void Core::updateViewport() {
         int windowWidth = 0;
         int windowHeight = 0;
 

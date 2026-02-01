@@ -53,7 +53,7 @@ namespace engine {
             void setVectorScale(int targetWindowWidth, int targetWindowHeight);
             void setVectorScale(bool useDefaultScale=true);
 
-            void updateVectorScale();
+            void updateViewport();
 
             Color getBackgroundColor() const { return m_BackgroundColor; }
 
@@ -63,6 +63,8 @@ namespace engine {
             Vector2 getWindowSize();
             Vector2 getTargetWindowSize() const { return Vector2{static_cast<float>(m_TargetWindowWidth), static_cast<float>(m_TargetWindowHeight)}; }
             Vector2 getLogicalWindowSize();
+
+            bool m_WindowResized = false;  // Public for WASM main loop access
 
         private:
             Core() : m_Window(nullptr, SDL_DestroyWindow) {}
@@ -91,7 +93,6 @@ namespace engine {
             int m_FrameStart = 0;
 
             bool m_DefaultVectorScale = true;
-            bool m_WindowResized = false;
 
             Color m_BackgroundColor{ 0.0f, 0.0f, 0.0f, 1.0f };
 

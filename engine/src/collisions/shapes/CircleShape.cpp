@@ -98,10 +98,10 @@ namespace engine::collisions::shapes {
 
     void CircleShape::renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color) const {
         const int segments = 12;
-        const float PI = 3.14159265359f;
+        constexpr float PI = 3.14159265359f;
 
         // Pre-calculated unit circle vertices
-        static const std::array<Vector2, 13> s_UnitCircle = [] {
+        static const std::array<Vector2, 13> s_UnitCircle = [PI] {
             std::array<Vector2, 13> circle;
 
             for (int i = 0; i <= 12; ++i) {

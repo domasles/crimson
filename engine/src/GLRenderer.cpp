@@ -440,8 +440,8 @@ namespace engine {
         // Draw all lines in one call
         glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(m_LineBatchCount * 2));
 
-        // Clear batch
-        m_LineBatchVertices.clear();
+        // Reset batch
+        m_LineBatchVertices.resize(0);
         m_LineBatchCount = 0;
     }
 }
