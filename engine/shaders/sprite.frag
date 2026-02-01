@@ -7,9 +7,9 @@ in vec4 v_Color;
 out vec4 FragColor;
 
 uniform sampler2D u_Texture;
-uniform bool u_UseTexture;
+uniform int u_UseTexture;
 
 void main() {
-    if (u_UseTexture) { FragColor = texture(u_Texture, v_TexCoord) * v_Color; }
-    else { FragColor = v_Color; }
+    vec4 texColor = u_UseTexture == 1 ? texture(u_Texture, v_TexCoord) : vec4(1.0);
+    FragColor = texColor * v_Color;
 }

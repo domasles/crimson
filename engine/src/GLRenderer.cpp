@@ -42,7 +42,6 @@ namespace engine {
         createLineBuffers();
 
         createIdentityMatrix(m_ProjectionMatrix.data());
-        createIdentityMatrix(m_ViewMatrix.data());
 
         m_Initialized = true;
         ENGINE_LOG_INIT("OpenGL ES 3.0 Renderer");
@@ -266,11 +265,6 @@ namespace engine {
         if (m_ProjectionDirty) {
             m_SpriteShader.setMat4("u_Projection", m_ProjectionMatrix.data());
             m_ProjectionDirty = false;
-        }
-        
-        if (m_ViewDirty) {
-            m_SpriteShader.setMat4("u_View", m_ViewMatrix.data());
-            m_ViewDirty = false;
         }
     }
 

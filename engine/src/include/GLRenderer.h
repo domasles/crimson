@@ -57,14 +57,12 @@ namespace engine {
             GLuint m_LineVBO = 0;
 
             std::array<float, 16> m_ProjectionMatrix{};
-            std::array<float, 16> m_ViewMatrix{};
 
             // State caching for performance
             GLuint m_CurrentVAO = 0;
             GLuint m_CurrentTexture = 0;
 
             bool m_ProjectionDirty = true;
-            bool m_ViewDirty = true;
 
             // Current render pass
             RenderPass m_CurrentPass = RenderPass::Opaque;
