@@ -9,6 +9,11 @@ using namespace engine::utils::math;
 using namespace engine::utils::rendering;
 
 namespace engine {
+    enum class RenderPass {
+        Opaque,  // Textured quads (game objects)
+        Debug    // Gizmo lines and debug visualization
+    };
+
     class GLRenderer {
         public:
             GLRenderer() = default;
@@ -19,6 +24,9 @@ namespace engine {
 
             void beginFrame() {}
             void endFrame();
+
+            void beginPass(RenderPass pass);
+            void endPass();
 
             void clear(const Color& color);
             void setViewport(int x, int y, int width, int height);
@@ -57,6 +65,9 @@ namespace engine {
 
             bool m_ProjectionDirty = true;
             bool m_ViewDirty = true;
+
+            // Current render pass
+            RenderPass m_CurrentPass = RenderPass::Opaque;
 
             // Batching system - Quads
             static constexpr size_t MAX_QUADS_PER_BATCH = 1000;

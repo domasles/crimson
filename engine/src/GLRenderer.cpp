@@ -62,8 +62,26 @@ namespace engine {
     void GLRenderer::endFrame() {
         flushQuadBatch();
         flushLineBatch();
-
         glFlush();
+    }
+
+    void GLRenderer::beginPass(RenderPass pass) {
+        if (pass != m_CurrentPass) {
+            endPass();
+        }
+
+        m_CurrentPass = pass;
+    }
+
+    void GLRenderer::endPass() {
+        switch (m_CurrentPass) {
+            case RenderPass::Opaque:
+                flushQuadBatch();
+                break;
+            case RenderPass::Debug:
+                flushLineBatch();
+                break;
+        }
     }
 
     void GLRenderer::clear(const Color& color) {

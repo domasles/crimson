@@ -35,8 +35,16 @@ using namespace engine;
         }
 
         SceneManager::getInstance().update();
+
+        // PASS 1: Render all opaque game objects
+        core.getRenderer()->beginPass(RenderPass::Opaque);
         SceneManager::getInstance().render();
+        core.getRenderer()->endPass();
+
+        // PASS 2: Render all debug gizmos
+        core.getRenderer()->beginPass(RenderPass::Debug);
         Gizmos::renderGizmos();
+        core.getRenderer()->endPass();
 
         core.getRenderer()->endFrame();
         SDL_GL_SwapWindow(core.getWindow());
@@ -224,8 +232,16 @@ namespace engine {
                 }
 
                 SceneManager::getInstance().update();
+
+                // PASS 1: Render all opaque game objects
+                m_Renderer->beginPass(RenderPass::Opaque);
                 SceneManager::getInstance().render();
+                m_Renderer->endPass();
+
+                // PASS 2: Render all debug gizmos
+                m_Renderer->beginPass(RenderPass::Debug);
                 Gizmos::renderGizmos();
+                m_Renderer->endPass();
 
                 m_Renderer->endFrame();
                 SDL_GL_SwapWindow(m_Window.get());
