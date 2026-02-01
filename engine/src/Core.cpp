@@ -38,8 +38,8 @@ using namespace engine;
         SceneManager::getInstance().render();
         Gizmos::renderGizmos();
 
-        SDL_GL_SwapWindow(core.getWindow());
         core.getRenderer()->endFrame();
+        SDL_GL_SwapWindow(core.getWindow());
     }
 #endif
 
@@ -183,6 +183,9 @@ namespace engine {
             return false;
         }
 
+        Vector2::setGlobalScale(1.0f, 1.0f);
+        Vector2::updateAll();
+
         ENGINE_LOG_INIT("Renderer");
         return true;
     }
@@ -224,8 +227,8 @@ namespace engine {
                 SceneManager::getInstance().render();
                 Gizmos::renderGizmos();
 
-                SDL_GL_SwapWindow(m_Window.get());
                 m_Renderer->endFrame();
+                SDL_GL_SwapWindow(m_Window.get());
             }
         #endif
     }
@@ -271,10 +274,10 @@ namespace engine {
     }
 
     Vector2 Core::getLogicalWindowSize() {
-        float gameWidth = getWindowSize().getRawX() * (getTargetWindowSize().getRawY() / getWindowSize().getRawY());
-        float gameHeight = getWindowSize().getRawY() * (getTargetWindowSize().getRawX() / getWindowSize().getRawX());
-
-        return Vector2{ gameWidth, gameHeight };
+        return Vector2{
+            static_cast<float>(m_TargetWindowWidth),
+            static_cast<float>(m_TargetWindowHeight)
+        };
     }
 
     bool Core::initWindowedWindow(const std::string& title, const int width, const int height, const bool resizable) {
@@ -336,46 +339,39 @@ namespace engine {
     }
 
     void Core::updateVectorScale() {
-        int prevWidth = 0;
-        int prevHeight = 0;
+        int windowWidth = 0;
+        int windowHeight = 0;
 
-        SDL_GetWindowSize(m_Window.get(), &prevWidth, &prevHeight);
+        SDL_GetWindowSize(m_Window.get(), &windowWidth, &windowHeight);
 
-        m_Renderer->setViewport(0, 0, prevWidth, prevHeight);
-        m_Renderer->setOrthographicProjection(0.0f, static_cast<float>(prevWidth), static_cast<float>(prevHeight), 0.0f);
+        // Flush any batched rendering before changing viewport/projection
+        m_Renderer->endFrame();
 
-        float baseWidth = 0.0f;
-        float baseHeight = 0.0f;
+        float virtualWidth = 0.0f;
+        float virtualHeight = 0.0f;
 
         if (m_DefaultVectorScale) {
-            baseWidth = static_cast<float>(m_DefaultWindowWidth);
-            baseHeight = static_cast<float>(m_DefaultWindowHeight);
+            virtualWidth = static_cast<float>(m_DefaultWindowWidth);
+            virtualHeight = static_cast<float>(m_DefaultWindowHeight);
         }
 
         else {
-            baseWidth = static_cast<float>(m_TargetWindowWidth);
-            baseHeight = static_cast<float>(m_TargetWindowHeight);
+            virtualWidth = static_cast<float>(m_TargetWindowWidth);
+            virtualHeight = static_cast<float>(m_TargetWindowHeight);
         }
 
-        float initialScale = calculateUniformScale(prevWidth, prevHeight, baseWidth, baseHeight);
-        
-        Vector2::setGlobalScale(initialScale, initialScale);
-        Vector2::updateAll();
+        // Calculate scale to maintain aspect ratio (letterboxing/pillarboxing)
+        float scaleX = static_cast<float>(windowWidth) / virtualWidth;
+        float scaleY = static_cast<float>(windowHeight) / virtualHeight;
+        float scale = std::min(scaleX, scaleY);
 
-        int currentWidth = 0;
-        int currentHeight = 0;
+        int viewportWidth = static_cast<int>(virtualWidth * scale);
+        int viewportHeight = static_cast<int>(virtualHeight * scale);
+        int viewportX = (windowWidth - viewportWidth) / 2;
+        int viewportY = (windowHeight - viewportHeight) / 2;
 
-        SDL_GetWindowSize(m_Window.get(), &currentWidth, &currentHeight);
-
-        if (currentWidth != prevWidth || currentHeight != prevHeight) {
-            m_Renderer->setViewport(0, 0, currentWidth, currentHeight);
-            m_Renderer->setOrthographicProjection(0.0f, static_cast<float>(currentWidth), static_cast<float>(currentHeight), 0.0f);
-
-            float updatedScale = calculateUniformScale(currentWidth, currentHeight, baseWidth, baseHeight);
-
-            Vector2::setGlobalScale(updatedScale, updatedScale);
-            Vector2::updateAll();
-        }
+        m_Renderer->setViewport(viewportX, viewportY, viewportWidth, viewportHeight);
+        m_Renderer->setOrthographicProjection(0.0f, virtualWidth, virtualHeight, 0.0f);
     }
 
     float Core::calculateUniformScale(int width, int height, float baseWidth, float baseHeight) {

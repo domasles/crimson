@@ -36,6 +36,9 @@ namespace engine::utils::math {
             static void setGlobalScale(float scaleX, float scaleY);
             static void updateAll();
 
+            static float getGlobalScaleX() { return s_GlobalScaleX; }
+            static float getGlobalScaleY() { return s_GlobalScaleY; }
+
             Vector2 getRawVector() const { return Vector2{ getRawX(), getRawY() }; }
             Vector2 normalize() const;
 

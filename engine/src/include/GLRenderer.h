@@ -58,6 +58,18 @@ namespace engine {
             bool m_ProjectionDirty = true;
             bool m_ViewDirty = true;
 
+            // Batching system
+            static constexpr size_t MAX_QUADS_PER_BATCH = 1000;
+            static constexpr size_t MAX_VERTICES_PER_BATCH = MAX_QUADS_PER_BATCH * 4;
+            static constexpr size_t MAX_INDICES_PER_BATCH = MAX_QUADS_PER_BATCH * 6;
+
+            std::vector<float> m_QuadBatchVertices;
+            std::vector<uint32_t> m_QuadBatchIndices;
+
+            GLuint m_CurrentBatchTexture = 0;
+
+            size_t m_QuadBatchCount = 0;
+
             void createQuadBuffers();
             void createLineBuffers();
             void destroyBuffers();
@@ -68,5 +80,9 @@ namespace engine {
             void bindVAO(GLuint vao);
             void bindTexture(GLuint texture);
             void updateUniforms();
+
+            // Batching helpers
+            void addQuadToBatch(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color& tint);
+            void flushQuadBatch();
     };
 }

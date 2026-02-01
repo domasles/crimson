@@ -60,10 +60,13 @@ namespace engine {
     }
 
     void GLRenderer::endFrame() {
+        flushQuadBatch();
         glFlush();
     }
 
     void GLRenderer::clear(const Color& color) {
+        flushQuadBatch();
+
         glClearColor(color.r, color.g, color.b, color.a);
         glClear(GL_COLOR_BUFFER_BIT);
     }
@@ -77,41 +80,12 @@ namespace engine {
     }
 
     void GLRenderer::drawQuad(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color tint) {
-        m_SpriteShader.use();
-        updateUniforms();
-        m_SpriteShader.setInt("u_UseTexture", textureID != 0 ? 1 : 0);
-
-        if (textureID != 0) {
-            bindTexture(textureID);
-            m_SpriteShader.setInt("u_Texture", 0);
-        } else {
-            bindTexture(0);
-        }
-
-        // Build quad vertices using structured data
-        float x = position.getX();
-        float y = position.getY();
-        float w = size.getX();
-        float h = size.getY();
-
-        std::array<Vertex2D, 4> quadVertices = {{
-            Vertex2D({x,     y    }, {texCoordMin.getX(), texCoordMin.getY()}, tint), // Bottom-left
-            Vertex2D({x + w, y    }, {texCoordMax.getX(), texCoordMin.getY()}, tint), // Bottom-right
-            Vertex2D({x + w, y + h}, {texCoordMax.getX(), texCoordMax.getY()}, tint), // Top-right
-            Vertex2D({x,     y + h}, {texCoordMin.getX(), texCoordMax.getY()}, tint), // Top-left
-        }};
-
-        // Convert to flat array for OpenGL
-        auto vertices = verticesToFloatArray(quadVertices);
-
-        bindVAO(m_QuadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        addQuadToBatch(position, size, texCoordMin, texCoordMax, textureID, tint);
     }
 
     void GLRenderer::drawRect(const Vector2& position, const Vector2& size, const Color& color) {
+        flushQuadBatch();
+
         float x = position.getX();
         float y = position.getY();
         float w = size.getX();
@@ -148,6 +122,8 @@ namespace engine {
     }
 
     void GLRenderer::drawLine(const Vector2& start, const Vector2& end, const Color& color) {
+        flushQuadBatch();
+
         std::array<LineVertex, 2> vertices = {{
             LineVertex(start, color),
             LineVertex(end, color),
@@ -168,11 +144,15 @@ namespace engine {
     }
 
     void GLRenderer::setProjectionMatrix(const float* matrix) {
+        flushQuadBatch();
+
         std::copy(matrix, matrix + 16, m_ProjectionMatrix.begin());
         m_ProjectionDirty = true;
     }
 
     void GLRenderer::setOrthographicProjection(float left, float right, float bottom, float top) {
+        flushQuadBatch();
+
         createOrthographicMatrix(left, right, bottom, top, m_ProjectionMatrix.data());
         m_ProjectionDirty = true;
     }
@@ -300,5 +280,90 @@ namespace engine {
             m_SpriteShader.setMat4("u_View", m_ViewMatrix.data());
             m_ViewDirty = false;
         }
+    }
+
+    void GLRenderer::addQuadToBatch(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color& tint) {
+        // Flush if texture changes or batch is full
+        if ((m_CurrentBatchTexture != textureID && m_QuadBatchCount > 0) || m_QuadBatchCount >= MAX_QUADS_PER_BATCH) {
+            flushQuadBatch();
+        }
+
+        m_CurrentBatchTexture = textureID;
+
+        // Build quad vertices using SCALED coordinates
+        float x = position.getX();
+        float y = position.getY();
+        float w = size.getX();
+        float h = size.getY();
+
+        std::array<Vertex2D, 4> quadVertices = {{
+            Vertex2D({x,     y    }, {texCoordMin.getX(), texCoordMin.getY()}, tint),
+            Vertex2D({x + w, y    }, {texCoordMax.getX(), texCoordMin.getY()}, tint),
+            Vertex2D({x + w, y + h}, {texCoordMax.getX(), texCoordMax.getY()}, tint),
+            Vertex2D({x,     y + h}, {texCoordMin.getX(), texCoordMax.getY()}, tint),
+        }};
+
+        // Convert to flat array and append to batch
+        auto vertices = verticesToFloatArray(quadVertices);
+        m_QuadBatchVertices.insert(m_QuadBatchVertices.end(), vertices.begin(), vertices.end());
+
+        uint32_t baseVertex = static_cast<uint32_t>(m_QuadBatchCount * 4);
+
+        std::array<uint32_t, 6> quadIndices = {{
+            baseVertex + 0, baseVertex + 1, baseVertex + 2,
+            baseVertex + 2, baseVertex + 3, baseVertex + 0
+        }};
+
+        m_QuadBatchIndices.insert(m_QuadBatchIndices.end(), quadIndices.begin(), quadIndices.end());
+
+        m_QuadBatchCount++;
+    }
+
+    void GLRenderer::flushQuadBatch() {
+        if (m_QuadBatchCount == 0) return;
+
+        m_SpriteShader.use();
+        updateUniforms();
+        m_SpriteShader.setInt("u_UseTexture", m_CurrentBatchTexture != 0 ? 1 : 0);
+
+        if (m_CurrentBatchTexture != 0) {
+            bindTexture(m_CurrentBatchTexture);
+            m_SpriteShader.setInt("u_Texture", 0);
+        }
+
+        else bindTexture(0);
+
+        bindVAO(m_QuadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
+
+        GLint bufferSize = 0;
+        glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
+        size_t requiredSize = m_QuadBatchVertices.size() * sizeof(float);
+
+        if (static_cast<size_t>(bufferSize) < requiredSize) {
+            glBufferData(GL_ARRAY_BUFFER, requiredSize, nullptr, GL_DYNAMIC_DRAW);
+        }
+
+        glBufferSubData(GL_ARRAY_BUFFER, 0, requiredSize, m_QuadBatchVertices.data());
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_QuadEBO);
+        glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
+
+        requiredSize = m_QuadBatchIndices.size() * sizeof(uint32_t);
+
+        if (static_cast<size_t>(bufferSize) < requiredSize) {
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, requiredSize, nullptr, GL_DYNAMIC_DRAW);
+        }
+
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, requiredSize, m_QuadBatchIndices.data());
+
+        // Draw all quads in one call
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_QuadBatchIndices.size()), GL_UNSIGNED_INT, 0);
+
+        // Clear batch
+        m_QuadBatchVertices.clear();
+        m_QuadBatchIndices.clear();
+
+        m_QuadBatchCount = 0;
+        m_CurrentBatchTexture = 0;
     }
 }
