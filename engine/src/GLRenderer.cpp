@@ -150,10 +150,16 @@ namespace engine {
         glBindVertexArray(m_QuadVAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_DYNAMIC_DRAW);
+
+        // Pre-allocate buffer to maximum batch size
+        size_t maxVertexBytes = MAX_QUADS_PER_BATCH * 4 * 8 * sizeof(float); // 4 verts, 8 floats each
+        glBufferData(GL_ARRAY_BUFFER, maxVertexBytes, nullptr, GL_DYNAMIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_QuadEBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, QUAD_INDICES.size() * sizeof(uint32_t), QUAD_INDICES.data(), GL_STATIC_DRAW);
+
+        // Pre-allocate index buffer to maximum batch size
+        size_t maxIndexBytes = MAX_QUADS_PER_BATCH * 6 * sizeof(uint32_t); // 6 indices per quad
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, maxIndexBytes, nullptr, GL_DYNAMIC_DRAW);
 
         // Position attribute (location 0)
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, VERTEX2D_SIZE, reinterpret_cast<void*>(VERTEX2D_POSITION_OFFSET));
@@ -177,8 +183,9 @@ namespace engine {
         glBindVertexArray(m_LineVAO);
         glBindBuffer(GL_ARRAY_BUFFER, m_LineVBO);
 
-        // Reserve space for line vertices (position + color)
-        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 8, nullptr, GL_DYNAMIC_DRAW);
+        // Pre-allocate buffer to maximum batch size
+        size_t maxLineBytes = MAX_LINES_PER_BATCH * 2 * 6 * sizeof(float); // 2 verts, 6 floats each
+        glBufferData(GL_ARRAY_BUFFER, maxLineBytes, nullptr, GL_DYNAMIC_DRAW);
 
         // Position attribute
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
@@ -319,25 +326,13 @@ namespace engine {
         bindVAO(m_QuadVAO);
         glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
 
-        GLint bufferSize = 0;
-        glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
-        size_t requiredSize = m_QuadBatchVertices.size() * sizeof(float);
+        size_t vertexBytes = m_QuadBatchVertices.size() * sizeof(float);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, vertexBytes, m_QuadBatchVertices.data());
 
-        if (static_cast<size_t>(bufferSize) < requiredSize) {
-            glBufferData(GL_ARRAY_BUFFER, requiredSize, nullptr, GL_DYNAMIC_DRAW);
-        }
-
-        glBufferSubData(GL_ARRAY_BUFFER, 0, requiredSize, m_QuadBatchVertices.data());
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_QuadEBO);
-        glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
 
-        requiredSize = m_QuadBatchIndices.size() * sizeof(uint32_t);
-
-        if (static_cast<size_t>(bufferSize) < requiredSize) {
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, requiredSize, nullptr, GL_DYNAMIC_DRAW);
-        }
-
-        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, requiredSize, m_QuadBatchIndices.data());
+        size_t indexBytes = m_QuadBatchIndices.size() * sizeof(uint32_t);
+        glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indexBytes, m_QuadBatchIndices.data());
 
         // Draw all quads in one call
         glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_QuadBatchIndices.size()), GL_UNSIGNED_INT, 0);
@@ -391,15 +386,8 @@ namespace engine {
         bindVAO(m_LineVAO);
         glBindBuffer(GL_ARRAY_BUFFER, m_LineVBO);
 
-        GLint bufferSize = 0;
-        glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
-        size_t requiredSize = m_LineBatchVertices.size() * sizeof(float);
-
-        if (static_cast<size_t>(bufferSize) < requiredSize) {
-            glBufferData(GL_ARRAY_BUFFER, requiredSize, nullptr, GL_DYNAMIC_DRAW);
-        }
-
-        glBufferSubData(GL_ARRAY_BUFFER, 0, requiredSize, m_LineBatchVertices.data());
+        size_t lineBytes = m_LineBatchVertices.size() * sizeof(float);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, lineBytes, m_LineBatchVertices.data());
 
         // Draw all lines in one call
         glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(m_LineBatchCount * 2));

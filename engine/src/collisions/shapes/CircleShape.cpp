@@ -97,7 +97,7 @@ namespace engine::collisions::shapes {
     }
 
     void CircleShape::renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color) const {
-        const int segments = 16;
+        const int segments = 12;
         const float PI = 3.14159265359f;
 
         float centerX = position.getX() + size.getX() * 0.5f;
