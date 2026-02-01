@@ -103,8 +103,6 @@ namespace engine {
     }
 
     void GLRenderer::drawRect(const Vector2& position, const Vector2& size, const Color& color) {
-        flushQuadBatch();
-
         float x = position.getX();
         float y = position.getY();
         float w = size.getX();
@@ -158,6 +156,10 @@ namespace engine {
         size_t maxIndexBytes = MAX_QUADS_PER_BATCH * 6 * sizeof(uint32_t); // 6 indices per quad
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, maxIndexBytes, nullptr, GL_DYNAMIC_DRAW);
 
+        // Pre-reserve CPU vector capacity to avoid reallocations
+        m_QuadBatchVertices.reserve(MAX_QUADS_PER_BATCH * 4 * 8); // 32 floats per quad
+        m_QuadBatchIndices.reserve(MAX_QUADS_PER_BATCH * 6);      // 6 indices per quad
+
         // Position attribute (location 0)
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, VERTEX2D_SIZE, reinterpret_cast<void*>(VERTEX2D_POSITION_OFFSET));
         glEnableVertexAttribArray(0);
@@ -183,6 +185,9 @@ namespace engine {
         // Pre-allocate buffer to maximum batch size
         size_t maxLineBytes = MAX_LINES_PER_BATCH * 2 * 6 * sizeof(float); // 2 verts, 6 floats each
         glBufferData(GL_ARRAY_BUFFER, maxLineBytes, nullptr, GL_DYNAMIC_DRAW);
+
+        // Pre-reserve CPU vector capacity to avoid reallocations
+        m_LineBatchVertices.reserve(MAX_LINES_PER_BATCH * 2 * 6); // 12 floats per line
 
         // Position attribute
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
