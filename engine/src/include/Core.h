@@ -91,6 +91,7 @@ namespace engine {
             int m_FrameStart = 0;
 
             bool m_DefaultVectorScale = true;
+            bool m_WindowResized = false;
 
             Color m_BackgroundColor{ 0.0f, 0.0f, 0.0f, 1.0f };
 

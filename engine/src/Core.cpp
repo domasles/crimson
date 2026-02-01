@@ -28,7 +28,9 @@ using namespace engine;
 
         core.getRenderer()->clear(getCore().getBackgroundColor());
 
-        core.updateVectorScale();
+        if (core.m_WindowResized) {
+            core.updateVectorScale();
+        }
 
         if (s_WASMUpdate) {
             s_WASMUpdate();
@@ -200,6 +202,7 @@ namespace engine {
 
     const bool Core::processEvents() {
         SDL_Event event;
+        m_WindowResized = false;
 
         while (SDL_PollEvent(&event)) {
             m_EventQueue.push(event);
@@ -211,6 +214,10 @@ namespace engine {
 
             if (e.type == SDL_EVENT_QUIT) {
                 return false;
+            }
+
+            if (e.type == SDL_EVENT_WINDOW_RESIZED) {
+                m_WindowResized = true;
             }
         }
 
@@ -225,7 +232,9 @@ namespace engine {
             while (processEvents()) {
                 m_Renderer->clear(m_BackgroundColor);
 
-                updateVectorScale();
+                if (m_WindowResized) {
+                    updateVectorScale();
+                }
 
                 if (customUpdate) {
                     customUpdate();
@@ -350,6 +359,9 @@ namespace engine {
 
         m_Renderer->setViewport(0, 0, windowWidth, windowHeight);
         m_Renderer->setOrthographicProjection(0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight), 0.0f);
+
+        m_WindowResized = true;
+        updateVectorScale();
         
         return true;
     }
@@ -359,9 +371,6 @@ namespace engine {
         int windowHeight = 0;
 
         SDL_GetWindowSize(m_Window.get(), &windowWidth, &windowHeight);
-
-        // Flush any batched rendering before changing viewport/projection
-        m_Renderer->endFrame();
 
         float virtualWidth = 0.0f;
         float virtualHeight = 0.0f;

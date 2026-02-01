@@ -60,8 +60,6 @@ namespace engine {
     }
 
     void GLRenderer::endFrame() {
-        flushQuadBatch();
-        flushLineBatch();
         glFlush();
     }
 
@@ -120,7 +118,6 @@ namespace engine {
     }
 
     void GLRenderer::drawLine(const Vector2& start, const Vector2& end, const Color& color) {
-        flushLineBatch();
         addLineToBatch(start, end, color);
     }
 
