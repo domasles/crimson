@@ -100,6 +100,18 @@ namespace engine::collisions::shapes {
         const int segments = 12;
         const float PI = 3.14159265359f;
 
+        // Pre-calculated unit circle vertices
+        static const std::array<Vector2, 13> s_UnitCircle = [] {
+            std::array<Vector2, 13> circle;
+
+            for (int i = 0; i <= 12; ++i) {
+                float angle = (2.0f * PI * i) / 12;
+                circle[i] = Vector2{std::cos(angle), std::sin(angle)};
+            }
+
+            return circle;
+        }();
+
         float centerX = position.getX() + size.getX() * 0.5f;
         float centerY = position.getY() + size.getY() * 0.5f;
 
@@ -107,13 +119,13 @@ namespace engine::collisions::shapes {
         float radiusY = size.getY() * 0.5f;
 
         for (int i = 0; i < segments; ++i) {
-            float angle1 = (2.0f * PI * i) / segments;
-            float angle2 = (2.0f * PI * (i + 1)) / segments;
+            const Vector2& p1 = s_UnitCircle[i];
+            const Vector2& p2 = s_UnitCircle[i + 1];
 
-            float x1 = centerX + radiusX * cos(angle1);
-            float y1 = centerY + radiusY * sin(angle1);
-            float x2 = centerX + radiusX * cos(angle2);
-            float y2 = centerY + radiusY * sin(angle2);
+            float x1 = centerX + radiusX * p1.getRawX();
+            float y1 = centerY + radiusY * p1.getRawY();
+            float x2 = centerX + radiusX * p2.getRawX();
+            float y2 = centerY + radiusY * p2.getRawY();
 
             renderer->drawLine(Vector2{x1, y1}, Vector2{x2, y2}, color);
         }
