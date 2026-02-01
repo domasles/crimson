@@ -51,11 +51,22 @@ namespace engine {
             std::array<float, 16> m_ProjectionMatrix{};
             std::array<float, 16> m_ViewMatrix{};
 
+            // State caching for performance
+            GLuint m_CurrentVAO = 0;
+            GLuint m_CurrentTexture = 0;
+
+            bool m_ProjectionDirty = true;
+            bool m_ViewDirty = true;
+
             void createQuadBuffers();
             void createLineBuffers();
             void destroyBuffers();
 
             void createOrthographicMatrix(float left, float right, float bottom, float top, float* out);
             void createIdentityMatrix(float* out);
+
+            void bindVAO(GLuint vao);
+            void bindTexture(GLuint texture);
+            void updateUniforms();
     };
 }

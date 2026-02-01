@@ -78,14 +78,14 @@ namespace engine {
 
     void GLRenderer::drawQuad(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color tint) {
         m_SpriteShader.use();
-        m_SpriteShader.setMat4("u_Projection", m_ProjectionMatrix.data());
-        m_SpriteShader.setMat4("u_View", m_ViewMatrix.data());
+        updateUniforms();
         m_SpriteShader.setInt("u_UseTexture", textureID != 0 ? 1 : 0);
 
         if (textureID != 0) {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, textureID);
+            bindTexture(textureID);
             m_SpriteShader.setInt("u_Texture", 0);
+        } else {
+            bindTexture(0);
         }
 
         // Build quad vertices using structured data
@@ -104,14 +104,11 @@ namespace engine {
         // Convert to flat array for OpenGL
         auto vertices = verticesToFloatArray(quadVertices);
 
-        glBindVertexArray(m_QuadVAO);
+        bindVAO(m_QuadVAO);
         glBindBuffer(GL_ARRAY_BUFFER, m_QuadVBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(float), vertices.data());
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
-
-        if (textureID != 0) glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     void GLRenderer::drawRect(const Vector2& position, const Vector2& size, const Color& color) {
@@ -139,16 +136,15 @@ namespace engine {
         auto flatVertices = lineVerticesToFloatArray(vertices);
 
         m_SpriteShader.use();
-        m_SpriteShader.setMat4("u_Projection", m_ProjectionMatrix.data());
-        m_SpriteShader.setMat4("u_View", m_ViewMatrix.data());
+        updateUniforms();
         m_SpriteShader.setInt("u_UseTexture", 0);
+        bindTexture(0);
 
-        glBindVertexArray(m_LineVAO);
+        bindVAO(m_LineVAO);
         glBindBuffer(GL_ARRAY_BUFFER, m_LineVBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, flatVertices.size() * sizeof(float), flatVertices.data());
 
         glDrawArrays(GL_LINES, 0, 8);
-        glBindVertexArray(0);
     }
 
     void GLRenderer::drawLine(const Vector2& start, const Vector2& end, const Color& color) {
@@ -160,24 +156,25 @@ namespace engine {
         auto flatVertices = lineVerticesToFloatArray(vertices);
 
         m_SpriteShader.use();
-        m_SpriteShader.setMat4("u_Projection", m_ProjectionMatrix.data());
-        m_SpriteShader.setMat4("u_View", m_ViewMatrix.data());
+        updateUniforms();
         m_SpriteShader.setInt("u_UseTexture", 0);
+        bindTexture(0);
 
-        glBindVertexArray(m_LineVAO);
+        bindVAO(m_LineVAO);
         glBindBuffer(GL_ARRAY_BUFFER, m_LineVBO);
         glBufferSubData(GL_ARRAY_BUFFER, 0, flatVertices.size() * sizeof(float), flatVertices.data());
 
         glDrawArrays(GL_LINES, 0, 2);
-        glBindVertexArray(0);
     }
 
     void GLRenderer::setProjectionMatrix(const float* matrix) {
         std::copy(matrix, matrix + 16, m_ProjectionMatrix.begin());
+        m_ProjectionDirty = true;
     }
 
     void GLRenderer::setOrthographicProjection(float left, float right, float bottom, float top) {
         createOrthographicMatrix(left, right, bottom, top, m_ProjectionMatrix.data());
+        m_ProjectionDirty = true;
     }
 
     void GLRenderer::createQuadBuffers() {
@@ -272,5 +269,36 @@ namespace engine {
     void GLRenderer::createIdentityMatrix(float* out) {
         std::fill(out, out + 16, 0.0f);
         out[0] = out[5] = out[10] = out[15] = 1.0f;
+    }
+
+    void GLRenderer::bindVAO(GLuint vao) {
+        if (m_CurrentVAO != vao) {
+            glBindVertexArray(vao);
+            m_CurrentVAO = vao;
+        }
+    }
+
+    void GLRenderer::bindTexture(GLuint texture) {
+        if (m_CurrentTexture != texture) {
+            if (texture != 0) {
+                glActiveTexture(GL_TEXTURE0);
+                glBindTexture(GL_TEXTURE_2D, texture);
+            } else {
+                glBindTexture(GL_TEXTURE_2D, 0);
+            }
+            m_CurrentTexture = texture;
+        }
+    }
+
+    void GLRenderer::updateUniforms() {
+        if (m_ProjectionDirty) {
+            m_SpriteShader.setMat4("u_Projection", m_ProjectionMatrix.data());
+            m_ProjectionDirty = false;
+        }
+        
+        if (m_ViewDirty) {
+            m_SpriteShader.setMat4("u_View", m_ViewMatrix.data());
+            m_ViewDirty = false;
+        }
     }
 }
