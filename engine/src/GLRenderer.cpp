@@ -61,11 +61,14 @@ namespace engine {
 
     void GLRenderer::endFrame() {
         flushQuadBatch();
+        flushLineBatch();
+
         glFlush();
     }
 
     void GLRenderer::clear(const Color& color) {
         flushQuadBatch();
+        flushLineBatch();
 
         glClearColor(color.r, color.g, color.b, color.a);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -91,60 +94,21 @@ namespace engine {
         float w = size.getX();
         float h = size.getY();
 
-        // Create structured vertices for rectangle outline
-        std::array<LineVertex, 8> vertices = {{
-            // Bottom edge
-            LineVertex({x,     y    }, color),
-            LineVertex({x + w, y    }, color),
-            // Right edge
-            LineVertex({x + w, y    }, color),
-            LineVertex({x + w, y + h}, color),
-            // Top edge
-            LineVertex({x + w, y + h}, color),
-            LineVertex({x,     y + h}, color),
-            // Left edge
-            LineVertex({x,     y + h}, color),
-            LineVertex({x,     y    }, color),
-        }};
-
-        auto flatVertices = lineVerticesToFloatArray(vertices);
-
-        m_SpriteShader.use();
-        updateUniforms();
-        m_SpriteShader.setInt("u_UseTexture", 0);
-        bindTexture(0);
-
-        bindVAO(m_LineVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, m_LineVBO);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, flatVertices.size() * sizeof(float), flatVertices.data());
-
-        glDrawArrays(GL_LINES, 0, 8);
+        // Add line vertices to batch
+        addLineToBatch({x,     y    }, {x + w, y    }, color); // Bottom
+        addLineToBatch({x + w, y    }, {x + w, y + h}, color); // Right
+        addLineToBatch({x + w, y + h}, {x,     y + h}, color); // Top
+        addLineToBatch({x,     y + h}, {x,     y    }, color); // Left
     }
 
     void GLRenderer::drawLine(const Vector2& start, const Vector2& end, const Color& color) {
-        flushQuadBatch();
-
-        std::array<LineVertex, 2> vertices = {{
-            LineVertex(start, color),
-            LineVertex(end, color),
-        }};
-
-        auto flatVertices = lineVerticesToFloatArray(vertices);
-
-        m_SpriteShader.use();
-        updateUniforms();
-        m_SpriteShader.setInt("u_UseTexture", 0);
-        bindTexture(0);
-
-        bindVAO(m_LineVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, m_LineVBO);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, flatVertices.size() * sizeof(float), flatVertices.data());
-
-        glDrawArrays(GL_LINES, 0, 2);
+        flushLineBatch();
+        addLineToBatch(start, end, color);
     }
 
     void GLRenderer::setProjectionMatrix(const float* matrix) {
         flushQuadBatch();
+        flushLineBatch();
 
         std::copy(matrix, matrix + 16, m_ProjectionMatrix.begin());
         m_ProjectionDirty = true;
@@ -152,6 +116,7 @@ namespace engine {
 
     void GLRenderer::setOrthographicProjection(float left, float right, float bottom, float top) {
         flushQuadBatch();
+        flushLineBatch();
 
         createOrthographicMatrix(left, right, bottom, top, m_ProjectionMatrix.data());
         m_ProjectionDirty = true;
@@ -365,5 +330,64 @@ namespace engine {
 
         m_QuadBatchCount = 0;
         m_CurrentBatchTexture = 0;
+    }
+
+    void GLRenderer::addLineToBatch(const Vector2& start, const Vector2& end, const Color& color) {
+        if (m_LineBatchCount >= MAX_LINES_PER_BATCH) {
+            flushLineBatch();
+        }
+
+        // Add line vertices (2 vertices per line, 6 floats each: x, y, r, g, b, a)
+        float x1 = start.getX();
+        float y1 = start.getY();
+        float x2 = end.getX();
+        float y2 = end.getY();
+
+        // Start vertex
+        m_LineBatchVertices.push_back(x1);
+        m_LineBatchVertices.push_back(y1);
+        m_LineBatchVertices.push_back(color.r);
+        m_LineBatchVertices.push_back(color.g);
+        m_LineBatchVertices.push_back(color.b);
+        m_LineBatchVertices.push_back(color.a);
+
+        // End vertex
+        m_LineBatchVertices.push_back(x2);
+        m_LineBatchVertices.push_back(y2);
+        m_LineBatchVertices.push_back(color.r);
+        m_LineBatchVertices.push_back(color.g);
+        m_LineBatchVertices.push_back(color.b);
+        m_LineBatchVertices.push_back(color.a);
+
+        m_LineBatchCount++;
+    }
+
+    void GLRenderer::flushLineBatch() {
+        if (m_LineBatchCount == 0) return;
+
+        m_SpriteShader.use();
+        updateUniforms();
+        m_SpriteShader.setInt("u_UseTexture", 0);
+        bindTexture(0);
+
+        bindVAO(m_LineVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_LineVBO);
+
+        GLint bufferSize = 0;
+        glGetBufferParameteriv(GL_ARRAY_BUFFER, GL_BUFFER_SIZE, &bufferSize);
+        size_t requiredSize = m_LineBatchVertices.size() * sizeof(float);
+
+        if (static_cast<size_t>(bufferSize) < requiredSize) {
+            glBufferData(GL_ARRAY_BUFFER, requiredSize, nullptr, GL_DYNAMIC_DRAW);
+        }
+
+        glBufferSubData(GL_ARRAY_BUFFER, 0, requiredSize, m_LineBatchVertices.data());
+
+        // Draw all lines in one call
+        glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(m_LineBatchCount * 2));
+
+        // Clear batch
+        m_LineBatchVertices.clear();
+        m_LineBatchCount = 0;
     }
 }

@@ -58,7 +58,7 @@ namespace engine {
             bool m_ProjectionDirty = true;
             bool m_ViewDirty = true;
 
-            // Batching system
+            // Batching system - Quads
             static constexpr size_t MAX_QUADS_PER_BATCH = 1000;
             static constexpr size_t MAX_VERTICES_PER_BATCH = MAX_QUADS_PER_BATCH * 4;
             static constexpr size_t MAX_INDICES_PER_BATCH = MAX_QUADS_PER_BATCH * 6;
@@ -69,6 +69,14 @@ namespace engine {
             GLuint m_CurrentBatchTexture = 0;
 
             size_t m_QuadBatchCount = 0;
+
+            // Batching system - Lines
+            static constexpr size_t MAX_LINES_PER_BATCH = 2000;
+            static constexpr size_t MAX_LINE_VERTICES_PER_BATCH = MAX_LINES_PER_BATCH * 2;
+
+            std::vector<float> m_LineBatchVertices;
+
+            size_t m_LineBatchCount = 0;
 
             void createQuadBuffers();
             void createLineBuffers();
@@ -84,5 +92,8 @@ namespace engine {
             // Batching helpers
             void addQuadToBatch(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color& tint);
             void flushQuadBatch();
+
+            void addLineToBatch(const Vector2& start, const Vector2& end, const Color& color);
+            void flushLineBatch();
     };
 }
