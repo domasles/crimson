@@ -111,6 +111,8 @@ else()
 
     target_precompile_headers(${LAUNCHER_TARGET} PRIVATE src/pch/pch.h)
 
+    strip_debug_symbols(${LAUNCHER_TARGET})
+
     add_custom_command(TARGET ${LAUNCHER_TARGET} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "$<TARGET_FILE:SDL3::SDL3-shared>"

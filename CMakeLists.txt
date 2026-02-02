@@ -169,6 +169,15 @@ add_subdirectory(vendor/sdl3)
 add_subdirectory(vendor/sdl3-image)
 add_subdirectory(vendor/sdl3-mixer)
 
+function(strip_debug_symbols target_name)
+    if(MSVC)
+        add_custom_command(TARGET ${target_name} POST_BUILD
+            COMMAND powershell -Command "if ('$<CONFIG>' -eq 'Release') { Write-Host 'Cleaning PDB files...'; Get-ChildItem -Path '${CMAKE_BINARY_DIR}/bin/Release' -Filter '*.pdb' -Recurse -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue }"
+            VERBATIM
+        )
+    endif()
+endfunction()
+
 add_subdirectory(engine)
 
 file(GLOB all_dirs RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/games" "${CMAKE_CURRENT_SOURCE_DIR}/games/*")
