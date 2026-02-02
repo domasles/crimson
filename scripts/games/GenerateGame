@@ -8,6 +8,18 @@ fi
 
 GAME_NAME="$1"
 GAME_DISPLAY_NAME="${2:-$GAME_NAME}"
+
+# Lint checks
+if [[ ! "$GAME_NAME" =~ ^[a-zA-Z_]+$ ]]; then
+    echo "Error: GAME_NAME can only contain letters (a-z, A-Z) and underscores (_)."
+    exit 1
+fi
+
+if [[ ! "$GAME_DISPLAY_NAME" =~ ^[a-zA-Z_[:space:]]+$ ]]; then
+    echo "Error: GAME_DISPLAY_NAME can only contain letters (a-z, A-Z), underscores (_), and spaces."
+    exit 1
+fi
+
 GAME_NAME_UPPER=$(echo "$GAME_NAME" | tr '[:lower:]' '[:upper:]')
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

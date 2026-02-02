@@ -44,8 +44,6 @@ namespace engine {
         createIdentityMatrix(m_ProjectionMatrix.data());
 
         m_Initialized = true;
-        ENGINE_LOG_INIT("OpenGL ES 3.0 Renderer");
-
         return true;
     }
 

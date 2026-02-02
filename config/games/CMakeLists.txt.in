@@ -116,8 +116,8 @@ endif()
 # Copy engine shaders
 add_custom_command(TARGET ${libName} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_SOURCE_DIR}/engine/shaders/engine"
-    "$<TARGET_FILE_DIR:${libName}>/shaders"
+    "${CMAKE_SOURCE_DIR}/engine/shaders"
+    "$<TARGET_FILE_DIR:${libName}>/shaders/engine"
     COMMENT "Copying engine shaders to output"
 )
 
