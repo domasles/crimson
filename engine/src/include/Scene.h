@@ -14,6 +14,8 @@ namespace engine {
             virtual void update(float deltaTime) = 0;
             virtual void render() = 0;
 
+            virtual void prepareRender(float alpha);
+
             void setInitialized(bool value) { m_Initialized = value; }
 
             bool getInitialized() const { return m_Initialized; }
@@ -113,6 +115,14 @@ namespace engine {
 
             const bool update();
             const bool render();
+
+            // Prepare entities for rendering with interpolation
+            void prepareRender() {
+                if (m_CurrentScene) {
+                    float alpha = m_PhysicsAccumulator / FIXED_TIMESTEP;
+                    m_CurrentScene->prepareRender(alpha);
+                }
+            }
 
             const std::string& getCurrentSceneName() const;
             std::shared_ptr<Scene> getCurrentScene() const;

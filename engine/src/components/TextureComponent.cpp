@@ -13,7 +13,7 @@ namespace engine {
         auto* transformComp = m_Entity->getComponent<TransformComponent>();
         if (!transformComp) return;
 
-        m_Texture->render(transformComp->getSize(), transformComp->getPosition());
+        m_Texture->render(transformComp->getSize(), transformComp->getInterpolatedPosition());
     }
 
     void TextureComponent::render(const SDL_FRect& cropRegion) {
@@ -25,7 +25,7 @@ namespace engine {
         Vector2 cropSize{cropRegion.w, cropRegion.h};
         Vector2 cropPosition{cropRegion.x, cropRegion.y};
 
-        m_Texture->render(transformComp->getSize(), transformComp->getPosition(), cropSize, cropPosition);
+        m_Texture->render(transformComp->getSize(), transformComp->getInterpolatedPosition(), cropSize, cropPosition);
     }
 
     void TextureComponent::render(const SDL_FRect& cropRegion, const SDL_FRect& destinationRegion) {

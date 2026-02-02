@@ -14,7 +14,7 @@ namespace engine {
         GLRenderer* renderer = getCore().getRenderer();
 
         renderer->drawQuad(
-            transform->getPosition(),
+            transform->getInterpolatedPosition(),
             transform->getSize(),
             0, // No texture
             m_Color

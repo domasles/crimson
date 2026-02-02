@@ -37,6 +37,7 @@ using namespace engine;
         }
 
         SceneManager::getInstance().update();
+        SceneManager::getInstance().prepareRender();
 
         // PASS 1: Render all opaque game objects
         core.getRenderer()->beginPass(RenderPass::Opaque);
@@ -238,6 +239,7 @@ namespace engine {
                 }
 
                 SceneManager::getInstance().update();
+                SceneManager::getInstance().prepareRender();
 
                 // PASS 1: Render all opaque game objects
                 m_Renderer->beginPass(RenderPass::Opaque);

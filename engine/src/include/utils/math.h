@@ -45,4 +45,9 @@ namespace engine::utils::math {
             static float getFloat(float min, float max);
             static bool chance(float probability);
     };
+
+   class Geometry {
+        public:
+            static float lerpAngle(float from, float to, float alpha);
+    };
 }

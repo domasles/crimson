@@ -68,4 +68,13 @@ namespace engine::utils::math {
         std::bernoulli_distribution dist(probability);
         return dist(rng);
     }
+
+    float Geometry::lerpAngle(float from, float to, float alpha) {
+        float diff = to - from;
+
+        while (diff > 180.0f) diff -= 360.0f;
+        while (diff < -180.0f) diff += 360.0f;
+
+        return from + diff * alpha;
+    }
 }

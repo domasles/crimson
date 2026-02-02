@@ -13,11 +13,9 @@ namespace engine {
             ~Transform() = default;
 
             void setPosition(const Vector2& position) { m_Position = position; }
-            void addPosition(const Vector2& offset) { m_Position += offset; }
 
             void setSize(const Vector2& size) { m_Size = size; }
             void setRotation(float rotation) { m_Rotation = rotation; }
-            void addRotation(float delta) { m_Rotation += delta; }
 
             void setScale(const Vector2& scale) { m_Scale = scale; }
             void setScale(float uniformScale) { m_Scale = Vector2{uniformScale, uniformScale}; }

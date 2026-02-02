@@ -46,6 +46,9 @@ namespace engine {
             Vector2 getWorldPosition() const;
             Vector2 getCollisionWorldPosition() const;
 
+            Vector2 getInterpolatedWorldPosition() const;
+            Vector2 getInterpolatedCollisionWorldPosition() const;
+
         private:
             bool m_Enabled = true;
             bool m_ParticipatesInQueries = false;

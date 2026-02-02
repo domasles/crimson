@@ -29,34 +29,25 @@ namespace outBreak {
             Vector2 velocity = m_Direction * BALL_SPEED;
             Vector2 movement = velocity * deltaTime;
 
-            Vector2 screenSize = getWindowSize();
-            Vector2 targetScreenSize = getTargetWindowSize();
-
             float game_width = getLogicalWindowSize().getRawX();
 
-            m_LocalOffset += Vector2{ movement.getRawX(), 0.0f };
+            Vector2 nextPos = currentPos + movement;
 
-            float finalX = (game_width / 2.0f) - (BALL_SIZE / 2.0f) + m_LocalOffset.getRawX();
-            float finalY = currentPos.getRawY() + movement.getRawY();
-
-            if (finalX < 0.0f) {
-                finalX = 0.0f;
+            if (nextPos.getRawX() < 0.0f) {
+                nextPos = Vector2{ 0.0f, nextPos.getRawY() };
                 setDirectionX(1.0f);
-                m_LocalOffset = Vector2{ finalX - (game_width / 2.0f - BALL_SIZE / 2.0f), m_LocalOffset.getRawY() };
             }
-
-            else if (finalX + BALL_SIZE > game_width) {
-                finalX = game_width - BALL_SIZE;
+            else if (nextPos.getRawX() + BALL_SIZE > game_width) {
+                nextPos = Vector2{ game_width - BALL_SIZE, nextPos.getRawY() };
                 setDirectionX(-1.0f);
-                m_LocalOffset = Vector2{ finalX - (game_width / 2.0f - BALL_SIZE / 2.0f), m_LocalOffset.getRawY() };
             }
 
-            if (finalY < 0.0f) {
-                finalY = 0.0f;
+            if (nextPos.getRawY() < 0.0f) {
+                nextPos = Vector2{ nextPos.getRawX(), 0.0f };
                 setDirectionY(1.0f);
             }
 
-            transform->setPosition(Vector2{ finalX, finalY });
+            transform->move(movement);
         }
     }
 

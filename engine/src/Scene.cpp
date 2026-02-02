@@ -5,8 +5,39 @@
 #include <Scene.h>
 
 using namespace engine::utils::logger;
+using namespace engine::utils::math;
 
 namespace engine {
+    void Scene::prepareRender(float alpha) {
+        for (auto& entity : m_Entities) {
+            if (auto* transform = entity->getComponent<TransformComponent>()) {
+                Vector2 prevPos = transform->getPreviousPosition();
+                Vector2 currentPos = transform->getPosition();
+                Vector2 interpolatedPos = prevPos + (currentPos - prevPos) * alpha;
+
+                transform->setInterpolatedPosition(interpolatedPos);
+
+                float prevRot = transform->getPreviousRotation();
+                float currentRot = transform->getRotation();
+                float interpolatedRot = Geometry::lerpAngle(prevRot, currentRot, alpha);
+
+                transform->setInterpolatedRotation(interpolatedRot);
+
+                Vector2 prevSize = transform->getPreviousSize();
+                Vector2 currentSize = transform->getSize();
+                Vector2 interpolatedSize = prevSize + (currentSize - prevSize) * alpha;
+
+                transform->setInterpolatedSize(interpolatedSize);
+
+                Vector2 prevScale = transform->getPreviousScale();
+                Vector2 currentScale = transform->getScale();
+                Vector2 interpolatedScale = prevScale + (currentScale - prevScale) * alpha;
+
+                transform->setInterpolatedScale(interpolatedScale);
+            }
+        }
+    }
+
     SceneManager& SceneManager::getInstance() {
         try {
             static SceneManager& instance = *new SceneManager();

@@ -84,7 +84,7 @@ namespace engine {
                     auto* collision = entity->getComponent<CollisionComponent>();
 
                     if (collision && collision->isEnabled()) {
-                        Vector2 collisionPos = collision->getCollisionWorldPosition();
+                        Vector2 collisionPos = collision->getInterpolatedCollisionWorldPosition();
                         Vector2 collisionSize = collision->getCollision().size;
 
                         Color red{1.0f, 0.0f, 0.0f, 1.0f}; // Red for collision

@@ -115,6 +115,19 @@ namespace engine {
         return { worldPos.getRawX() + m_Collision.offset.getRawX(), worldPos.getRawY() + m_Collision.offset.getRawY() };
     }
 
+    Vector2 CollisionComponent::getInterpolatedWorldPosition() const {
+        if (auto transform = m_Entity->getComponent<TransformComponent>()) {
+            return transform->getInterpolatedPosition();
+        }
+
+        return {0, 0};
+    }
+
+    Vector2 CollisionComponent::getInterpolatedCollisionWorldPosition() const {
+        Vector2 worldPos = getInterpolatedWorldPosition();
+        return { worldPos.getRawX() + m_Collision.offset.getRawX(), worldPos.getRawY() + m_Collision.offset.getRawY() };
+    }
+
     std::vector<Entity*> CollisionComponent::getOtherCollisionEntities() const {
         auto& sceneManager = getSceneManager();
         auto currentScene = sceneManager.getCurrentScene();

@@ -33,33 +33,26 @@ namespace outBreak {
         auto* transform = getComponent<TransformComponent>();
 
         if (input && transform && input->getInputSystem()) {
-            Vector2 movement = input->getMovementVector();
+            Vector2 movementInput = input->getMovementVector();
             Vector2 currentPos = transform->getPosition();
 
             Vector2 paddleSize = transform->getSize();
             float paddleWidth = paddleSize.getRawX();
-
-            Vector2 screenSize = getWindowSize();
-            Vector2 targetScreenSize = getTargetWindowSize();
-
             float game_width = getLogicalWindowSize().getRawX();
 
-            m_LocalOffset += movement * m_Speed * deltaTime;
+            Vector2 movement = movementInput * m_Speed * deltaTime;
+            Vector2 nextPos = currentPos + movement;
 
-            float finalX = (game_width / 2.0f) - (paddleWidth / 2.0f) + m_LocalOffset.getRawX();
-            float finalY = currentPos.getRawY();
-
-            if (finalX < 0.0f) {
-                finalX = 0.0f;
-                m_LocalOffset = Vector2{ finalX - (game_width / 2.0f - paddleWidth / 2.0f), m_LocalOffset.getRawY() };
+            if (nextPos.getRawX() < 0.0f) {
+                nextPos = Vector2{ 0.0f, nextPos.getRawY() };
+                movement = Vector2{ 0.0f, movement.getRawY() };
+            }
+            else if (nextPos.getRawX() + paddleWidth > game_width) {
+                nextPos = Vector2{ game_width - paddleWidth, nextPos.getRawY() };
+                movement = Vector2{ 0.0f, movement.getRawY() };
             }
 
-            else if (finalX + paddleWidth > game_width) {
-                finalX = game_width - paddleWidth;
-                m_LocalOffset = Vector2{ finalX - (game_width / 2.0f - paddleWidth / 2.0f), m_LocalOffset.getRawY() };
-            }
-
-            transform->setPosition(Vector2{ finalX, finalY });
+            transform->move(movement);
         }
     }
 
