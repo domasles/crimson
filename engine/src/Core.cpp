@@ -26,18 +26,18 @@ using namespace engine;
             return;
         }
 
-        if (core.m_UseCustomOutOfBoundsColor) {
+        if (core.getUseCustomOutOfBoundsColor()) {
             int windowWidth, windowHeight;
-            SDL_GetWindowSize(core.m_Window.get(), &windowWidth, &windowHeight);
+            SDL_GetWindowSize(core.getWindow(), &windowWidth, &windowHeight);
 
             glDisable(GL_SCISSOR_TEST);
             glViewport(0, 0, windowWidth, windowHeight);
 
-            core.getRenderer()->clear(core.m_OutOfBoundsColor);
+            core.getRenderer()->clear(core.getOutOfBoundsColor());
             core.updateViewport();
         }
 
-        if (core.m_WindowResized) {
+        if (core.getWindowResized()) {
             core.updateViewport();
         }
 

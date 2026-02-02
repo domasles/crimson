@@ -20,6 +20,11 @@ if ($DisplayName -notmatch '^[a-zA-Z_ ]+$') {
     exit 1
 }
 
+if ($DisplayName -match '[\r\n]') {
+    Write-Host "Error: DisplayName cannot contain line breaks."
+    exit 1
+}
+
 $GameNameUpper = $GameName.ToUpper()
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path

@@ -1,0 +1,15 @@
+# OutBreak Docker Compose Configuration
+
+services:
+  outBreak:
+    build:
+      context: ../../../
+      dockerfile: games/outBreak/docker/Dockerfile
+
+    image: ghcr.io/domasles/crimson/outbreak:latest
+    container_name: api
+
+    ports:
+      - "0.0.0.0:80:80"
+
+    restart: unless-stopped

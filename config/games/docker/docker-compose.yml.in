@@ -1,0 +1,14 @@
+# @GAME_DISPLAY_NAME@'s Docker Compose Configuration
+
+services:
+  @GAME_NAME@:
+    build:
+      context: ../../../
+      dockerfile: games/@GAME_NAME@/docker/Dockerfile
+
+    container_name: @GAME_NAME@
+
+    ports:
+      - "0.0.0.0:80:80"
+
+    restart: unless-stopped

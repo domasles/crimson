@@ -1,9 +1,9 @@
 # Directories
-/.vs
-/.vscode
+.vs
+.vscode
 
-/out
-/build*
+out
+build*
 
 # User files
 *.user

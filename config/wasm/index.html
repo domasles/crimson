@@ -15,7 +15,7 @@
                 width: 100vw;
                 height: 100vh;
             }
-            
+
             .emscripten {
                 image-rendering: pixelated;
                 image-rendering: crisp-edges;
@@ -51,17 +51,38 @@
                 margin: 0;
                 color: #ffffff;
             }
+
+            .loading-wheel {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 60px;
+                height: 60px;
+                border: 4px solid rgba(255, 255, 255, 0.1);
+                border-top: 4px solid #ffffff;
+                border-radius: 50%;
+                z-index: 10;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                0% { transform: translate(-50%, -50%) rotate(0deg); }
+                100% { transform: translate(-50%, -50%) rotate(360deg); }
+            }
         </style>
     </head>
     <body>
         <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex=-1></canvas>
+
         <div class="mobile-warning" id="mobile-warning">
             <h1>Uh oh!</h1>
             <p>This is not compatible with mobile devices.<br>
             Open it up on a desktop browser and try out the game!</p>
         </div>
 
-        <!-- Emscripten script is injected here -->
+        <div id="loading-wheel" class="loading-wheel"></div>
+
         <div id="emscripten-container">
             {{{ SCRIPT }}}
         </div>
@@ -71,12 +92,16 @@
                 return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.innerWidth < 768);
             }
 
+            function hideLoadingWheel() {
+                const wheel = document.getElementById('loading-wheel');
+                if (wheel) wheel.style.display = 'none';
+            }
+
             if (isMobile()) {
-                // Mobile: show warning, hide canvas
                 document.getElementById('mobile-warning').style.display = 'block';
                 document.getElementById('canvas').style.display = 'none';
 
-                // Remove Emscripten script to prevent execution
+                hideLoadingWheel();
                 document.getElementById('emscripten-container').innerHTML = '';
             }
 
@@ -85,7 +110,7 @@
 
                 var Module = {
                     preRun: [],
-                    postRun: [],
+                    postRun: [function () { hideLoadingWheel(); }],
 
                     print: function(text) {
                         if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
@@ -116,9 +141,9 @@
                         Module.setStatus(left ? 'Loading...' : '');
                     }
                 };
-                
+
                 Module.setStatus('Downloading...');
-                
+
                 window.onerror = function() {
                     Module.setStatus('Exception thrown, see JavaScript console');
                     Module.setStatus = function(text) { if (text) console.error('[post-exception status] ' + text); };

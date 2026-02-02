@@ -1,0 +1,40 @@
+# git
+.git*
+
+# Node
+node_modules
+
+*.log
+*.tmp
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Templates
+*.in
+
+# Already built outputs
+build-native
+build-wasm
+build
+out
+
+*.bak
+
+# Environments
+.vs*
+.github
+XCode
+emsdk
+
+# Demos
+demos
+
+# Docs and Markdown
+docs
+*.md
+
+# Tests
+tests
+test

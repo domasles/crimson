@@ -2,25 +2,16 @@
 
 #ifdef GAME_PLATFORM_WINDOWS
     #define GAME_API extern "C" __declspec(dllexport)
-#elif defined(GAME_PLATFORM_MACOS)
+#elif defined(GAME_PLATFORM_LINUX) || defined(GAME_PLATFORM_MACOS)
     #define GAME_API extern "C" __attribute__((visibility("default")))
-#elif defined(GAME_PLATFORM_LINUX)
-    #define GAME_API extern "C" __attribute__((visibility("default")))
-#elif defined(GAME_PLATFORM_EMSCRIPTEN)
-    #define GAME_API extern "C"
 #else
     #define GAME_API extern "C"
 #endif
 
-
 #ifdef ENGINE_PLATFORM_WINDOWS
     #define ENGINE_API extern "C" __declspec(dllexport)
-#elif defined(ENGINE_PLATFORM_MACOS)
+#elif defined(ENGINE_PLATFORM_LINUX) || defined(ENGINE_PLATFORM_MACOS)
     #define ENGINE_API extern "C" __attribute__((visibility("default")))
-#elif defined(ENGINE_PLATFORM_LINUX)
-    #define ENGINE_API extern "C" __attribute__((visibility("default")))
-#elif defined(ENGINE_PLATFORM_EMSCRIPTEN)
-    #define ENGINE_API extern "C"
 #else
     #define ENGINE_API extern "C"
 #endif
@@ -63,7 +54,8 @@ namespace engine {
 
             void updateViewport();
 
-            bool getUseOutOfBoundsColor() const { return m_UseCustomOutOfBoundsColor; }
+            bool getWindowResized() const { return m_WindowResized; }
+            bool getUseCustomOutOfBoundsColor() const { return m_UseCustomOutOfBoundsColor; }
 
             Color getBackgroundColor() const { return m_BackgroundColor; }
             Color getOutOfBoundsColor() const { return m_OutOfBoundsColor; }
@@ -74,8 +66,6 @@ namespace engine {
             Vector2 getWindowSize();
             Vector2 getTargetWindowSize() const { return Vector2{static_cast<float>(m_TargetWindowWidth), static_cast<float>(m_TargetWindowHeight)}; }
             Vector2 getLogicalWindowSize();
-
-            bool m_WindowResized = false;  // Public for WASM main loop access
 
         private:
             Core() : m_Window(nullptr, SDL_DestroyWindow) {}
@@ -105,6 +95,7 @@ namespace engine {
 
             bool m_DefaultVectorScale = true;
             bool m_VSync = true;
+            bool m_WindowResized = false;
             bool m_UseCustomOutOfBoundsColor = false;
 
             Color m_BackgroundColor{ 0.0f, 0.0f, 0.0f, 1.0f };

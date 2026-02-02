@@ -20,6 +20,11 @@ if [[ ! "$GAME_DISPLAY_NAME" =~ ^[a-zA-Z_[:space:]]+$ ]]; then
     exit 1
 fi
 
+if [[ "$GAME_DISPLAY_NAME" =~ $'\n' || "$GAME_DISPLAY_NAME" =~ $'\r' ]]; then
+    echo "Error: GAME_DISPLAY_NAME cannot contain line breaks."
+    exit 1
+fi
+
 GAME_NAME_UPPER=$(echo "$GAME_NAME" | tr '[:lower:]' '[:upper:]')
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
