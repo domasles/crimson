@@ -40,15 +40,20 @@ namespace engine {
             MIX_Mixer* getMixer() const { return m_Mixer; }
             MIX_Track* getFreeTrack();
 
-            const bool init(const std::string& workingDir, const std::string& title, const int width=800, const int height=600, const bool resizable=false);
-            const bool init(const std::string& workingDir, const std::string& title, const bool fullScreen=false);
-            const bool initInternal(const std::string& workingDir, const std::string& title, WindowMode mode, int width = 0, int height = 0, bool resizable = false);
+            const bool init(const std::string& workingDir, const std::string& title, const int width=800, const int height=600, const bool resizable=false, const bool vsync=true);
+            const bool init(const std::string& workingDir, const std::string& title, const bool fullScreen=false, const bool vsync=true);
+            const bool initInternal(const std::string& workingDir, const std::string& title, WindowMode mode, int width = 0, int height = 0, bool resizable = false, bool vsync = true);
 
             const bool processEvents();
             const std::string& getName() const { return m_ParentFolder; }
 
             void run(std::function<void()> customUpdate);
             void setBackgroundColor(const Color& color);
+
+            void setVSync(bool enabled);
+            bool getVSync() const { return m_VSync; }
+
+            void setFullscreen(bool enabled);
 
             void setVectorScale(int targetWindowWidth, int targetWindowHeight);
             void setVectorScale(bool useDefaultScale=true);
@@ -93,6 +98,7 @@ namespace engine {
             int m_FrameStart = 0;
 
             bool m_DefaultVectorScale = true;
+            bool m_VSync = true;
 
             Color m_BackgroundColor{ 0.0f, 0.0f, 0.0f, 1.0f };
 
@@ -110,8 +116,10 @@ namespace engine {
     };
 
     inline Core& getCore() { return Core::getInstance(); }
+
     inline GLRenderer* getRenderer() { return getCore().getRenderer(); }
     inline SDL_Window* getWindow() { return getCore().getWindow(); }
+
     inline Vector2 getWindowSize() { return getCore().getWindowSize(); }
     inline Vector2 getTargetWindowSize() { return getCore().getTargetWindowSize(); }
     inline Vector2 getLogicalWindowSize() { return getCore().getLogicalWindowSize(); }

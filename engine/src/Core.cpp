@@ -98,21 +98,25 @@ namespace engine {
         SDL_Quit();
     }
 
-    const bool Core::init(const std::string& workingDir, const std::string& title, const int width, const int height, const bool resizable) {
-        return initInternal(workingDir, title, WindowMode::Windowed, width, height, resizable);
+    const bool Core::init(const std::string& workingDir, const std::string& title, const int width, const int height, const bool resizable, const bool vsync) {
+        m_VSync = vsync;
+        return initInternal(workingDir, title, WindowMode::Windowed, width, height, resizable, vsync);
     }
 
-    const bool Core::init(const std::string& workingDir, const std::string& title, const bool fullScreen) {
+    const bool Core::init(const std::string& workingDir, const std::string& title, const bool fullScreen, const bool vsync) {
         if (!fullScreen) {
             Logger::engine_error("Flag 'fullscreen' must be set to true!");
             return false;
         }
 
-        return initInternal(workingDir, title, WindowMode::Fullscreen);
+        m_VSync = vsync;
+        return initInternal(workingDir, title, WindowMode::Fullscreen, 0, 0, false, vsync);
     }
 
-    const bool Core::initInternal(const std::string& workingDir, const std::string& title, WindowMode mode, int width, int height, bool resizable) {
+    const bool Core::initInternal(const std::string& workingDir, const std::string& title, WindowMode mode, int width, int height, bool resizable, bool vsync) {
         m_ParentFolder = workingDir;
+        m_VSync = vsync;
+
         SDL_SetLogPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
 
         if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
@@ -339,7 +343,7 @@ namespace engine {
         }
 
         #ifndef ENGINE_PLATFORM_EMSCRIPTEN
-            if (!SDL_GL_SetSwapInterval(1)) {
+            if (!SDL_GL_SetSwapInterval(m_VSync ? 1 : 0)) {
                 Logger::engine_warn("SDL_GL_SetSwapInterval failed: {}", SDL_GetError());
             }
         #endif
@@ -412,5 +416,26 @@ namespace engine {
             }
         }
         return m_Tracks.empty() ? nullptr : m_Tracks[0];
+    }
+
+    void Core::setVSync(bool enabled) {
+        m_VSync = enabled;
+        
+        #ifndef ENGINE_PLATFORM_EMSCRIPTEN
+            if (!SDL_GL_SetSwapInterval(m_VSync ? 1 : 0)) {
+                Logger::engine_warn("SDL_GL_SetSwapInterval failed: {}", SDL_GetError());
+            }
+        #endif
+    }
+
+    void Core::setFullscreen(bool enabled) {
+        if (!m_Window) {
+            Logger::engine_error("Cannot set fullscreen: window not initialized");
+            return;
+        }
+
+        if (!SDL_SetWindowFullscreen(m_Window.get(), enabled ? SDL_WINDOW_FULLSCREEN : 0)) {
+            Logger::engine_error("SDL_SetWindowFullscreen failed: {}", SDL_GetError());
+        }
     }
 }
