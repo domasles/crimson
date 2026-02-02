@@ -13,7 +13,12 @@ namespace engine {
         auto* transformComp = m_Entity->getComponent<TransformComponent>();
         if (!transformComp) return;
 
-        m_Texture->render(transformComp->getSize(), transformComp->getInterpolatedPosition());
+        m_Texture->render(
+            transformComp->getSize(), 
+            transformComp->getInterpolatedPosition(),
+            transformComp->getInterpolatedRotation(),
+            transformComp->getInterpolatedScale()
+        );
     }
 
     void TextureComponent::render(const SDL_FRect& cropRegion) {
@@ -25,7 +30,14 @@ namespace engine {
         Vector2 cropSize{cropRegion.w, cropRegion.h};
         Vector2 cropPosition{cropRegion.x, cropRegion.y};
 
-        m_Texture->render(transformComp->getSize(), transformComp->getInterpolatedPosition(), cropSize, cropPosition);
+        m_Texture->render(
+            transformComp->getSize(), 
+            transformComp->getInterpolatedPosition(), 
+            cropSize, 
+            cropPosition,
+            transformComp->getInterpolatedRotation(),
+            transformComp->getInterpolatedScale()
+        );
     }
 
     void TextureComponent::render(const SDL_FRect& cropRegion, const SDL_FRect& destinationRegion) {
@@ -39,7 +51,7 @@ namespace engine {
         m_Texture->render(destSize, destPosition, cropSize, cropPosition);
     }
 
-    void TextureComponent::renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color) const {
-        renderer->drawRect(position, size, color);
+    void TextureComponent::renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color, float rotation) const {
+        renderer->drawRect(position, size, color, rotation);
     }
 }

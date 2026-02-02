@@ -15,7 +15,7 @@ namespace engine::collisions::shapes {
             CollisionResult checkCollisionWithBox(const Vector2& myPos, const Vector2& mySize, const Vector2& boxPos, const Vector2& boxSize) const override;
             CollisionResult checkCollisionWithCircle(const Vector2& myPos, const Vector2& mySize, const Vector2& circlePos, const Vector2& circleSize) const override;
 
-            void renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color) const override;
+            void renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color, float rotation = 0.0f) const override;
 
             std::unique_ptr<CollisionShape> clone() const override { return std::make_unique<CircleShape>(*this); }
     };

@@ -13,8 +13,8 @@ namespace engine {
 
             const bool loadTexture(const std::string& fileName, bool linearFiltering = false);
 
-            const bool render(const Vector2& size, const Vector2& position);
-            const bool render(const Vector2& size, const Vector2& position, const Vector2& cropSize, const Vector2& cropPosition);
+            const bool render(const Vector2& size, const Vector2& position, float rotation = 0.0f, const Vector2& scale = Vector2{1.0f, 1.0f});
+            const bool render(const Vector2& size, const Vector2& position, const Vector2& cropSize, const Vector2& cropPosition, float rotation = 0.0f, const Vector2& scale = Vector2{1.0f, 1.0f});
 
             GLuint getTextureID() const { return m_TextureID; }
 

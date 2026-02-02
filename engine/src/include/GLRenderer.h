@@ -31,10 +31,10 @@ namespace engine {
             void clear(const Color& color);
             void setViewport(int x, int y, int width, int height);
 
-            void drawQuad(const Vector2& position, const Vector2& size, GLuint textureID, const Color& tint = Color(1.0f, 1.0f, 1.0f, 1.0f));
-            void drawQuad(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color tint = Color(1.0f, 1.0f, 1.0f, 1.0f));
+            void drawQuad(const Vector2& position, const Vector2& size, GLuint textureID, const Color& tint = Color(1.0f, 1.0f, 1.0f, 1.0f), float rotation = 0.0f, const Vector2& scale = Vector2{1.0f, 1.0f});
+            void drawQuad(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color tint = Color(1.0f, 1.0f, 1.0f, 1.0f), float rotation = 0.0f, const Vector2& scale = Vector2{1.0f, 1.0f});
 
-            void drawRect(const Vector2& position, const Vector2& size, const Color& color);
+            void drawRect(const Vector2& position, const Vector2& size, const Color& color, float rotation = 0.0f);
             void drawLine(const Vector2& start, const Vector2& end, const Color& color);
 
             void setProjectionMatrix(const float* matrix);
@@ -99,11 +99,11 @@ namespace engine {
             void updateUniforms();
 
             // Batching helpers
-            void addQuadToBatch(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color& tint);
+            void addQuadToBatch(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color& tint, float rotation = 0.0f, const Vector2& scale = Vector2{1.0f, 1.0f});
             void flushQuadBatch();
 
             void addLineToBatch(const Vector2& start, const Vector2& end, const Color& color);
-            void addRectToBatch(float x, float y, float w, float h, const Color& color);
+            void addRectToBatch(float x, float y, float w, float h, const Color& color, float rotation = 0.0f);
 
             void flushLineBatch();
     };

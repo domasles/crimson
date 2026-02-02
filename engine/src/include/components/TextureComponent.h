@@ -25,7 +25,7 @@ namespace engine {
             void render(const SDL_FRect& cropRegion);
             void render(const SDL_FRect& cropRegion, const SDL_FRect& destinationRegion);
             
-            void renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color) const;
+            void renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color, float rotation = 0.0f) const;
 
         private:
             std::shared_ptr<Texture> m_Texture = nullptr;

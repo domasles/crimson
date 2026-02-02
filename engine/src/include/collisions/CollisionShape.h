@@ -20,7 +20,7 @@ namespace engine::collisions {
             virtual CollisionResult checkCollisionWithBox(const Vector2& myPos, const Vector2& mySize, const Vector2& boxPos, const Vector2& boxSize) const = 0;
             virtual CollisionResult checkCollisionWithCircle(const Vector2& myPos, const Vector2& mySize, const Vector2& circlePos, const Vector2& circleSize) const = 0;
 
-            virtual void renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color) const = 0;
+            virtual void renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color, float rotation = 0.0f) const = 0;
 
             virtual std::unique_ptr<CollisionShape> clone() const = 0;
     };

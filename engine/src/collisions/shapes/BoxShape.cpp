@@ -95,7 +95,7 @@ namespace engine::collisions::shapes {
         return result;
     }
 
-    void BoxShape::renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color) const {
-        renderer->drawRect(position, size, color);
+    void BoxShape::renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color, float rotation) const {
+        renderer->drawRect(position, size, color, rotation);
     }
 }

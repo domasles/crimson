@@ -96,7 +96,7 @@ namespace engine::collisions::shapes {
         return result;
     }
 
-    void CircleShape::renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color) const {
+    void CircleShape::renderGizmo(GLRenderer* renderer, const Vector2& position, const Vector2& size, const Color& color, float rotation) const {
         const int segments = 12;
         constexpr float PI = 3.14159265359f;
 

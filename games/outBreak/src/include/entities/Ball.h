@@ -17,7 +17,7 @@ namespace outBreak {
             void setDirectionX(float sign);
             void setDirectionY(float sign);
 
-            void resetDirection() { m_Direction = Vector2{1.0f, -1.0f}.normalize(); }
+            void resetDirection();
             void resetPosition();
 
             Vector2 getInitialPosition() const { return m_InitialPosition; }
@@ -25,7 +25,10 @@ namespace outBreak {
 
         private:
             static constexpr float BALL_SIZE = 24.0f;
-            static constexpr float BALL_SPEED = 450.0f;
+            static constexpr float BALL_SPEED = 500.0f;
+            static constexpr float BALL_ROTATION_SPEED = 10.0f;
+
+            float m_RotationSpeed = 0.0f;
 
             Vector2 m_InitialPosition{ getLogicalWindowSize().getRawX()/2 - BALL_SIZE/2, 700.0f };
             Vector2 m_Direction{ Vector2{1.0f, -1.0f}.normalize() };

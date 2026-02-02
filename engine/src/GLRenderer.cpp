@@ -93,16 +93,16 @@ namespace engine {
         glViewport(x, y, width, height);
     }
 
-    void GLRenderer::drawQuad(const Vector2& position, const Vector2& size, GLuint textureID, const Color& tint) {
-        drawQuad(position, size, {0.0f, 0.0f}, {1.0f, 1.0f}, textureID, tint);
+    void GLRenderer::drawQuad(const Vector2& position, const Vector2& size, GLuint textureID, const Color& tint, float rotation, const Vector2& scale) {
+        drawQuad(position, size, {0.0f, 0.0f}, {1.0f, 1.0f}, textureID, tint, rotation, scale);
     }
 
-    void GLRenderer::drawQuad(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color tint) {
-        addQuadToBatch(position, size, texCoordMin, texCoordMax, textureID, tint);
+    void GLRenderer::drawQuad(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color tint, float rotation, const Vector2& scale) {
+        addQuadToBatch(position, size, texCoordMin, texCoordMax, textureID, tint, rotation, scale);
     }
 
-    void GLRenderer::drawRect(const Vector2& position, const Vector2& size, const Color& color) {
-        addRectToBatch(position.getX(), position.getY(), size.getX(), size.getY(), color);
+    void GLRenderer::drawRect(const Vector2& position, const Vector2& size, const Color& color, float rotation) {
+        addRectToBatch(position.getX(), position.getY(), size.getX(), size.getY(), color, rotation);
     }
 
     void GLRenderer::drawLine(const Vector2& start, const Vector2& end, const Color& color) {
@@ -257,19 +257,18 @@ namespace engine {
         }
     }
 
-    void GLRenderer::addQuadToBatch(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color& tint) {
-        // Flush if texture changes or batch is full
+    void GLRenderer::addQuadToBatch(const Vector2& position, const Vector2& size, const Vector2& texCoordMin, const Vector2& texCoordMax, GLuint textureID, const Color& tint, float rotation, const Vector2& scale) {
         if ((m_CurrentBatchTexture != textureID && m_QuadBatchCount > 0) || m_QuadBatchCount >= MAX_QUADS_PER_BATCH) {
             flushQuadBatch();
         }
 
         m_CurrentBatchTexture = textureID;
 
-        // Pre-calculate all coordinates once
+        // Pre-calculate all coordinates
         float x = position.getX();
         float y = position.getY();
-        float w = size.getX();
-        float h = size.getY();
+        float w = size.getX() * scale.getX();
+        float h = size.getY() * scale.getY();
 
         float u0 = texCoordMin.getX();
         float v0 = texCoordMin.getY();
@@ -288,24 +287,51 @@ namespace engine {
 
         uint32_t baseVertex = static_cast<uint32_t>(m_QuadBatchCount * 4);
 
-        // Vertex 0: bottom-left (x, y, u0, v0, r, g, b, a)
-        vData[0] = x;      vData[1] = y;
-        vData[2] = u0;     vData[3] = v0;
+        // Define quad corners
+        float corners[4][2] = {
+            {0.0f, 0.0f}, // bottom-left
+            {w, 0.0f},    // bottom-right
+            {w, h},       // top-right
+            {0.0f, h}     // top-left
+        };
+
+        // Apply rotation if needed
+        if (rotation != 0.0f) {
+            float rad = rotation * 3.14159265f / 180.0f;
+
+            float cosR = std::cos(rad);
+            float sinR = std::sin(rad);
+
+            float centerX = w / 2.0f;
+            float centerY = h / 2.0f;
+
+            for (int i = 0; i < 4; i++) {
+                float relX = corners[i][0] - centerX;
+                float relY = corners[i][1] - centerY;
+
+                corners[i][0] = centerX + (relX * cosR - relY * sinR);
+                corners[i][1] = centerY + (relX * sinR + relY * cosR);
+            }
+        }
+
+        // Vertex 0: bottom-left
+        vData[0] = x + corners[0][0];  vData[1] = y + corners[0][1];
+        vData[2] = u0;                  vData[3] = v0;
         vData[4] = tint.r; vData[5] = tint.g; vData[6] = tint.b; vData[7] = tint.a;
 
-        // Vertex 1: bottom-right (x+w, y, u1, v0, r, g, b, a)
-        vData[8] = x + w;  vData[9] = y;
-        vData[10] = u1;    vData[11] = v0;
+        // Vertex 1: bottom-right
+        vData[8] = x + corners[1][0];   vData[9] = y + corners[1][1];
+        vData[10] = u1;                 vData[11] = v0;
         vData[12] = tint.r; vData[13] = tint.g; vData[14] = tint.b; vData[15] = tint.a;
 
-        // Vertex 2: top-right (x+w, y+h, u1, v1, r, g, b, a)
-        vData[16] = x + w; vData[17] = y + h;
-        vData[18] = u1;    vData[19] = v1;
+        // Vertex 2: top-right
+        vData[16] = x + corners[2][0];  vData[17] = y + corners[2][1];
+        vData[18] = u1;                 vData[19] = v1;
         vData[20] = tint.r; vData[21] = tint.g; vData[22] = tint.b; vData[23] = tint.a;
 
-        // Vertex 3: top-left (x, y+h, u0, v1, r, g, b, a)
-        vData[24] = x;     vData[25] = y + h;
-        vData[26] = u0;    vData[27] = v1;
+        // Vertex 3: top-left
+        vData[24] = x + corners[3][0];  vData[25] = y + corners[3][1];
+        vData[26] = u0;                 vData[27] = v1;
         vData[28] = tint.r; vData[29] = tint.g; vData[30] = tint.b; vData[31] = tint.a;
 
         // Indices (two triangles: 0-1-2 and 2-3-0)
@@ -386,7 +412,7 @@ namespace engine {
         m_LineBatchCount++;
     }
 
-    void GLRenderer::addRectToBatch(float x, float y, float w, float h, const Color& color) {
+    void GLRenderer::addRectToBatch(float x, float y, float w, float h, const Color& color, float rotation) {
         if (m_LineBatchCount + 4 > MAX_LINES_PER_BATCH) {
             flushLineBatch();
         }
@@ -396,28 +422,52 @@ namespace engine {
 
         float* data = m_LineBatchVertices.data() + offset;
 
-        // Bottom line (x, y) → (x+w, y)
-        data[0] = x;       data[1] = y;
+        // Define rect corners (before rotation)
+        float corners[4][2] = {
+            {0.0f, 0.0f},  // bottom-left
+            {w, 0.0f},     // bottom-right
+            {w, h},        // top-right
+            {0.0f, h}      // top-left
+        };
+
+        // Apply rotation if needed
+        if (rotation != 0.0f) {
+            float rad = rotation * 3.14159265f / 180.0f;
+            float cosR = std::cos(rad);
+            float sinR = std::sin(rad);
+            float centerX = w / 2.0f;
+            float centerY = h / 2.0f;
+
+            for (int i = 0; i < 4; i++) {
+                float relX = corners[i][0] - centerX;
+                float relY = corners[i][1] - centerY;
+                corners[i][0] = centerX + (relX * cosR - relY * sinR);
+                corners[i][1] = centerY + (relX * sinR + relY * cosR);
+            }
+        }
+
+        // Bottom line: corner 0 → corner 1
+        data[0] = x + corners[0][0];  data[1] = y + corners[0][1];
         data[2] = color.r; data[3] = color.g; data[4] = color.b; data[5] = color.a;
-        data[6] = x + w;   data[7] = y;
+        data[6] = x + corners[1][0];  data[7] = y + corners[1][1];
         data[8] = color.r; data[9] = color.g; data[10] = color.b; data[11] = color.a;
 
-        // Right line (x+w, y) → (x+w, y+h)
-        data[12] = x + w;  data[13] = y;
+        // Right line: corner 1 → corner 2
+        data[12] = x + corners[1][0]; data[13] = y + corners[1][1];
         data[14] = color.r; data[15] = color.g; data[16] = color.b; data[17] = color.a;
-        data[18] = x + w;  data[19] = y + h;
+        data[18] = x + corners[2][0]; data[19] = y + corners[2][1];
         data[20] = color.r; data[21] = color.g; data[22] = color.b; data[23] = color.a;
 
-        // Top line (x+w, y+h) → (x, y+h)
-        data[24] = x + w;  data[25] = y + h;
+        // Top line: corner 2 → corner 3
+        data[24] = x + corners[2][0]; data[25] = y + corners[2][1];
         data[26] = color.r; data[27] = color.g; data[28] = color.b; data[29] = color.a;
-        data[30] = x;      data[31] = y + h;
+        data[30] = x + corners[3][0]; data[31] = y + corners[3][1];
         data[32] = color.r; data[33] = color.g; data[34] = color.b; data[35] = color.a;
 
-        // Left line (x, y+h) → (x, y)
-        data[36] = x;      data[37] = y + h;
+        // Left line: corner 3 → corner 0
+        data[36] = x + corners[3][0]; data[37] = y + corners[3][1];
         data[38] = color.r; data[39] = color.g; data[40] = color.b; data[41] = color.a;
-        data[42] = x;      data[43] = y;
+        data[42] = x + corners[0][0]; data[43] = y + corners[0][1];
         data[44] = color.r; data[45] = color.g; data[46] = color.b; data[47] = color.a;
 
         m_LineBatchCount += 4;

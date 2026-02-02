@@ -71,6 +71,7 @@ namespace engine {
 
             Vector2 position = transform->getPosition();
             Vector2 size = transform->getSize();
+            float rotation = transform->getRotation();
 
             // Quick AABB viewport culling - skip if completely off-screen
             if (position.getRawX() + size.getRawX() < 0 || position.getRawX() > viewportMaxX ||
@@ -91,7 +92,7 @@ namespace engine {
                         const CollisionShape* shape = collision->getCollisionShape();
 
                         if (shape) {
-                            shape->renderGizmo(renderer, collisionPos, collisionSize, red);
+                            shape->renderGizmo(renderer, collisionPos, collisionSize, red, rotation);
                         }
                     }
                 }
@@ -102,7 +103,7 @@ namespace engine {
         
                     if (texture && texture->hasTexture()) {
                         Color green{0.0f, 1.0f, 0.0f, 1.0f}; // Green for textures
-                        texture->renderGizmo(renderer, position, size, green);
+                        texture->renderGizmo(renderer, position, size, green, rotation);
                     }
                 }
             #endif

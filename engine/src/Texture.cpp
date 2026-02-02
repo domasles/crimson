@@ -17,19 +17,19 @@ namespace engine {
         }
     }
 
-    const bool Texture::render(const Vector2& size, const Vector2& position) {
+    const bool Texture::render(const Vector2& size, const Vector2& position, float rotation, const Vector2& scale) {
         if (m_TextureID == 0) {
             Logger::engine_error("Texture not loaded");
             return false;
         }
 
-        Core::getInstance().getRenderer()->drawQuad(position, size, m_TextureID);
+        Core::getInstance().getRenderer()->drawQuad(position, size, m_TextureID, Color(1.0f, 1.0f, 1.0f, 1.0f), rotation, scale);
         return true;
     }
 
-    const bool Texture::render(const Vector2& size, const Vector2& position, const Vector2& cropSize, const Vector2& cropPosition) {
+    const bool Texture::render(const Vector2& size, const Vector2& position, const Vector2& cropSize, const Vector2& cropPosition, float rotation, const Vector2& scale) {
         if (cropSize == Vector2{ 0.0f, 0.0f }) {
-            return render(size, position);
+            return render(size, position, rotation, scale);
         }
 
         if (m_TextureID == 0) {
@@ -42,7 +42,7 @@ namespace engine {
         float u1 = (cropPosition.getRawX() + cropSize.getRawX()) / static_cast<float>(m_Width);
         float v1 = (cropPosition.getRawY() + cropSize.getRawY()) / static_cast<float>(m_Height);
 
-        Core::getInstance().getRenderer()->drawQuad(position, size, Vector2{u0, v0}, Vector2{u1, v1}, m_TextureID);
+        Core::getInstance().getRenderer()->drawQuad(position, size, Vector2{u0, v0}, Vector2{u1, v1}, m_TextureID, Color(1.0f, 1.0f, 1.0f, 1.0f), rotation, scale);
         return true;
     }
 
