@@ -45,14 +45,14 @@ namespace outBreak {
 
             if (nextPos.getRawX() < 0.0f) {
                 nextPos = Vector2{ 0.0f, nextPos.getRawY() };
-                movement = Vector2{ 0.0f, movement.getRawY() };
-            }
-            else if (nextPos.getRawX() + paddleWidth > game_width) {
-                nextPos = Vector2{ game_width - paddleWidth, nextPos.getRawY() };
-                movement = Vector2{ 0.0f, movement.getRawY() };
             }
 
-            transform->move(movement);
+            else if (nextPos.getRawX() + paddleWidth > game_width) {
+                nextPos = Vector2{ game_width - paddleWidth, nextPos.getRawY() };
+            }
+
+            Vector2 actualMovement = nextPos - currentPos;
+            transform->move(actualMovement);
         }
     }
 
