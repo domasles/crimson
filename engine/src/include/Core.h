@@ -50,6 +50,9 @@ namespace engine {
             void run(std::function<void()> customUpdate);
             void setBackgroundColor(const Color& color);
 
+            void setOutOfBoundsColor(bool custom);
+            void setOutOfBoundsColor(bool custom, const Color& color);
+
             void setVSync(bool enabled);
             bool getVSync() const { return m_VSync; }
 
@@ -60,7 +63,10 @@ namespace engine {
 
             void updateViewport();
 
+            bool getUseOutOfBoundsColor() const { return m_UseCustomOutOfBoundsColor; }
+
             Color getBackgroundColor() const { return m_BackgroundColor; }
+            Color getOutOfBoundsColor() const { return m_OutOfBoundsColor; }
 
             GLRenderer* getRenderer() const;
             SDL_Window* getWindow() const;
@@ -99,8 +105,10 @@ namespace engine {
 
             bool m_DefaultVectorScale = true;
             bool m_VSync = true;
+            bool m_UseCustomOutOfBoundsColor = false;
 
             Color m_BackgroundColor{ 0.0f, 0.0f, 0.0f, 1.0f };
+            Color m_OutOfBoundsColor{ 0.0f, 0.0f, 0.0f, 1.0f };
 
             std::string m_ParentFolder;
 

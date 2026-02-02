@@ -26,11 +26,22 @@ using namespace engine;
             return;
         }
 
-        core.getRenderer()->clear(getCore().getBackgroundColor());
+        if (core.m_UseCustomOutOfBoundsColor) {
+            int windowWidth, windowHeight;
+            SDL_GetWindowSize(core.m_Window.get(), &windowWidth, &windowHeight);
+
+            glDisable(GL_SCISSOR_TEST);
+            glViewport(0, 0, windowWidth, windowHeight);
+
+            core.getRenderer()->clear(core.m_OutOfBoundsColor);
+            core.updateViewport();
+        }
 
         if (core.m_WindowResized) {
             core.updateViewport();
         }
+
+        core.getRenderer()->clear(getCore().getBackgroundColor());
 
         if (s_WASMUpdate) {
             s_WASMUpdate();
@@ -232,11 +243,22 @@ namespace engine {
             emscripten_set_main_loop(emscripten_main_loop, 0, 1);
         #else
             while (processEvents()) {
-                m_Renderer->clear(m_BackgroundColor);
+                if (m_UseCustomOutOfBoundsColor) {
+                    int windowWidth, windowHeight;
+                    SDL_GetWindowSize(m_Window.get(), &windowWidth, &windowHeight);
+
+                    glDisable(GL_SCISSOR_TEST);
+                    glViewport(0, 0, windowWidth, windowHeight);
+
+                    m_Renderer->clear(m_OutOfBoundsColor);
+                    updateViewport();
+                }
 
                 if (m_WindowResized) {
                     updateViewport();
                 }
+
+                m_Renderer->clear(m_BackgroundColor);
 
                 if (customUpdate) {
                     customUpdate();
@@ -263,6 +285,15 @@ namespace engine {
 
     void Core::setBackgroundColor(const Color& color) {
         m_BackgroundColor = color;
+    }
+
+    void Core::setOutOfBoundsColor(bool custom) {
+        m_UseCustomOutOfBoundsColor = custom;
+    }
+
+    void Core::setOutOfBoundsColor(bool custom, const Color& color) {
+        m_UseCustomOutOfBoundsColor = custom;
+        m_OutOfBoundsColor = color;
     }
 
     void Core::setVectorScale(int targetWindowWidth, int targetWindowHeight) {

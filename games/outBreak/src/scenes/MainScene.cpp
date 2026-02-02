@@ -15,6 +15,9 @@ namespace outBreak {
             getInputSystem()->loadInputActions("InputActions.json");
         }
 
+        getCore().setBackgroundColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
+        getCore().setOutOfBoundsColor(true, Color(0.0f, 0.0f, 0.0f, 1.0f));
+
         m_Ball = createEntity<Ball>();
         m_Paddle = createEntity<Paddle>();
         m_GameManager = createEntity<GameManager>();

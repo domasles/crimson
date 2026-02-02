@@ -6,6 +6,7 @@
 #include <rendering/RenderConstants.h>
 
 #include <GLRenderer.h>
+#include <Core.h>
 
 using namespace engine::rendering;
 using namespace engine::utils::logger;
@@ -89,6 +90,8 @@ namespace engine {
 
     void GLRenderer::setViewport(int x, int y, int width, int height) {
         glViewport(x, y, width, height);
+        glEnable(GL_SCISSOR_TEST);
+        glScissor(x, y, width, height);
     }
 
     void GLRenderer::drawQuad(const Vector2& position, const Vector2& size, GLuint textureID, const Color& tint, float rotation, const Vector2& scale) {
