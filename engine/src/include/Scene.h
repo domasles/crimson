@@ -132,6 +132,10 @@ namespace engine {
             std::string m_FallbackCurrentSceneText = "No active scene!";
 
             uint64_t m_LastFrameTime;
+            float m_PhysicsAccumulator = 0.0f;
+
+            static constexpr float FIXED_TIMESTEP = 1.0f / 60.0f;
+            static constexpr float MAX_DELTA_TIME = 0.25f;
     };
 
     inline SceneManager& getSceneManager() {

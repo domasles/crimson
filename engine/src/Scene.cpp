@@ -72,7 +72,7 @@ namespace engine {
 
     const bool SceneManager::update() {
         uint64_t currentTime = SDL_GetTicksNS();
-        float deltaTime = (currentTime - m_LastFrameTime) / 1'000'000'000.0f;
+        float rawDeltaTime = (currentTime - m_LastFrameTime) / 1'000'000'000.0f;
         m_LastFrameTime = currentTime;
 
         if (!m_CurrentScene) {
@@ -80,7 +80,14 @@ namespace engine {
             return false;
         }
 
-        m_CurrentScene->update(deltaTime);
+        float cappedDeltaTime = std::min(rawDeltaTime, MAX_DELTA_TIME);
+        m_PhysicsAccumulator += cappedDeltaTime;
+
+        while (m_PhysicsAccumulator >= FIXED_TIMESTEP) {
+            m_CurrentScene->update(FIXED_TIMESTEP);
+            m_PhysicsAccumulator -= FIXED_TIMESTEP;
+        }
+        
         return true;
     }
 
