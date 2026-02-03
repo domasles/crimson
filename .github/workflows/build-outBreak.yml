@@ -57,7 +57,7 @@ jobs:
       - name: Build and push OutBreak Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./games/outBreak/docker
+          context: ./
           file: ./games/outBreak/docker/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
