@@ -1,8 +1,5 @@
 #pragma once
 
-#include <array>
-#include <cstdint>
-
 #include <utils/math.h>
 #include <utils/rendering.h>
 

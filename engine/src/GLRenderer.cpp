@@ -23,7 +23,7 @@ namespace engine {
             return true;
         }
 
-        #ifdef ENGINE_PLATFORM_WINDOWS
+        #ifndef ENGINE_PLATFORM_EMSCRIPTEN
             if (!gladLoadGLES2Loader((GLADloadproc)SDL_GL_GetProcAddress)) {
                 Logger::engine_error("Failed to initialize GLAD");
                 return false;

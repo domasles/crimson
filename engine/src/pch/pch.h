@@ -33,7 +33,9 @@
 #include <cmath>
 
 #include <functional>
+#include <cstdint>
 #include <chrono>
 #include <ranges>
+#include <array>
 #include <deque>
 #include <queue>
