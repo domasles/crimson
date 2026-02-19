@@ -69,9 +69,10 @@ namespace engine {
             auto* transform = entity->getComponent<TransformComponent>();
             if (!transform) continue;
 
-            Vector2 position = transform->getPosition();
-            Vector2 size = transform->getSize();
-            float rotation = transform->getRotation();
+            Vector2 position = transform->getInterpolatedPosition();
+            Vector2 size = transform->getInterpolatedSize();
+
+            float rotation = transform->getInterpolatedRotation();
 
             // Quick AABB viewport culling - skip if completely off-screen
             if (position.getRawX() + size.getRawX() < 0 || position.getRawX() > viewportMaxX ||
