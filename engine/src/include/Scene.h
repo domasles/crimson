@@ -18,6 +18,10 @@ namespace engine {
             virtual void update(float deltaTime) = 0;
             virtual void render() = 0;
 
+            virtual void onEnter(bool resumed) {}
+            virtual void onExit() {}
+            virtual void reset();
+
             virtual void prepareRender(float alpha);
 
             void setInitialized(bool value) { m_Initialized = value; }
@@ -118,12 +122,12 @@ namespace engine {
         public:
             static SceneManager& getInstance();
 
-            const bool registerScene(const std::string& name, std::shared_ptr<Scene> scene);
-            const bool unregisterScene(const std::string& name);
-            const bool changeScene(const std::string& name);
+            bool registerScene(const std::string& name, std::shared_ptr<Scene> scene);
+            bool unregisterScene(const std::string& name);
+            bool changeScene(const std::string& name);
 
-            const bool update();
-            const bool render();
+            bool update();
+            bool render();
 
             // Prepare entities for rendering with interpolation
             void prepareRender() {
@@ -144,12 +148,15 @@ namespace engine {
             SceneManager(const SceneManager&) = delete;
             SceneManager& operator=(const SceneManager&) = delete;
 
+            void applyPendingSwitch();
+
             std::unordered_map<std::string, std::shared_ptr<Scene>> m_Scenes;
 
             std::shared_ptr<Scene> m_CurrentScene;
             std::shared_ptr<Scene> m_PreviousScene;
 
             std::string m_FallbackCurrentSceneText = "No active scene!";
+            std::string m_PendingSceneName;
 
             uint64_t m_LastFrameTime;
             float m_PhysicsAccumulator = 0.0f;

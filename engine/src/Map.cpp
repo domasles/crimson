@@ -84,7 +84,7 @@ namespace engine {
         RenderQueueManager::getInstance().render(textureQueue);
     }
 
-    const bool Map::loadTilesets() {
+    bool Map::loadTilesets() {
         for (const auto& tileset : m_JsonFile["defs"]["tilesets"]) {
             const std::string& fullRelPath = m_WorkingDir + "/" + (std::string)tileset["relPath"];
 
@@ -158,7 +158,7 @@ namespace engine {
         return Vector2{ 0.0f, 0.0f };
     }
     
-    const bool Map::validateMapStructure() const {
+    bool Map::validateMapStructure() const {
         std::string relativePath = m_WorkingDir + "/" + m_FileName;
         if (relativePath.find("assets/") == 0) {
             relativePath = relativePath.substr(7);

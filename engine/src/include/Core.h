@@ -31,11 +31,11 @@ namespace engine {
             MIX_Mixer* getMixer() const { return m_Mixer; }
             MIX_Track* getFreeTrack();
 
-            const bool init(const std::string& workingDir, const std::string& title, const int width=800, const int height=600, const bool resizable=false, const bool vsync=true);
-            const bool init(const std::string& workingDir, const std::string& title, const bool fullScreen=false, const bool vsync=true);
-            const bool initInternal(const std::string& workingDir, const std::string& title, WindowMode mode, int width = 0, int height = 0, bool resizable = false, bool vsync = true);
+            bool init(const std::string& workingDir, const std::string& title, const int width=800, const int height=600, const bool resizable=false, const bool vsync=true);
+            bool init(const std::string& workingDir, const std::string& title, const bool fullScreen=false, const bool vsync=true);
+            bool initInternal(const std::string& workingDir, const std::string& title, WindowMode mode, int width = 0, int height = 0, bool resizable = false, bool vsync = true);
 
-            const bool processEvents();
+            bool processEvents();
             const std::string& getName() const { return m_ParentFolder; }
 
             void run(std::function<void()> customUpdate);
@@ -89,10 +89,6 @@ namespace engine {
             int m_TargetWindowWidth = 0;
             int m_TargetWindowHeight = 0;
 
-            int m_FrameDelay = 0;
-            int m_FrameTime = 0;
-            int m_FrameStart = 0;
-
             bool m_DefaultVectorScale = true;
             bool m_VSync = true;
             bool m_WindowResized = false;
@@ -108,8 +104,6 @@ namespace engine {
 
             SDL_GLContext m_GLContext = nullptr;
 
-            std::queue<SDL_Event> m_EventQueue;
-            
             MIX_Mixer* m_Mixer = nullptr;
             std::vector<MIX_Track*> m_Tracks;
     };

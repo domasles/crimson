@@ -17,7 +17,7 @@ namespace engine {
         }
     }
 
-    const bool Sound::loadSound(const std::string& fileName) {
+    bool Sound::loadSound(const std::string& fileName) {
         std::string filePath = getGamePath() + "/" + m_WorkingDir + "/" + fileName;
         MIX_Mixer* mixer = Core::getInstance().getMixer();
 
@@ -43,7 +43,7 @@ namespace engine {
         return true;
     }
 
-    const bool Sound::play(int loops) {
+    bool Sound::play(int loops) {
         if (!m_Audio) {
             Logger::engine_error("Sound not loaded!");
             return false;

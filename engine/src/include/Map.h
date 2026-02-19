@@ -50,8 +50,8 @@ namespace engine {
             bool hasCollisionData() const { return !m_MapTiles.empty(); }
         
         private:
-            const bool loadTilesets();
-            const bool validateMapStructure() const;
+            bool loadTilesets();
+            bool validateMapStructure() const;
 
             float m_MinTileSize = 0.0f;
 

@@ -17,7 +17,7 @@ namespace engine {
         }
     }
 
-    const bool Texture::render(const Vector2& size, const Vector2& position, float rotation, const Vector2& scale) {
+    bool Texture::render(const Vector2& size, const Vector2& position, float rotation, const Vector2& scale) {
         if (m_TextureID == 0) {
             Logger::engine_error("Texture not loaded");
             return false;
@@ -27,7 +27,7 @@ namespace engine {
         return true;
     }
 
-    const bool Texture::render(const Vector2& size, const Vector2& position, const Vector2& cropSize, const Vector2& cropPosition, float rotation, const Vector2& scale) {
+    bool Texture::render(const Vector2& size, const Vector2& position, const Vector2& cropSize, const Vector2& cropPosition, float rotation, const Vector2& scale) {
         if (cropSize == Vector2{ 0.0f, 0.0f }) {
             return render(size, position, rotation, scale);
         }
@@ -46,7 +46,7 @@ namespace engine {
         return true;
     }
 
-    const bool Texture::loadTexture(const std::string& fileName, bool linearFiltering) {
+    bool Texture::loadTexture(const std::string& fileName, bool linearFiltering) {
         const std::string& filePath = getGamePath() + "/" + m_WorkingDir + "/" + fileName;
 
         SDL_Surface* surface = IMG_Load(filePath.c_str());

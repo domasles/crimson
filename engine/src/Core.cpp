@@ -109,12 +109,12 @@ namespace engine {
         SDL_Quit();
     }
 
-    const bool Core::init(const std::string& workingDir, const std::string& title, const int width, const int height, const bool resizable, const bool vsync) {
+    bool Core::init(const std::string& workingDir, const std::string& title, const int width, const int height, const bool resizable, const bool vsync) {
         m_VSync = vsync;
         return initInternal(workingDir, title, WindowMode::Windowed, width, height, resizable, vsync);
     }
 
-    const bool Core::init(const std::string& workingDir, const std::string& title, const bool fullScreen, const bool vsync) {
+    bool Core::init(const std::string& workingDir, const std::string& title, const bool fullScreen, const bool vsync) {
         if (!fullScreen) {
             Logger::engine_error("Flag 'fullscreen' must be set to true!");
             return false;
@@ -124,7 +124,7 @@ namespace engine {
         return initInternal(workingDir, title, WindowMode::Fullscreen, 0, 0, false, vsync);
     }
 
-    const bool Core::initInternal(const std::string& workingDir, const std::string& title, WindowMode mode, int width, int height, bool resizable, bool vsync) {
+    bool Core::initInternal(const std::string& workingDir, const std::string& title, WindowMode mode, int width, int height, bool resizable, bool vsync) {
         m_ParentFolder = workingDir;
         m_VSync = vsync;
 
@@ -213,23 +213,16 @@ namespace engine {
         return true;
     }
 
-    const bool Core::processEvents() {
+    bool Core::processEvents() {
         SDL_Event event;
         m_WindowResized = false;
 
         while (SDL_PollEvent(&event)) {
-            m_EventQueue.push(event);
-        }
-
-        while (!m_EventQueue.empty()) {
-            SDL_Event e = m_EventQueue.front();
-            m_EventQueue.pop();
-
-            if (e.type == SDL_EVENT_QUIT) {
+            if (event.type == SDL_EVENT_QUIT) {
                 return false;
             }
 
-            if (e.type == SDL_EVENT_WINDOW_RESIZED) {
+            if (event.type == SDL_EVENT_WINDOW_RESIZED) {
                 m_WindowResized = true;
             }
         }

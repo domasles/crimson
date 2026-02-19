@@ -44,6 +44,14 @@ namespace engine {
         m_Entities.erase(std::remove_if(m_Entities.begin(), m_Entities.end(), [entity](const auto& ptr) { return ptr.get() == entity; }), m_Entities.end());
     }
 
+    void Scene::reset() {
+        m_Entities.clear();
+        m_BVH.clear();
+        m_CollisionComponents.clear();
+        m_CollisionCacheDirty = true;
+        m_Initialized = false;
+    }
+
     void Scene::rebuildBVH() {
         if (m_CollisionCacheDirty) {
             m_CollisionComponents.clear();
@@ -83,7 +91,7 @@ namespace engine {
         return fallbackInstance;
     }
 
-    const bool SceneManager::registerScene(const std::string& name, std::shared_ptr<Scene> scene) {
+    bool SceneManager::registerScene(const std::string& name, std::shared_ptr<Scene> scene) {
         if (!scene) {
             Logger::engine_error("Cannot register scene: Scene pointer is null!");
             return false;
@@ -99,7 +107,7 @@ namespace engine {
         return true;
     }
 
-    const bool SceneManager::unregisterScene(const std::string& name) {
+    bool SceneManager::unregisterScene(const std::string& name) {
         auto it = m_Scenes.find(name);
 
         if (it == m_Scenes.end()) {
@@ -111,31 +119,48 @@ namespace engine {
         return true;
     }
 
-    const bool SceneManager::changeScene(const std::string& name) {
-        auto sceneIt = m_Scenes.find(name);
-
-        if (sceneIt == m_Scenes.end()) {
+    bool SceneManager::changeScene(const std::string& name) {
+        if (m_Scenes.find(name) == m_Scenes.end()) {
             Logger::engine_error("Scene {} not found!", name);
             return false;
         }
 
-        auto newScene = sceneIt->second;
+        m_PendingSceneName = name;
+        return true;
+    }
+
+    void SceneManager::applyPendingSwitch() {
+        auto newScene = m_Scenes.at(m_PendingSceneName);
+
+        if (m_CurrentScene) {
+            m_CurrentScene->onExit();
+        }
 
         m_PreviousScene = m_CurrentScene;
         m_CurrentScene = newScene;
 
-        if (!newScene->getInitialized()) {
+        bool resumed = newScene->getInitialized();
+
+        if (!resumed) {
             newScene->setInitialized(true);
             newScene->init();
         }
 
-        return true;
+        newScene->onEnter(resumed);
     }
 
-    const bool SceneManager::update() {
+    bool SceneManager::update() {
         uint64_t currentTime = SDL_GetTicksNS();
         float rawDeltaTime = (currentTime - m_LastFrameTime) / 1'000'000'000.0f;
         m_LastFrameTime = currentTime;
+
+        if (!m_PendingSceneName.empty()) {
+            applyPendingSwitch();
+
+            m_PendingSceneName.clear();
+            m_PhysicsAccumulator = 0;
+            m_LastFrameTime = SDL_GetTicksNS();
+        }
 
         if (!m_CurrentScene) {
             Logger::engine_error("No current scene is found or selected!");
@@ -155,7 +180,7 @@ namespace engine {
         return true;
     }
 
-    const bool SceneManager::render() {
+    bool SceneManager::render() {
         if (!m_CurrentScene) {
             Logger::engine_error("No current scene is found or selected!");
             return false;
