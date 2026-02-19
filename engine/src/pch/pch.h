@@ -28,6 +28,7 @@
 #include <format>
 #include <string>
 
+#include <algorithm>
 #include <random>
 #include <vector>
 #include <cmath>

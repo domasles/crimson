@@ -5,6 +5,10 @@
 #include <Core.h>
 #include <Map.h>
 
+#include <collisions/BVH.h>
+
+using namespace engine::collisions;
+
 namespace engine {
     class Scene {
         public:
@@ -83,6 +87,11 @@ namespace engine {
             InputSystem* getInputSystem() { return m_InputSystem.get(); }
             const InputSystem* getInputSystem() const { return m_InputSystem.get(); }
 
+            void rebuildBVH();
+
+            BVH& getBVH() { return m_BVH; }
+            const BVH& getBVH() const { return m_BVH; }
+
         protected:
             bool m_Initialized = false;
             std::string m_Name;
@@ -91,6 +100,8 @@ namespace engine {
 
             std::unique_ptr<Map> m_Map;
             std::unique_ptr<InputSystem> m_InputSystem;
+
+            BVH m_BVH;
 
             void updateEntities(float deltaTime) {
                 for (auto& entity : m_Entities) {

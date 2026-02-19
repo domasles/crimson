@@ -1,6 +1,7 @@
 #include <pch.h>
 
 #include <utils/logger.h>
+#include <utils/gjk.h>
 
 #include <components/CollisionComponent.h>
 #include <components/TransformComponent.h>
@@ -42,7 +43,8 @@ namespace engine {
     CollisionResult CollisionComponent::testCollisionAt(const Vector2& testPosition) const {
         if (!m_Enabled) return CollisionResult{};
 
-        auto otherEntities = getOtherCollisionEntities();
+        auto otherEntities = getOtherCollisionEntities(testPosition);
+
         for (auto* otherEntity : otherEntities) {
             auto* otherCollision = otherEntity->getComponent<CollisionComponent>();
             if (!otherCollision || !otherCollision->isEnabled()) continue;
@@ -71,8 +73,8 @@ namespace engine {
 
         Vector2 otherWorldPos = otherCollision->getCollisionWorldPosition();
 
-        auto collisionResult = m_Collision.shape->checkCollision(
-            myWorldPos, m_Collision.size,
+        auto collisionResult = engine::utils::gjk::test(
+            *m_Collision.shape, myWorldPos, m_Collision.size,
             *otherCollision->getCollision().shape,
             otherWorldPos, otherCollision->getCollision().size
         );
@@ -92,7 +94,7 @@ namespace engine {
         MultiCollisionResult result;
         
         if (!m_Enabled) return result;
-        auto otherEntities = getOtherCollisionEntities();
+        auto otherEntities = getOtherCollisionEntities(testPosition);
 
         for (auto* otherEntity : otherEntities) {
             CollisionResult entityCollision = checkCollisionWithEntityAt(otherEntity, testPosition);
@@ -128,21 +130,32 @@ namespace engine {
         return { worldPos.getRawX() + m_Collision.offset.getRawX(), worldPos.getRawY() + m_Collision.offset.getRawY() };
     }
 
-    std::vector<Entity*> CollisionComponent::getOtherCollisionEntities() const {
+    std::vector<Entity*> CollisionComponent::getOtherCollisionEntities(const Vector2& testPosition) const {
         auto& sceneManager = getSceneManager();
         auto currentScene = sceneManager.getCurrentScene();
 
         if (!currentScene) return {};
 
-        auto collisionComponents = currentScene->getEntitiesWithComponent<CollisionComponent>();
+        Vector2 worldPos = {
+            testPosition.getRawX() + m_Collision.offset.getRawX(),
+            testPosition.getRawY() + m_Collision.offset.getRawY()
+        };
+
+        AABB queryAABB = m_Collision.shape->getBoundingBox(worldPos, m_Collision.size);
+
+        thread_local static std::vector<CollisionComponent*> s_candidates;
+
+        s_candidates.clear();
+        currentScene->getBVH().query(queryAABB, s_candidates);
+
         std::vector<Entity*> otherEntities;
+        otherEntities.reserve(s_candidates.size());
 
-        for (auto* otherCollision : collisionComponents) {
-            if (otherCollision == this) continue;
-            if (!otherCollision->isEnabled()) continue;
+        for (auto* candidate : s_candidates) {
+            if (candidate == this || !candidate->isEnabled()) continue;
 
-            if (otherCollision->getParticipatesInQueries() || (otherCollision->getCollisionType() && otherCollision->getCollisionType()->shouldBlock())) {
-                otherEntities.push_back(otherCollision->getEntity());
+            if (candidate->getParticipatesInQueries() || (candidate->getCollisionType() && candidate->getCollisionType()->shouldBlock())) {
+                otherEntities.push_back(candidate->getEntity());
             }
         }
 

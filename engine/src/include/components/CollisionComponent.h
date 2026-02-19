@@ -41,6 +41,7 @@ namespace engine {
             CollisionResult testCollisionAt(const Vector2& testPosition) const;
             CollisionResult checkCollisionWithEntity(Entity* other) const;
             CollisionResult checkCollisionWithEntityAt(Entity* other, const Vector2& testPosition) const;
+
             MultiCollisionResult getAllCollisionsAt(const Vector2& testPosition) const;
 
             Vector2 getWorldPosition() const;
@@ -56,6 +57,6 @@ namespace engine {
             void updateFromTransform();
 
             Collision m_Collision;
-            std::vector<Entity*> getOtherCollisionEntities() const;
+            std::vector<Entity*> getOtherCollisionEntities(const Vector2& testPosition) const;
     };
 }

@@ -106,54 +106,49 @@ namespace outBreak {
         Vector2 ballPos = ballTransform->getPosition();
         Vector2 ballSize = ballTransform->getSize();
 
-        for (auto* brick : m_Bricks) {
+        MultiCollisionResult allCollisions = ballCollision->getAllCollisionsAt(ballPos);
+
+        for (const auto& collision : allCollisions.collisions) {
+            auto* brick = dynamic_cast<Brick*>(collision.hitEntity);
             if (!brick || brick->isDestroyed()) continue;
 
-            CollisionResult collision = ballCollision->checkCollisionWithEntity(brick);
-            
-            if (collision.hasCollision) {
-                brick->setDestroyed(true);
+            brick->setDestroyed(true);
 
-                auto* brickTransform = brick->getComponent<TransformComponent>();
+            auto* brickTransform = brick->getComponent<TransformComponent>();
 
-                Vector2 brickPos = brickTransform->getPosition();
-                Vector2 brickSize = brickTransform->getSize();
-                Vector2 normal = collision.contactNormal;
-                
-                // Set absolute direction based on collision normal
-                if (std::abs(normal.getRawX()) > std::abs(normal.getRawY())) {
-                    // Horizontal collision - set X direction based on normal
-                    m_Ball->setDirectionX(normal.getRawX() > 0 ? 1.0f : -1.0f);
+            Vector2 brickPos = brickTransform->getPosition();
+            Vector2 brickSize = brickTransform->getSize();
+            Vector2 normal = collision.contactNormal;
 
-                    if (normal.getRawX() > 0) {
-                        ballPos = Vector2{ brickPos.getRawX() + brickSize.getRawX() + 5.0f, ballPos.getRawY() };
-                    }
+            if (std::abs(normal.getRawX()) > std::abs(normal.getRawY())) {
+                m_Ball->setDirectionX(normal.getRawX() > 0 ? 1.0f : -1.0f);
 
-                    else {
-                        ballPos = Vector2{ brickPos.getRawX() - ballSize.getRawX() - 5.0f, ballPos.getRawY() };
-                    }
+                if (normal.getRawX() > 0) {
+                    ballPos = Vector2{ brickPos.getRawX() + brickSize.getRawX() + 5.0f, ballPos.getRawY() };
                 }
 
                 else {
-                    // Vertical collision - set Y direction based on normal
-                    m_Ball->setDirectionY(normal.getRawY() > 0 ? 1.0f : -1.0f);
+                    ballPos = Vector2{ brickPos.getRawX() - ballSize.getRawX() - 5.0f, ballPos.getRawY() };
+                }
+            }
 
-                    if (normal.getRawY() > 0) {
-                        ballPos = Vector2{ ballPos.getRawX(), brickPos.getRawY() + brickSize.getRawY() + 5.0f };
-                    }
+            else {
+                m_Ball->setDirectionY(normal.getRawY() > 0 ? 1.0f : -1.0f);
 
-                    else {
-                        ballPos = Vector2{ ballPos.getRawX(), brickPos.getRawY() - ballSize.getRawY() - 5.0f };
-                    }
+                if (normal.getRawY() > 0) {
+                    ballPos = Vector2{ ballPos.getRawX(), brickPos.getRawY() + brickSize.getRawY() + 5.0f };
                 }
 
-                ballTransform->setPosition(ballPos);
-
-                // Trigger wave effect from this brick's center position
-                Vector2 brickCenter = brick->getPosition() + Vector2{ 25.0f, 15.0f };
-                triggerWaveEffect(brickCenter);
-                break; // Only handle one collision per frame
+                else {
+                    ballPos = Vector2{ ballPos.getRawX(), brickPos.getRawY() - ballSize.getRawY() - 5.0f };
+                }
             }
+
+            ballTransform->setPosition(ballPos);
+
+            Vector2 brickCenter = brick->getPosition() + Vector2{ 25.0f, 15.0f };
+            triggerWaveEffect(brickCenter);
+            break;
         }
     }
 

@@ -50,4 +50,33 @@ namespace engine::utils::math {
         public:
             static float lerpAngle(float from, float to, float alpha);
     };
+
+    struct AABB {
+        Vector2 min{0.0f, 0.0f};
+        Vector2 max{0.0f, 0.0f};
+
+        bool overlaps(const AABB& other) const {
+            return min.getRawX() < other.max.getRawX() &&
+                   max.getRawX() > other.min.getRawX() &&
+                   min.getRawY() < other.max.getRawY() &&
+                   max.getRawY() > other.min.getRawY();
+        }
+
+        AABB merge(const AABB& other) const {
+            float minX = min.getRawX() < other.min.getRawX() ? min.getRawX() : other.min.getRawX();
+            float minY = min.getRawY() < other.min.getRawY() ? min.getRawY() : other.min.getRawY();
+            float maxX = max.getRawX() > other.max.getRawX() ? max.getRawX() : other.max.getRawX();
+            float maxY = max.getRawY() > other.max.getRawY() ? max.getRawY() : other.max.getRawY();
+
+            return AABB{Vector2{minX, minY}, Vector2{maxX, maxY}};
+        }
+
+        float area() const {
+            float w = max.getRawX() - min.getRawX();
+            float h = max.getRawY() - min.getRawY();
+
+            return w * h;
+        }
+    };
+
 }

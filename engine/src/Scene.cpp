@@ -3,6 +3,7 @@
 #include <utils/logger.h>
 
 #include <Scene.h>
+#include <components/CollisionComponent.h>
 
 using namespace engine::utils::logger;
 using namespace engine::utils::math;
@@ -36,6 +37,17 @@ namespace engine {
                 transform->setInterpolatedScale(interpolatedScale);
             }
         }
+    }
+
+    void Scene::rebuildBVH() {
+        auto comps = getEntitiesWithComponent<CollisionComponent>();
+        std::vector<CollisionComponent*> enabled;
+
+        for (auto* comp : comps) {
+            if (comp->isEnabled()) enabled.push_back(comp);
+        }
+
+        m_BVH.rebuild(enabled);
     }
 
     SceneManager& SceneManager::getInstance() {
@@ -115,7 +127,9 @@ namespace engine {
         m_PhysicsAccumulator += cappedDeltaTime;
 
         while (m_PhysicsAccumulator >= FIXED_TIMESTEP) {
+            m_CurrentScene->rebuildBVH();
             m_CurrentScene->update(FIXED_TIMESTEP);
+
             m_PhysicsAccumulator -= FIXED_TIMESTEP;
         }
         
