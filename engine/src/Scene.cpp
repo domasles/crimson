@@ -176,4 +176,8 @@ namespace engine {
     std::shared_ptr<Scene> SceneManager::getCurrentScene() const {
         return m_CurrentScene;
     }
+
+    Scene* SceneManager::getCurrentSceneRaw() const {
+        return m_CurrentScene.get();
+    }
 }

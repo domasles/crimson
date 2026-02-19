@@ -23,11 +23,11 @@ namespace engine {
     }
 
     void InputSystem::addMovementAction(const std::string& name, const SDL_Keycode key, const Vector2& m_Direction) {
-        m_Actions[name] = std::make_shared<DirectionalInputAction>(key, m_Direction);
+        m_Actions[name] = std::make_unique<DirectionalInputAction>(key, m_Direction);
     }
 
     void InputSystem::addSimpleAction(const std::string& name, const SDL_Keycode key) {
-        m_Actions[name] = std::make_shared<SimpleInputAction>(key);
+        m_Actions[name] = std::make_unique<SimpleInputAction>(key);
     }
 
     const bool InputSystem::loadInputActions(const std::string& fileName) {

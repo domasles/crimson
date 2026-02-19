@@ -43,7 +43,7 @@ namespace engine {
     CollisionResult CollisionComponent::testCollisionAt(const Vector2& testPosition) const {
         if (!m_Enabled) return CollisionResult{};
 
-        auto otherEntities = getOtherCollisionEntities(testPosition);
+        const auto& otherEntities = getOtherCollisionEntities(testPosition);
 
         for (auto* otherEntity : otherEntities) {
             auto* otherCollision = otherEntity->getComponent<CollisionComponent>();
@@ -94,7 +94,8 @@ namespace engine {
         MultiCollisionResult result;
         
         if (!m_Enabled) return result;
-        auto otherEntities = getOtherCollisionEntities(testPosition);
+
+        const auto& otherEntities = getOtherCollisionEntities(testPosition);
 
         for (auto* otherEntity : otherEntities) {
             CollisionResult entityCollision = checkCollisionWithEntityAt(otherEntity, testPosition);
@@ -130,11 +131,13 @@ namespace engine {
         return { worldPos.getRawX() + m_Collision.offset.getRawX(), worldPos.getRawY() + m_Collision.offset.getRawY() };
     }
 
-    std::vector<Entity*> CollisionComponent::getOtherCollisionEntities(const Vector2& testPosition) const {
-        auto& sceneManager = getSceneManager();
-        auto currentScene = sceneManager.getCurrentScene();
+    const std::vector<Entity*>& CollisionComponent::getOtherCollisionEntities(const Vector2& testPosition) const {
+        thread_local static std::vector<Entity*> s_otherEntities;
+        s_otherEntities.clear();
 
-        if (!currentScene) return {};
+        Scene* currentScene = getSceneManager().getCurrentSceneRaw();
+
+        if (!currentScene) return s_otherEntities;
 
         Vector2 worldPos = {
             testPosition.getRawX() + m_Collision.offset.getRawX(),
@@ -148,17 +151,16 @@ namespace engine {
         s_candidates.clear();
         currentScene->getBVH().query(queryAABB, s_candidates);
 
-        std::vector<Entity*> otherEntities;
-        otherEntities.reserve(s_candidates.size());
+        s_otherEntities.reserve(s_candidates.size());
 
         for (auto* candidate : s_candidates) {
             if (candidate == this || !candidate->isEnabled()) continue;
 
             if (candidate->getParticipatesInQueries() || (candidate->getCollisionType() && candidate->getCollisionType()->shouldBlock())) {
-                otherEntities.push_back(candidate->getEntity());
+                s_otherEntities.push_back(candidate->getEntity());
             }
         }
 
-        return otherEntities;
+        return s_otherEntities;
     }
 }

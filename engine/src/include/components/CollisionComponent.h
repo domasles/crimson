@@ -57,6 +57,6 @@ namespace engine {
             void updateFromTransform();
 
             Collision m_Collision;
-            std::vector<Entity*> getOtherCollisionEntities(const Vector2& testPosition) const;
+            const std::vector<Entity*>& getOtherCollisionEntities(const Vector2& testPosition) const;
     };
 }

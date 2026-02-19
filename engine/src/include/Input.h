@@ -52,6 +52,6 @@ namespace engine {
             json m_JsonFile;
 
             std::string m_WorkingDir;
-            std::unordered_map<std::string, std::shared_ptr<InputAction>> m_Actions;
+            std::unordered_map<std::string, std::unique_ptr<InputAction>> m_Actions;
     };
 }

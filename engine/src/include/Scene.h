@@ -135,6 +135,7 @@ namespace engine {
 
             const std::string& getCurrentSceneName() const;
             std::shared_ptr<Scene> getCurrentScene() const;
+            Scene* getCurrentSceneRaw() const;
 
         private:
             SceneManager() : m_LastFrameTime(SDL_GetTicksNS()) {}
