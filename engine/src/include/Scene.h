@@ -29,12 +29,15 @@ namespace engine {
 
             T* createEntity(Args&&... args) {
                 auto entity = std::make_unique<T>(std::forward<Args>(args)...);
-
                 T* ptr = entity.get();
+
                 m_Entities.push_back(std::move(entity));
+                m_CollisionCacheDirty = true;
 
                 return ptr;
             }
+
+            void removeEntity(Entity* entity);
 
             template<typename T>
 
@@ -48,13 +51,6 @@ namespace engine {
                 }
 
                 return nullptr;
-            }
-
-            void removeEntity(Entity* entity) {
-                m_Entities.erase(
-                    std::remove_if(m_Entities.begin(), m_Entities.end(),
-                        [entity](const auto& ptr) { return ptr.get() == entity; }),
-                    m_Entities.end());
             }
 
             size_t getEntityCount() const { return m_Entities.size(); }
@@ -94,14 +90,16 @@ namespace engine {
 
         protected:
             bool m_Initialized = false;
-            std::string m_Name;
+            bool m_CollisionCacheDirty = true;
 
+            std::string m_Name;
             std::vector<std::unique_ptr<Entity>> m_Entities;
 
             std::unique_ptr<Map> m_Map;
             std::unique_ptr<InputSystem> m_InputSystem;
 
             BVH m_BVH;
+            std::vector<CollisionComponent*> m_CollisionComponents;
 
             void updateEntities(float deltaTime) {
                 for (auto& entity : m_Entities) {

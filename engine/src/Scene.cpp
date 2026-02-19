@@ -39,15 +39,34 @@ namespace engine {
         }
     }
 
-    void Scene::rebuildBVH() {
-        auto comps = getEntitiesWithComponent<CollisionComponent>();
-        std::vector<CollisionComponent*> enabled;
+    void Scene::removeEntity(Entity* entity) {
+        m_CollisionCacheDirty = true;
+        m_Entities.erase(std::remove_if(m_Entities.begin(), m_Entities.end(), [entity](const auto& ptr) { return ptr.get() == entity; }), m_Entities.end());
+    }
 
-        for (auto* comp : comps) {
-            if (comp->isEnabled()) enabled.push_back(comp);
+    void Scene::rebuildBVH() {
+        if (m_CollisionCacheDirty) {
+            m_CollisionComponents.clear();
+
+            for (auto& entity : m_Entities) {
+                if (auto* comp = entity->getComponent<CollisionComponent>()) {
+                    m_CollisionComponents.push_back(comp);
+                }
+            }
+
+            m_CollisionCacheDirty = false;
         }
 
-        m_BVH.rebuild(enabled);
+        thread_local static std::vector<CollisionComponent*> s_enabled;
+
+        s_enabled.clear();
+        s_enabled.reserve(m_CollisionComponents.size());
+
+        for (auto* comp : m_CollisionComponents) {
+            if (comp->isEnabled()) s_enabled.push_back(comp);
+        }
+
+        m_BVH.update(s_enabled);
     }
 
     SceneManager& SceneManager::getInstance() {

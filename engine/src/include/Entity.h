@@ -7,7 +7,7 @@
 namespace engine {
     class Entity {
         public:
-            virtual ~Entity() = default;
+            virtual ~Entity();
 
             virtual void init() = 0;
             virtual void update(const float deltaTime) = 0;

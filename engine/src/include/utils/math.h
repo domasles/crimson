@@ -77,6 +77,13 @@ namespace engine::utils::math {
 
             return w * h;
         }
+
+        bool contains(const AABB& other) const {
+            return min.getRawX() <= other.min.getRawX() &&
+                   min.getRawY() <= other.min.getRawY() &&
+                   max.getRawX() >= other.max.getRawX() &&
+                   max.getRawY() >= other.max.getRawY();
+        }
     };
 
 }

@@ -7,6 +7,8 @@ namespace engine::collisions {
 
     void BVH::clear() {
         m_Nodes.clear();
+        m_FatAABBs.clear();
+
         m_Root = -1;
     }
 
@@ -16,9 +18,32 @@ namespace engine::collisions {
         if (entities.empty()) return;
 
         m_Nodes.reserve(2 * entities.size());
+        m_FatAABBs.reserve(entities.size());
 
         std::vector<engine::CollisionComponent*> sorted = entities;
         m_Root = buildNode(sorted, 0, (int)sorted.size());
+    }
+
+    bool BVH::update(const std::vector<engine::CollisionComponent*>& entities) {
+        if (m_Root == -1 || entities.size() != m_FatAABBs.size()) {
+            rebuild(entities);
+            return true;
+        }
+
+        for (auto* comp : entities) {
+            Vector2 pos = comp->getCollisionWorldPosition();
+            Vector2 size = comp->getCollision().size;
+
+            AABB tight = comp->getCollision().shape->getBoundingBox(pos, size);
+            auto it = m_FatAABBs.find(comp);
+
+            if (it == m_FatAABBs.end() || !it->second.contains(tight)) {
+                rebuild(entities);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     int BVH::buildNode(std::vector<engine::CollisionComponent*>& entities, int start, int end) {
@@ -31,6 +56,13 @@ namespace engine::collisions {
             Node node;
             node.aabb = comp->getCollision().shape->getBoundingBox(pos, size);
             node.entity = comp;
+
+            AABB fat{
+                Vector2{node.aabb.min.getRawX() - FAT_MARGIN, node.aabb.min.getRawY() - FAT_MARGIN},
+                Vector2{node.aabb.max.getRawX() + FAT_MARGIN, node.aabb.max.getRawY() + FAT_MARGIN}
+            };
+
+            m_FatAABBs[comp] = fat;
 
             int idx = (int)m_Nodes.size();
             m_Nodes.push_back(node);

@@ -9,7 +9,9 @@ namespace engine { class CollisionComponent; }
 namespace engine::collisions {
     class BVH {
         public:
-            void rebuild(const std::vector<engine::CollisionComponent*>& entities);
+            static constexpr float FAT_MARGIN = 4.0f;
+
+            bool update(const std::vector<engine::CollisionComponent*>& entities);
             void query(const AABB& aabb, std::vector<engine::CollisionComponent*>& results) const;
             void clear();
 
@@ -25,9 +27,11 @@ namespace engine::collisions {
             };
 
             std::vector<Node> m_Nodes;
+            std::unordered_map<engine::CollisionComponent*, AABB> m_FatAABBs;
 
             int m_Root = -1;
 
+            void rebuild(const std::vector<engine::CollisionComponent*>& entities);
             int buildNode(std::vector<engine::CollisionComponent*>& entities, int start, int end);
             void queryNode(int idx, const AABB& aabb, std::vector<engine::CollisionComponent*>& results) const;
     };
