@@ -3,6 +3,7 @@
 #include <utils/logger.h>
 
 #include <Scene.h>
+
 #include <components/CollisionComponent.h>
 
 using namespace engine::utils::logger;
@@ -144,6 +145,9 @@ namespace engine {
         if (!resumed) {
             newScene->setInitialized(true);
             newScene->init();
+
+            newScene->rebuildBVH();
+            newScene->update(0.0f);
         }
 
         newScene->onEnter(resumed);
@@ -160,6 +164,8 @@ namespace engine {
             m_PendingSceneName.clear();
             m_PhysicsAccumulator = 0;
             m_LastFrameTime = SDL_GetTicksNS();
+
+            rawDeltaTime = 0;
         }
 
         if (!m_CurrentScene) {
