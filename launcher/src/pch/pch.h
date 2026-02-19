@@ -16,9 +16,21 @@
     #include <dlfcn.h>
 #endif
 
-#if !defined(LAUNCHER_PLATFORM_EMSCRIPTEN)
-    #include <wx/wx.h>
-    #include <wx/choicdlg.h>
+#ifndef LAUNCHER_PLATFORM_EMSCRIPTEN
+    #include <SDL3/SDL.h>
+
+    #define NK_INCLUDE_STANDARD_VARARGS
+    #define NK_INCLUDE_STANDARD_IO
+    #define NK_INCLUDE_FONT_BAKING
+    #define NK_INCLUDE_DEFAULT_FONT
+    #define NK_INCLUDE_COMMAND_USERDATA
+    #define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
+
+    #include <nuklear.h>
+
+    extern "C" {
+        #include <nuklear_sdl3_renderer.h>
+    }
 #endif
 
 #include <nlohmann/json.hpp>

@@ -78,31 +78,21 @@ else()
 
     target_link_libraries(${LAUNCHER_TARGET}
         PRIVATE
-            wx::core
-            wx::base
+            nuklear
+            SDL3::SDL3-shared
     )
 
     add_dependencies(${LAUNCHER_TARGET} ${AVAILABLE_GAMES})
 
     if(WIN32)
         set_target_properties(launcher PROPERTIES WIN32_EXECUTABLE $<$<CONFIG:Release>:TRUE>)
-    elseif(APPLE)
-        set_target_properties(launcher PROPERTIES MACOSX_BUNDLE $<$<CONFIG:Release>:TRUE>)
     elseif(UNIX AND NOT APPLE)
-        target_link_libraries(${LAUNCHER_TARGET} PRIVATE
-            X11
-            Xext
-            Xi
-            Xrandr
-            SM
-            ICE
-            pthread
-            dl
-        )
+        target_link_libraries(${LAUNCHER_TARGET} PRIVATE pthread dl)
     endif()
 
     target_include_directories(${LAUNCHER_TARGET}
         PRIVATE
+            assets/fonts/inter
             src/include
             src/pch
             ../engine/src/include

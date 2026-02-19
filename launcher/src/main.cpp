@@ -20,35 +20,21 @@
     #include <utils/filesystem.h>
     #include <utils/lib.h>
 
-    #include <wx/wx.h>
-    
-    class GameLauncherApp : public wxApp {
-        public:
-            bool OnInit() override { return true; }
-    };
-    
-    wxIMPLEMENT_APP_NO_MAIN(GameLauncherApp);
-
     using namespace launcher::utils::filesystem;
     using namespace launcher::utils::lib;
-
     using namespace launcher::utils::game_selector;
 
     int main(int argc, char* argv[]) {
-        wxInitialize(argc, argv);
 
         auto availableGames = scanAvailableGames();
         auto selectedGame = selectGame(availableGames);
 
         if (!selectedGame) {
             std::cerr << "No game selected or available." << std::endl;
-            wxUninitialize();
             return -1;
         }
 
         std::string fileName = selectedGame->libPath;
-
-        wxUninitialize();
 
         void* libraryHandle = loadLibrary(fileName);
         if (!libraryHandle) return -1;

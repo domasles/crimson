@@ -11,7 +11,7 @@ namespace outBreak {
         auto* texture = addComponent<TextureComponent>();
         auto* collision = addComponent<CollisionComponent>();
 
-        texture->setTexture(loadTexture("assets", "ball.png"));
+        texture->setTexture(loadTexture("assets/textures", "ball.png"));
         transform->setSize({BALL_SIZE, BALL_SIZE});
         transform->setPosition(m_InitialPosition);
 

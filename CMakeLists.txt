@@ -155,19 +155,14 @@ set(SDLMIXER_MOD OFF CACHE BOOL "Disable MOD (tracker music)")
 
 set(SDLMIXER_MIDI OFF CACHE BOOL "Disable MIDI support")
 
-if(NOT WASM)
-    set(wxBUILD_SHARED OFF CACHE BOOL "Build wxWidgets as shared library" FORCE)
-    set(wxBUILD_SAMPLES OFF CACHE BOOL "Disable wxWidgets samples" FORCE)
-    set(wxBUILD_DEMOS OFF CACHE BOOL "Disable wxWidgets demos" FORCE)
-    set(wxBUILD_TESTS OFF CACHE BOOL "Disable wxWidgets tests" FORCE)
-
-    add_subdirectory(vendor/wxwidgets)
-    add_subdirectory(vendor/glad)
-endif()
-
 add_subdirectory(vendor/sdl3)
 add_subdirectory(vendor/sdl3-image)
 add_subdirectory(vendor/sdl3-mixer)
+
+if(NOT WASM)
+    add_subdirectory(vendor/nuklear)
+    add_subdirectory(vendor/glad)
+endif()
 
 function(strip_debug_symbols target_name)
     if(MSVC)
