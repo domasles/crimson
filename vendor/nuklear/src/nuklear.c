@@ -16,7 +16,6 @@
 #define NK_INCLUDE_COMMAND_USERDATA
 #define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
 
-/* Reuse SDL portable types */
 #define NK_INT8   Sint8
 #define NK_UINT8  Uint8
 #define NK_INT16  Sint16

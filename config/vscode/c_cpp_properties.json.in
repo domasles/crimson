@@ -11,7 +11,8 @@
         "${workspaceFolder}/vendor/sdl3/include/**",
         "${workspaceFolder}/vendor/sdl3-image/include/**",
         "${workspaceFolder}/vendor/sdl3-mixer/include/**",
-        "${workspaceFolder}/vendor/wxwidgets/include/**"
+        "${workspaceFolder}/vendor/glad/include/**",
+        "${workspaceFolder}/vendor/nuklear/include/**"
       ],
       "defines": [
         "_DEBUG",

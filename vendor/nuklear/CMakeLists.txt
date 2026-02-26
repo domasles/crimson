@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(nuklear LANGUAGES C)
 
 add_library(nuklear STATIC
-    src/nuklear_impl.c
+    src/nuklear.c
 )
 
 target_include_directories(nuklear PUBLIC

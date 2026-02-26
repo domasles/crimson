@@ -116,13 +116,15 @@ set(SDLIMAGE_SAMPLES OFF CACHE BOOL "Disable building SDL3_image samples")
 
 set(SDLIMAGE_VENDORED OFF CACHE BOOL "Don't use vendored third-party libraries")
 set(SDLIMAGE_AVIF OFF CACHE BOOL "Disable AVIF support")
-set(SDLIMAGE_TIF OFF CACHE BOOL "Disable TIF support")
 set(SDLIMAGE_WEBP OFF CACHE BOOL "Disable WEBP support")
 set(SDLIMAGE_JXL OFF CACHE BOOL "Disable JXL support")
+set(SDLIMAGE_GIF OFF CACHE BOOL "Disable GIF support")
+set(SDLIMAGE_TIF OFF CACHE BOOL "Disable TIF support")
+
 set(SDLIMAGE_BMP ON CACHE BOOL "Enable BMP support")
-set(SDLIMAGE_GIF ON CACHE BOOL "Enable GIF support")
 set(SDLIMAGE_PNG ON CACHE BOOL "Enable PNG support")
 set(SDLIMAGE_JPG ON CACHE BOOL "Enable JPG support")
+
 set(SDLIMAGE_BACKEND_STB ON CACHE BOOL "Use stb_image for JPEG/PNG loading")
 
 set(SDLIMAGE_PNG_VENDORED OFF CACHE BOOL "Don't use vendored libpng (STB handles PNG)")
@@ -134,9 +136,9 @@ set(SKIP_INSTALL_FILES ON CACHE BOOL "Skip zlib file install" FORCE)
 set(SDLMIXER_VENDORED OFF CACHE BOOL "Don't use vendored SDL3_mixer libraries")
 
 set(SDLMIXER_WAVE ON CACHE BOOL "Enable WAV support")
-set(SDLMIXER_AIFF ON CACHE BOOL "Enable AIFF support")
-set(SDLMIXER_VOC ON CACHE BOOL "Enable VOC support")
-set(SDLMIXER_AU ON CACHE BOOL "Enable AU support")
+set(SDLMIXER_AIFF OFF CACHE BOOL "Disable AIFF support")
+set(SDLMIXER_VOC OFF CACHE BOOL "Disable VOC support")
+set(SDLMIXER_AU OFF CACHE BOOL "Disable AU support")
 
 set(SDLMIXER_MP3 ON CACHE BOOL "Enable MP3 support")
 set(SDLMIXER_MP3_DRMP3 ON CACHE BOOL "Enable MP3 via dr_mp3 (header-only)")
