@@ -26,6 +26,10 @@ target_include_directories(engine
         src/pch
 )
 
+if(NOT WASM)
+    target_include_directories(engine PUBLIC ${CMAKE_SOURCE_DIR}/vendor/rmlui/Include)
+endif()
+
 if(WIN32)
     target_include_directories(engine PUBLIC ${CMAKE_SOURCE_DIR}/vendor/glad/include)
 endif()
@@ -45,6 +49,7 @@ else()
             SDL3_mixer::SDL3_mixer-shared
         PRIVATE
             glad
+            RmlUi::Core
     )
 endif()
 

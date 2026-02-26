@@ -13,3 +13,9 @@
 [submodule "vendor/emsdk"]
 	path = vendor/emsdk
 	url = https://github.com/emscripten-core/emsdk.git
+[submodule "vendor/rmlui"]
+	path = vendor/rmlui
+	url = https://github.com/mikke89/RmlUi.git
+[submodule "vendor/freetype"]
+	path = vendor/freetype
+	url = https://gitlab.freedesktop.org/freetype/freetype.git

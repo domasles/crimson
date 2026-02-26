@@ -164,6 +164,25 @@ add_subdirectory(vendor/sdl3-mixer)
 if(NOT WASM)
     add_subdirectory(vendor/nuklear)
     add_subdirectory(vendor/glad)
+
+    set(_saved_build_shared ${BUILD_SHARED_LIBS})
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
+    add_subdirectory(vendor/freetype)
+
+    if(NOT TARGET Freetype::Freetype)
+        add_library(Freetype::Freetype ALIAS freetype)
+    endif()
+
+    set(FREETYPE_FOUND TRUE CACHE BOOL "" FORCE)
+
+    set(RMLUI_ENABLE_DEBUGGER OFF CACHE BOOL "" FORCE)
+    set(RMLUI_WARNINGS_AS_ERRORS OFF CACHE BOOL "" FORCE)
+    set(RMLUI_FONT_ENGINE "freetype" CACHE STRING "" FORCE)
+
+    add_subdirectory(vendor/rmlui)
+
+    set(BUILD_SHARED_LIBS ${_saved_build_shared} CACHE BOOL "" FORCE)
 endif()
 
 function(strip_debug_symbols target_name)

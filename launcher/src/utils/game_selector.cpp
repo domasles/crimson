@@ -141,7 +141,6 @@ namespace launcher::utils::game_selector {
                 fontBig->handle.height /= dpiScale;
                 fontReg->handle.height /= dpiScale;
 
-                // fontBig is the default — used for the window title bar
                 nk_style_set_font(ctx, &fontBig->handle);
             }
 
@@ -239,9 +238,6 @@ namespace launcher::utils::game_selector {
 
         #ifndef LAUNCHER_PLATFORM_EMSCRIPTEN
             return showNuklearPicker(games);
-        #else
-            std::cerr << "Game selection not supported in WASM builds" << std::endl;
-            return std::nullopt;
         #endif
     }
 }

@@ -1,7 +1,9 @@
 #pragma once
 
-#include <GLES3/gl3.h>
 #include <utils/math.h>
+#include <utils/rendering.h>
+
+#include <GLES3/gl3.h>
 
 #include <Shader.h>
 
@@ -39,6 +41,8 @@ namespace engine {
 
             void setProjectionMatrix(const float* matrix);
             void setOrthographicProjection(float left, float right, float bottom, float top);
+
+            const float* getProjectionMatrix() const { return m_ProjectionMatrix.data(); }
 
             Shader* getDefaultShader() { return &m_SpriteShader; }
 
