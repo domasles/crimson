@@ -87,8 +87,6 @@ namespace engine {
     bool Map::loadTilesets() {
         for (const auto& tileset : m_JsonFile["defs"]["tilesets"]) {
             const std::string& fullRelPath = m_WorkingDir + "/" + (std::string)tileset["relPath"];
-
-            const std::string& relPath = getParentPath(fullRelPath);
             const std::string& fileName = getFileName(fullRelPath);
 
             const float pxWid = tileset["pxWid"];
@@ -99,7 +97,7 @@ namespace engine {
             const float spacing = tileset["spacing"];
             const float padding = tileset["padding"];
 
-            auto tilesetTexture = loadTexture(relPath, fileName);
+            auto tilesetTexture = loadTexture(fullRelPath);
 
             m_Tilesets[fileName] = Tileset{};
 

@@ -17,8 +17,8 @@ namespace engine {
         }
     }
 
-    bool Sound::loadSound(const std::string& fileName) {
-        std::string filePath = getGamePath() + "/" + m_WorkingDir + "/" + fileName;
+    bool Sound::loadSound() {
+        std::string filePath = getGamePath() + "/" + m_FilePath;
         MIX_Mixer* mixer = Core::getInstance().getMixer();
 
         if (!mixer) {
@@ -33,7 +33,7 @@ namespace engine {
             return false;
         }
 
-        std::string relativePath = m_WorkingDir + "/" + fileName;
+        std::string relativePath = m_FilePath;
 
         if (relativePath.find("assets/") == 0) {
             relativePath = relativePath.substr(7);

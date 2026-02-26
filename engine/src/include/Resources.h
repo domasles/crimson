@@ -8,8 +8,8 @@ namespace engine {
         public:
             static ResourceManager& getInstance();
 
-            std::shared_ptr<Texture> loadTexture(const std::string& workingDir, const std::string& fileName);
-            std::shared_ptr<Sound> loadSound(const std::string& workingDir, const std::string& fileName);
+            std::shared_ptr<Texture> loadTexture(const std::string& filePath);
+            std::shared_ptr<Sound> loadSound(const std::string& filePath);
 
             void clearCache();
             void clearTextureCache();
@@ -28,18 +28,18 @@ namespace engine {
             std::unordered_map<std::string, std::shared_ptr<Texture>> m_Textures;
             std::unordered_map<std::string, std::shared_ptr<Sound>> m_Sounds;
 
-            std::string makeKey(const std::string& workingDir, const std::string& fileName) const;
+            std::string makeKey(const std::string& filePath) const;
     };
 
     inline ResourceManager& getResources() { 
         return ResourceManager::getInstance(); 
     }
     
-    inline std::shared_ptr<Texture> loadTexture(const std::string& workingDir, const std::string& fileName) {
-        return getResources().loadTexture(workingDir, fileName);
+    inline std::shared_ptr<Texture> loadTexture(const std::string& filePath) {
+        return getResources().loadTexture(filePath);
     }
     
-    inline std::shared_ptr<Sound> loadSound(const std::string& workingDir, const std::string& fileName) {
-        return getResources().loadSound(workingDir, fileName);
+    inline std::shared_ptr<Sound> loadSound(const std::string& filePath) {
+        return getResources().loadSound(filePath);
     }
 }

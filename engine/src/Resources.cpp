@@ -23,8 +23,8 @@ namespace engine {
         return fallbackInstance;
     }
 
-    std::shared_ptr<Texture> ResourceManager::loadTexture(const std::string& workingDir, const std::string& fileName) {
-        std::string key = makeKey(workingDir, fileName);
+    std::shared_ptr<Texture> ResourceManager::loadTexture(const std::string& filePath) {
+        std::string key = makeKey(filePath);
         auto it = m_Textures.find(key);
 
         if (it != m_Textures.end()) {
@@ -32,9 +32,9 @@ namespace engine {
             return it->second;
         }
 
-        auto texture = std::make_shared<Texture>(workingDir);
+        auto texture = std::make_shared<Texture>(filePath);
 
-        if (texture->loadTexture(fileName)) {
+        if (texture->loadTexture()) {
             m_Textures[key] = texture;
             Logger::engine_debug("Texture loaded and cached: {}", key);
             return texture;
@@ -44,8 +44,8 @@ namespace engine {
         return nullptr;
     }
 
-    std::shared_ptr<Sound> ResourceManager::loadSound(const std::string& workingDir, const std::string& fileName) {
-        std::string key = makeKey(workingDir, fileName);
+    std::shared_ptr<Sound> ResourceManager::loadSound(const std::string& filePath) {
+        std::string key = makeKey(filePath);
         auto it = m_Sounds.find(key);
 
         if (it != m_Sounds.end()) {
@@ -53,9 +53,9 @@ namespace engine {
             return it->second;
         }
 
-        auto sound = std::make_shared<Sound>(workingDir);
+        auto sound = std::make_shared<Sound>(filePath);
 
-        if (sound->loadSound(fileName)) {
+        if (sound->loadSound()) {
             m_Sounds[key] = sound;
             Logger::engine_debug("Sound loaded and cached: {}", key);
             return sound;
@@ -80,8 +80,7 @@ namespace engine {
         m_Sounds.clear();
     }
 
-    std::string ResourceManager::makeKey(const std::string& workingDir, const std::string& fileName) const {
-        std::string path = workingDir + "/" + fileName;
-        return normalizePath(path);
+    std::string ResourceManager::makeKey(const std::string& filePath) const {
+        return normalizePath(filePath);
     }
 }

@@ -46,8 +46,8 @@ namespace engine {
         return true;
     }
 
-    bool Texture::loadTexture(const std::string& fileName, bool linearFiltering) {
-        const std::string& filePath = getGamePath() + "/" + m_WorkingDir + "/" + fileName;
+    bool Texture::loadTexture(bool linearFiltering) {
+        const std::string& filePath = getGamePath() + "/" + m_FilePath;
 
         SDL_Surface* surface = IMG_Load(filePath.c_str());
 
@@ -90,7 +90,7 @@ namespace engine {
         SDL_DestroySurface(surface);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        std::string relativePath = m_WorkingDir + "/" + fileName;
+        std::string relativePath = m_FilePath;
 
         if (relativePath.find("assets/") == 0) {
             relativePath = relativePath.substr(7);
