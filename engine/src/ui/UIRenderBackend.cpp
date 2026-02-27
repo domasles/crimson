@@ -10,10 +10,6 @@
 using namespace engine::utils::logger;
 
 namespace engine::ui {
-    UIRenderBackend::~UIRenderBackend() {
-        shutdown();
-    }
-
     bool UIRenderBackend::init(engine::GLRenderer* renderer, int screenWidth, int screenHeight) {
         m_Renderer     = renderer;
         m_ScreenWidth  = screenWidth;
@@ -44,8 +40,6 @@ namespace engine::ui {
     }
 
     void UIRenderBackend::beginUIPass() {
-        m_Renderer->endPass();
-
         std::memcpy(m_SavedProjection.data(), m_Renderer->getProjectionMatrix(), 16 * sizeof(float));
 
         glEnable(GL_BLEND);

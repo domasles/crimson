@@ -3,6 +3,10 @@
 #ifdef GAME_PLATFORM_WINDOWS
     #define NOMINMAX
     #define WIN32_LEAN_AND_MEAN
+    #define NODRAWTEXT
+    #define NOUSER
+    #define NOMSG
+
     #include <windows.h>
 #elif defined(GAME_PLATFORM_MACOS)
     #include <TargetConditionals.h>
@@ -22,7 +26,6 @@
 #include <mutex>
 
 #include <concepts>
-#include <iostream>
 #include <cstdarg>
 #include <fstream>
 #include <format>

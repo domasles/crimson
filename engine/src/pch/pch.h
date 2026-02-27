@@ -3,6 +3,10 @@
 #ifdef ENGINE_PLATFORM_WINDOWS
     #define NOMINMAX
     #define WIN32_LEAN_AND_MEAN
+    #define NODRAWTEXT
+    #define NOUSER
+    #define NOMSG
+
     #include <windows.h>
 #elif defined(ENGINE_PLATFORM_MACOS)
     #include <TargetConditionals.h>
@@ -11,7 +15,15 @@
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_mixer/SDL_mixer.h>
 #include <SDL3/SDL_surface.h>
+#include <SDL3/SDL_events.h>
 #include <SDL3/SDL.h>
+
+#include <rmlui/Core/ElementDocument.h>
+#include <rmlui/Core/RenderInterface.h>
+#include <rmlui/Core/SystemInterface.h>
+#include <rmlui/Core/Context.h>
+#include <rmlui/Core/Input.h>
+#include <rmlui/Core.h>
 
 #include <nlohmann/json.hpp>
 
@@ -23,7 +35,6 @@
 #include <mutex>
 
 #include <concepts>
-#include <iostream>
 #include <cstdarg>
 #include <fstream>
 #include <format>

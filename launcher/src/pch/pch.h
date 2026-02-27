@@ -3,6 +3,10 @@
 #ifdef LAUNCHER_PLATFORM_WINDOWS
     #define NOMINMAX
     #define WIN32_LEAN_AND_MEAN
+    #define NODRAWTEXT
+    #define NOUSER
+    #define NOMSG
+
     #include <Windows.h>
 #elif defined(LAUNCHER_PLATFORM_MACOS)
     #include <TargetConditionals.h>
@@ -36,7 +40,6 @@
 #include <nlohmann/json.hpp>
 
 #include <filesystem>
-#include <iostream>
 #include <fstream>
 
 #include <utility>

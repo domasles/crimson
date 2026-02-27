@@ -13,7 +13,8 @@ using namespace engine::utils::rendering;
 namespace engine {
     enum class RenderPass {
         Opaque,  // Textured quads (game objects)
-        Debug    // Gizmo lines and debug visualization
+        Debug,   // Gizmo lines and debug visualization
+        UI       // RmlUI overlay
     };
 
     class GLRenderer {

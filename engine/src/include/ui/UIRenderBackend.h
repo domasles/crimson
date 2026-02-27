@@ -1,6 +1,5 @@
 #pragma once
 
-#include <RmlUi/Core/RenderInterface.h>
 #include <GLES3/gl3.h>
 
 #include <Texture.h>
@@ -21,7 +20,7 @@ namespace engine::ui {
     class UIRenderBackend : public Rml::RenderInterface {
         public:
             UIRenderBackend() = default;
-            ~UIRenderBackend() override;
+            ~UIRenderBackend() override { shutdown(); }
 
             bool init(engine::GLRenderer* renderer, int screenWidth, int screenHeight);
             void shutdown();

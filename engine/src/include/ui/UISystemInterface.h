@@ -1,7 +1,5 @@
 #pragma once
 
-#include <RmlUi/Core/SystemInterface.h>
-
 namespace engine::ui {
     class UISystemInterface : public Rml::SystemInterface {
         public:

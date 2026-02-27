@@ -3,6 +3,8 @@
 #include <utils/logger.h>
 #include <utils/math.h>
 
+#include <ui/UIManager.h>
+
 #include <Gizmos.h>
 #include <Scene.h>
 #include <Core.h>
@@ -13,6 +15,7 @@
 
 using namespace engine::utils::logger;
 using namespace engine::utils::math;
+using namespace engine::ui;
 using namespace engine;
 
 #ifdef ENGINE_PLATFORM_EMSCRIPTEN
@@ -60,6 +63,12 @@ using namespace engine;
         Gizmos::renderGizmos();
         core.getRenderer()->endPass();
 
+        // PASS 3: UI overlay
+        core.getRenderer()->beginPass(RenderPass::UI);
+        UIManager::getInstance().update();
+        UIManager::getInstance().render();
+        core.getRenderer()->endPass();
+
         core.getRenderer()->endFrame();
         SDL_GL_SwapWindow(core.getWindow());
     }
@@ -98,6 +107,7 @@ namespace engine {
             m_Mixer = nullptr;
         }
 
+        UIManager::getInstance().shutdown();
         m_Renderer->shutdown();
         
         if (m_GLContext) {
@@ -149,7 +159,6 @@ namespace engine {
             return false;
         }
 
-        // Create 32 tracks (like old channel allocation)
         m_Tracks.reserve(32);
 
         for (int i = 0; i < 32; ++i) {
@@ -210,6 +219,8 @@ namespace engine {
         }
 
         ENGINE_LOG_INIT("Renderer");
+        UIManager::getInstance().init(m_Renderer.get(), m_TargetWindowWidth, m_TargetWindowHeight);
+
         return true;
     }
 
@@ -225,6 +236,8 @@ namespace engine {
             if (event.type == SDL_EVENT_WINDOW_RESIZED) {
                 m_WindowResized = true;
             }
+
+            UIManager::getInstance().processEvent(event);
         }
 
         return true;
@@ -268,6 +281,12 @@ namespace engine {
                 // PASS 2: Render all debug gizmos
                 m_Renderer->beginPass(RenderPass::Debug);
                 Gizmos::renderGizmos();
+                m_Renderer->endPass();
+
+                // PASS 3: UI overlay
+                m_Renderer->beginPass(RenderPass::UI);
+                UIManager::getInstance().update();
+                UIManager::getInstance().render();
                 m_Renderer->endPass();
 
                 m_Renderer->endFrame();

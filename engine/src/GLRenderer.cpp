@@ -77,6 +77,8 @@ namespace engine {
             case RenderPass::Debug:
                 flushLineBatch();
                 break;
+            case RenderPass::UI:
+                break;
         }
     }
 
