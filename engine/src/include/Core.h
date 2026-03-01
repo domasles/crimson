@@ -39,9 +39,6 @@ namespace engine {
             const std::string& getName() const { return m_ParentFolder; }
 
             void run(std::function<void()> customUpdate);
-            void setBackgroundColor(const Color& color);
-
-            void setOutOfBoundsColor(bool custom, const Color& color);
 
             void setVSync(bool enabled);
             bool getVSync() const { return m_VSync; }
@@ -49,15 +46,13 @@ namespace engine {
             void setFullscreen(bool enabled);
 
             void setVectorScale(int targetWindowWidth, int targetWindowHeight);
-            void setVectorScale(bool useDefaultScale=true);
+            void setVectorScale(bool useDefaultScale=true) { m_DefaultVectorScale = useDefaultScale;}
 
             void updateViewport();
 
-            bool getWindowResized() const { return m_WindowResized; }
-            bool getUseCustomOutOfBoundsColor() const { return m_UseCustomOutOfBoundsColor; }
-
-            Color getBackgroundColor() const { return m_BackgroundColor; }
-            Color getOutOfBoundsColor() const { return m_OutOfBoundsColor; }
+            int getLetterboxX() const { return m_LetterboxX; }
+            int getLetterboxY() const { return m_LetterboxY; }
+            float getLetterboxScale() const { return m_LetterboxScale; }
 
             GLRenderer* getRenderer() const;
             SDL_Window* getWindow() const;
@@ -90,11 +85,10 @@ namespace engine {
 
             bool m_DefaultVectorScale = true;
             bool m_VSync = true;
-            bool m_WindowResized = false;
-            bool m_UseCustomOutOfBoundsColor = false;
 
-            Color m_BackgroundColor{ 0.0f, 0.0f, 0.0f, 1.0f };
-            Color m_OutOfBoundsColor{ 0.0f, 0.0f, 0.0f, 1.0f };
+            int m_LetterboxX = 0;
+            int m_LetterboxY = 0;
+            float m_LetterboxScale = 1.0f;
 
             std::string m_ParentFolder;
 
@@ -108,9 +102,6 @@ namespace engine {
     };
 
     inline Core& getCore() { return Core::getInstance(); }
-
-    inline void setBackgroundColor(const Color& color) { getCore().setBackgroundColor(color); }
-    inline void setOutOfBoundsColor(bool custom, const Color& color) { getCore().setOutOfBoundsColor(custom, color); }
 
     inline GLRenderer* getRenderer() { return getCore().getRenderer(); }
     inline SDL_Window* getWindow() { return getCore().getWindow(); }

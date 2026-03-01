@@ -44,10 +44,6 @@ namespace engine::ui {
         private:
             engine::GLRenderer* m_Renderer = nullptr;
 
-            int m_ScreenWidth  = 0;
-            int m_ScreenHeight = 0;
-
-            std::array<float, 16> m_UIProjection{};
             std::array<float, 16> m_SavedProjection{};
 
             std::unordered_map<Rml::CompiledGeometryHandle, UIGeometryData> m_Geometries;
@@ -55,7 +51,5 @@ namespace engine::ui {
 
             std::unordered_map<Rml::TextureHandle, std::shared_ptr<engine::Texture>> m_ManagedTextures;
             std::unordered_set<GLuint> m_GeneratedTextures;
-
-            void buildUIProjection(int w, int h);
     };
 }

@@ -89,6 +89,9 @@ namespace engine {
             void setInputSystem(std::unique_ptr<InputSystem> inputSystem) { m_InputSystem = std::move(inputSystem); }
             bool hasInputSystem() const { return m_InputSystem != nullptr; }
 
+            void  setBackgroundColor(const Color& color) { m_BackgroundColor = color; }
+            void  setOutOfBoundsColor(const Color& color) { m_OutOfBoundsColor = color; }
+
             void rebuildBVH();
 
             Map* getMap() { return m_Map.get(); }
@@ -102,6 +105,9 @@ namespace engine {
 
             UIContext& getUIContext() { return m_UIContext; }
 
+            Color getBackgroundColor()  const { return m_BackgroundColor; }
+            Color getOutOfBoundsColor() const { return m_OutOfBoundsColor; }
+
         protected:
             bool m_Initialized = false;
             bool m_CollisionCacheDirty = true;
@@ -114,7 +120,11 @@ namespace engine {
 
             BVH m_BVH;
             std::vector<CollisionComponent*> m_CollisionComponents;
+
             UIContext m_UIContext;
+
+            Color m_BackgroundColor  { 0.0f, 0.0f, 0.0f, 1.0f };
+            Color m_OutOfBoundsColor { 0.0f, 0.0f, 0.0f, 1.0f };
 
             void updateEntities(float deltaTime) {
                 for (auto& entity : m_Entities) {
@@ -145,8 +155,12 @@ namespace engine {
 
             bool processUIEvent(const SDL_Event& event);
 
+            Color getBackgroundColor() const { return m_CurrentScene ? m_CurrentScene->getBackgroundColor() : Color{0.0f, 0.0f, 0.0f, 1.0f}; }
+            Color getOutOfBoundsColor() const { return m_CurrentScene ? m_CurrentScene->getOutOfBoundsColor() : Color{0.0f, 0.0f, 0.0f, 1.0f}; }
+
             const std::string& getCurrentSceneName() const;
             std::shared_ptr<Scene> getCurrentScene() const;
+
             Scene* getCurrentSceneRaw() const;
 
         private:
@@ -175,6 +189,9 @@ namespace engine {
 
     inline SceneManager& getSceneManager() { return SceneManager::getInstance(); }
     inline bool switchToScene(const std::string& name) { return getSceneManager().changeScene(name); }
+
+    inline void setBackgroundColor(const Color& color) { if (auto* s = SceneManager::getInstance().getCurrentSceneRaw()) s->setBackgroundColor(color); }
+    inline void setOutOfBoundsColor(const Color& color) { if (auto* s = SceneManager::getInstance().getCurrentSceneRaw()) s->setOutOfBoundsColor(color); }
 
     template<typename T>
 

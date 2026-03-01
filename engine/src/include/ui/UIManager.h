@@ -35,6 +35,6 @@ namespace engine::ui {
             bool m_Initialized = false;
 
             std::unique_ptr<UISystemInterface> m_SystemInterface;
-            std::unique_ptr<UIRenderBackend>   m_RenderBackend;
+            std::unique_ptr<UIRenderBackend> m_RenderBackend;
     };
 }

@@ -29,28 +29,23 @@ using namespace engine;
             return;
         }
 
-        if (core.getUseCustomOutOfBoundsColor()) {
+        {
             int windowWidth, windowHeight;
+
             SDL_GetWindowSize(core.getWindow(), &windowWidth, &windowHeight);
 
             glDisable(GL_SCISSOR_TEST);
             glViewport(0, 0, windowWidth, windowHeight);
 
-            core.getRenderer()->clear(core.getOutOfBoundsColor());
-            core.updateViewport();
+            core.getRenderer()->clear(SceneManager::getInstance().getOutOfBoundsColor());
         }
 
-        if (core.getWindowResized()) {
-            core.updateViewport();
-        }
-
-        core.getRenderer()->clear(getCore().getBackgroundColor());
-
-        if (s_WASMUpdate) {
-            s_WASMUpdate();
-        }
+        core.updateViewport();
+        core.getRenderer()->clear(SceneManager::getInstance().getBackgroundColor());
+        if (s_WASMUpdate) s_WASMUpdate();
 
         SceneManager::getInstance().update();
+        SceneManager::getInstance().updateUI();
         SceneManager::getInstance().prepareRender();
 
         // PASS 1: Render all opaque game objects
@@ -65,7 +60,6 @@ using namespace engine;
 
         // PASS 3: UI overlay
         core.getRenderer()->beginPass(RenderPass::UI);
-        SceneManager::getInstance().updateUI();
         SceneManager::getInstance().renderUI();
         core.getRenderer()->endPass();
 
@@ -226,15 +220,10 @@ namespace engine {
 
     bool Core::processEvents() {
         SDL_Event event;
-        m_WindowResized = false;
 
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_EVENT_QUIT) {
                 return false;
-            }
-
-            if (event.type == SDL_EVENT_WINDOW_RESIZED) {
-                m_WindowResized = true;
             }
 
             SceneManager::getInstance().processUIEvent(event);
@@ -249,26 +238,17 @@ namespace engine {
             emscripten_set_main_loop(emscripten_main_loop, 0, 1);
         #else
             while (processEvents()) {
-                if (m_UseCustomOutOfBoundsColor) {
-                    int windowWidth, windowHeight;
-                    SDL_GetWindowSize(m_Window.get(), &windowWidth, &windowHeight);
+                int windowWidth, windowHeight;
+                SDL_GetWindowSize(m_Window.get(), &windowWidth, &windowHeight);
 
-                    glDisable(GL_SCISSOR_TEST);
-                    glViewport(0, 0, windowWidth, windowHeight);
+                glDisable(GL_SCISSOR_TEST);
+                glViewport(0, 0, windowWidth, windowHeight);
 
-                    m_Renderer->clear(m_OutOfBoundsColor);
-                    updateViewport();
-                }
+                m_Renderer->clear(SceneManager::getInstance().getOutOfBoundsColor());
 
-                if (m_WindowResized) {
-                    updateViewport();
-                }
-
-                m_Renderer->clear(m_BackgroundColor);
-
-                if (customUpdate) {
-                    customUpdate();
-                }
+                updateViewport();
+                m_Renderer->clear(SceneManager::getInstance().getBackgroundColor());
+                if (customUpdate) customUpdate();
 
                 SceneManager::getInstance().update();
                 SceneManager::getInstance().updateUI();
@@ -297,22 +277,9 @@ namespace engine {
         #endif
     }
 
-    void Core::setBackgroundColor(const Color& color) {
-        m_BackgroundColor = color;
-    }
-
-    void Core::setOutOfBoundsColor(bool custom, const Color& color) {
-        m_UseCustomOutOfBoundsColor = custom;
-        m_OutOfBoundsColor = color;
-    }
-
     void Core::setVectorScale(int targetWindowWidth, int targetWindowHeight) {
         m_TargetWindowWidth = targetWindowWidth;
         m_TargetWindowHeight = targetWindowHeight;
-    }
-
-    void Core::setVectorScale(bool useDefaultScale) {
-        m_DefaultVectorScale = useDefaultScale;
     }
 
     GLRenderer* Core::getRenderer() const {
@@ -404,7 +371,6 @@ namespace engine {
         m_Renderer->setViewport(0, 0, windowWidth, windowHeight);
         m_Renderer->setOrthographicProjection(0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight), 0.0f);
 
-        m_WindowResized = true;
         updateViewport();
         
         return true;
@@ -429,7 +395,6 @@ namespace engine {
             virtualHeight = static_cast<float>(m_TargetWindowHeight);
         }
 
-        // Calculate scale to maintain aspect ratio (letterboxing/pillarboxing)
         float scaleX = static_cast<float>(windowWidth) / virtualWidth;
         float scaleY = static_cast<float>(windowHeight) / virtualHeight;
         float scale = std::min(scaleX, scaleY);
@@ -438,6 +403,10 @@ namespace engine {
         int viewportHeight = static_cast<int>(virtualHeight * scale);
         int viewportX = (windowWidth - viewportWidth) / 2;
         int viewportY = (windowHeight - viewportHeight) / 2;
+
+        m_LetterboxX = viewportX;
+        m_LetterboxY = viewportY;
+        m_LetterboxScale = scale;
 
         m_Renderer->setViewport(viewportX, viewportY, viewportWidth, viewportHeight);
         m_Renderer->setOrthographicProjection(0.0f, virtualWidth, virtualHeight, 0.0f);

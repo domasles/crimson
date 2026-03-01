@@ -14,7 +14,7 @@ namespace engine {
     enum class RenderPass {
         Opaque,  // Textured quads (game objects)
         Debug,   // Gizmo lines and debug visualization
-        UI       // RmlUI overlay
+        UI       // UI overlay
     };
 
     class GLRenderer {

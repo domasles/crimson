@@ -11,12 +11,10 @@ namespace outBreak {
     void GameScene::init() {
         setInputSystem(std::make_unique<InputSystem>("config"));
 
-        if (hasInputSystem()) {
-            getInputSystem()->loadInputActions("InputActions.json");
-        }
+        if (hasInputSystem()) getInputSystem()->loadInputActions("InputActions.json");
 
         setBackgroundColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
-        setOutOfBoundsColor(true, Color(0.0f, 0.0f, 0.0f, 1.0f));
+        setOutOfBoundsColor(Color(0.0f, 0.0f, 0.0f, 1.0f));
 
         m_Ball = createEntity<Ball>();
         m_Paddle = createEntity<Paddle>();

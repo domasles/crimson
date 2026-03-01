@@ -239,5 +239,7 @@ namespace launcher::utils::game_selector {
         #ifndef LAUNCHER_PLATFORM_EMSCRIPTEN
             return showNuklearPicker(games);
         #endif
+
+        return std::nullopt;
     }
 }

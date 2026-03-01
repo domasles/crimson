@@ -21,9 +21,7 @@ target_include_directories(engine
         src/pch
 )
 
-if(NOT WASM)
-    target_include_directories(engine PUBLIC ${CMAKE_SOURCE_DIR}/vendor/rmlui/Include)
-endif()
+target_include_directories(engine PUBLIC ${CMAKE_SOURCE_DIR}/vendor/rmlui/Include)
 
 if(WIN32)
     target_include_directories(engine PUBLIC ${CMAKE_SOURCE_DIR}/vendor/glad/include)
@@ -35,6 +33,7 @@ if(WASM)
             SDL3::SDL3-static
             SDL3_image::SDL3_image-static
             SDL3_mixer::SDL3_mixer-static
+            RmlUi::Core
     )
 else()
     target_link_libraries(engine

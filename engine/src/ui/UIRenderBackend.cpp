@@ -6,18 +6,14 @@
 #include <GLRenderer.h>
 #include <Resources.h>
 #include <Shader.h>
+#include <Core.h>
 
 using namespace engine::utils::logger;
 using namespace engine::utils::math;
 
 namespace engine::ui {
     bool UIRenderBackend::init(engine::GLRenderer* renderer, int screenWidth, int screenHeight) {
-        m_Renderer     = renderer;
-        m_ScreenWidth  = screenWidth;
-        m_ScreenHeight = screenHeight;
-
-        buildUIProjection(screenWidth, screenHeight);
-
+        m_Renderer = renderer;
         Logger::engine_debug("RenderBackend initialized");
 
         return true;
@@ -124,7 +120,7 @@ namespace engine::ui {
         Shader* shader = m_Renderer->getDefaultShader();
 
         shader->use();
-        shader->setMat4("u_Projection", m_UIProjection.data());
+        shader->setMat4("u_Projection", m_Renderer->getProjectionMatrix());
         shader->setVec2("u_Translation", Vector2{translation.x, translation.y});
 
         if (texture != 0) {
@@ -213,19 +209,17 @@ namespace engine::ui {
     }
 
     void UIRenderBackend::SetScissorRegion(Rml::Rectanglei region) {
-        int gl_y = m_ScreenHeight - (region.Top() + region.Height());
-        glScissor(region.Left(), gl_y, region.Width(), region.Height());
-    }
+        const int lbX = Core::getInstance().getLetterboxX();
+        const int lbY = Core::getInstance().getLetterboxY();
+        const float lbS = Core::getInstance().getLetterboxScale();
 
-    void UIRenderBackend::buildUIProjection(int w, int h) {
-        float fw = static_cast<float>(w);
-        float fh = static_cast<float>(h);
+        const int screenX = lbX + static_cast<int>(region.Left() * lbS);
+        const int screenW = static_cast<int>(region.Width() * lbS);
+        const int screenH = static_cast<int>(region.Height() * lbS);
 
-        m_UIProjection = {
-             2.0f / fw, 0.0f,      0.0f, 0.0f,  // column 0
-             0.0f,     -2.0f / fh, 0.0f, 0.0f,  // column 1
-             0.0f,      0.0f,     -1.0f, 0.0f,  // column 2
-            -1.0f,      1.0f,      0.0f, 1.0f   // column 3
-        };
+        const int virtualH = static_cast<int>(Core::getInstance().getLogicalWindowSize().getY());
+        const int screenY  = lbY + static_cast<int>((virtualH - region.Top() - region.Height()) * lbS);
+
+        glScissor(screenX, screenY, screenW, screenH);
     }
 }
