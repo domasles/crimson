@@ -41,7 +41,6 @@ namespace engine {
             void run(std::function<void()> customUpdate);
             void setBackgroundColor(const Color& color);
 
-            void setOutOfBoundsColor(bool custom);
             void setOutOfBoundsColor(bool custom, const Color& color);
 
             void setVSync(bool enabled);
@@ -109,6 +108,9 @@ namespace engine {
     };
 
     inline Core& getCore() { return Core::getInstance(); }
+
+    inline void setBackgroundColor(const Color& color) { getCore().setBackgroundColor(color); }
+    inline void setOutOfBoundsColor(bool custom, const Color& color) { getCore().setOutOfBoundsColor(custom, color); }
 
     inline GLRenderer* getRenderer() { return getCore().getRenderer(); }
     inline SDL_Window* getWindow() { return getCore().getWindow(); }

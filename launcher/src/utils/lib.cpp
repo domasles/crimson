@@ -11,7 +11,7 @@ namespace launcher::utils::lib {
             int bufferSize = MultiByteToWideChar(CP_UTF8, 0, fileName.c_str(), -1, nullptr, 0);
 
             if (bufferSize == 0) {
-                std::cerr << "Failed to calculate buffer size!" << std::endl;
+                std::println(stderr, "Failed to calculate buffer size!");
                 return nullptr;
             }
 
@@ -22,7 +22,7 @@ namespace launcher::utils::lib {
             HMODULE hLib = LoadLibraryW(wideFileName.data());
 
             if (hLib == nullptr) {
-                std::cerr << "Failed to load the library!" << std::endl;
+                std::println(stderr, "Failed to load the library!");
             }
 
             return hLib;
@@ -31,7 +31,7 @@ namespace launcher::utils::lib {
             void* handle = dlopen(fileName.c_str(), RTLD_LAZY);
 
             if (!handle) {
-                std::cerr << "Failed to load the library: " << dlerror() << std::endl;
+                std::println(stderr, "Failed to load the library: {}", dlerror());
             }
 
             return handle;

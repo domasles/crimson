@@ -51,9 +51,7 @@ namespace engine {
             std::unordered_map<std::string, std::function<std::unique_ptr<Component>()>> m_ComponentFactories;
     };
 
-    inline ComponentManager& getComponentManager() {
-        return ComponentManager::getInstance();
-    }
+    inline ComponentManager& getComponentManager() { return ComponentManager::getInstance(); }
 
     template<typename T>
 

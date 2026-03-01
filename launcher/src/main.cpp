@@ -8,7 +8,7 @@
 
     int main() {
         if (!start()) {
-            std::cerr << "Game start failed" << std::endl;
+            std::println(stderr, "Game start failed");
             return -1;
         }
 
@@ -30,7 +30,7 @@
         auto selectedGame = selectGame(availableGames);
 
         if (!selectedGame) {
-            std::cerr << "No game selected or available." << std::endl;
+            std::println(stderr, "No game selected or available.");
             return -1;
         }
 
@@ -46,25 +46,25 @@
         auto internalUpdateFunc = reinterpret_cast<void(*)(std::function<void()> customUpdateFunc)>(getFunction(libraryHandle, "internalUpdate"));
 
         if (!internalUpdateFunc) {
-            std::cerr << "Failed to load internalUpdate function from game library" << std::endl;
+            std::println(stderr, "Failed to load internalUpdate function from game library");
             unloadLibrary(libraryHandle);
             return -1;
         }
 
         if (awakeFunc && !awakeFunc()) {
-            std::cerr << "Game awake failed" << std::endl;
+            std::println(stderr, "Game awake failed");
             unloadLibrary(libraryHandle);
             return -1;
         }
 
         if (!startFunc) {
-            std::cerr << "Game entry point 'start' not found." << std::endl;
+            std::println(stderr, "Game entry point 'start' not found.");
             unloadLibrary(libraryHandle);
             return -1;
         }
 
         if (!startFunc()) {
-            std::cerr << "Game start failed" << std::endl;
+            std::println(stderr, "Game start failed");
             unloadLibrary(libraryHandle);
             return -1;
         }

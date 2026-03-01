@@ -59,7 +59,7 @@ namespace launcher::utils::game_selector {
             std::string gamesDir = filesystem::getExecutableDirectory() + "/games";
         #endif
 
-        std::cout << "Scanning games in directory: " << gamesDir << std::endl;
+        std::println("Scanning games in directory: {}", gamesDir);
 
         if (!filesystem::directoryExists(gamesDir)) {
             return games;
@@ -102,12 +102,12 @@ namespace launcher::utils::game_selector {
             SDL_Renderer* renderer = nullptr;
 
             if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS)) {
-                std::cerr << "SDL_Init failed: " << SDL_GetError() << std::endl;
+                std::println(stderr, "SDL_Init failed: {}", SDL_GetError());
                 return std::nullopt;
             }
 
             if (!SDL_CreateWindowAndRenderer( "Select a Game", WIN_W, WIN_H, SDL_WINDOW_HIGH_PIXEL_DENSITY, &window, &renderer)) {
-                std::cerr << "SDL_CreateWindowAndRenderer failed: " << SDL_GetError() << std::endl;
+                std::println(stderr, "SDL_CreateWindowAndRenderer failed: {}", SDL_GetError());
                 SDL_Quit();
                 return std::nullopt;
             }
@@ -230,7 +230,7 @@ namespace launcher::utils::game_selector {
 
     std::optional<GameInfo> selectGame(const std::vector<GameInfo>& games) {
         if (games.empty()) {
-            std::cerr << "No games found!" << std::endl;
+            std::println(stderr, "No games found!");
             return std::nullopt;
         }
 

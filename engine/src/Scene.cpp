@@ -2,9 +2,9 @@
 
 #include <utils/logger.h>
 
-#include <Scene.h>
-
 #include <components/CollisionComponent.h>
+
+#include <Scene.h>
 
 using namespace engine::utils::logger;
 using namespace engine::utils::math;
@@ -194,6 +194,26 @@ namespace engine {
 
         m_CurrentScene->render();
         return true;
+    }
+
+    void SceneManager::updateUI() {
+        if (m_CurrentScene) m_CurrentScene->updateUI();
+    }
+
+    void SceneManager::renderUI() {
+        if (m_CurrentScene) m_CurrentScene->renderUI();
+    }
+
+    void SceneManager::prepareRender() {
+        if (m_CurrentScene) {
+            float alpha = m_PhysicsAccumulator / FIXED_TIMESTEP;
+            m_CurrentScene->prepareRender(alpha);
+        }
+    }
+
+    bool SceneManager::processUIEvent(const SDL_Event& event) {
+        if (m_CurrentScene) return m_CurrentScene->processUIEvent(event);
+        return false;
     }
 
     const std::string& SceneManager::getCurrentSceneName() const {

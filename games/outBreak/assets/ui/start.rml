@@ -1,0 +1,11 @@
+<rml>
+    <head>
+        <link type="text/rcss" href="start.rcss"/>
+    </head>
+    <body>
+        <div id="container">
+            <h1 id="title">OutBreak</h1>
+            <button id="play-btn">Play</button>
+        </div>
+    </body>
+</rml>

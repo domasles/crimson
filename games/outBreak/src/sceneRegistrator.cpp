@@ -1,6 +1,7 @@
 ﻿#include <pch.h>
 
-#include <scenes/MainScene.h>
+#include <scenes/StartScene.h>
+#include <scenes/GameScene.h>
 
 #include <Engine.h>
 
@@ -8,7 +9,9 @@
 
 namespace outBreak {
     void registrateScenes() {
-        createScene<MainScene>("MainScene");
-        switchToScene("MainScene");
+        createScene<StartScene>("StartScene");
+        createScene<GameScene>("GameScene");
+
+        switchToScene("StartScene");
     }
 }

@@ -1,13 +1,15 @@
 #pragma once
 
+#include <collisions/BVH.h>
+#include <ui/UIContext.h>
+
 #include <Entity.h>
 #include <Input.h>
 #include <Core.h>
 #include <Map.h>
 
-#include <collisions/BVH.h>
-
 using namespace engine::collisions;
+using namespace engine::ui;
 
 namespace engine {
     class Scene {
@@ -75,22 +77,30 @@ namespace engine {
                 return result;
             }
 
+            void updateUI()  { m_UIContext.update(); }
+            void renderUI()  { m_UIContext.render(); }
+
+            bool isUICapturingInput() const { return m_UIContext.isCapturingInput(); }
+            bool processUIEvent(const SDL_Event& event) { return m_UIContext.processEvent(event); }
+
             void setMap(std::unique_ptr<Map> map) { m_Map = std::move(map); }
             bool hasMap() const { return m_Map != nullptr; }
-
-            Map* getMap() { return m_Map.get(); }
-            const Map* getMap() const { return m_Map.get(); }
 
             void setInputSystem(std::unique_ptr<InputSystem> inputSystem) { m_InputSystem = std::move(inputSystem); }
             bool hasInputSystem() const { return m_InputSystem != nullptr; }
 
+            void rebuildBVH();
+
+            Map* getMap() { return m_Map.get(); }
+            const Map* getMap() const { return m_Map.get(); }
+
             InputSystem* getInputSystem() { return m_InputSystem.get(); }
             const InputSystem* getInputSystem() const { return m_InputSystem.get(); }
 
-            void rebuildBVH();
-
             BVH& getBVH() { return m_BVH; }
             const BVH& getBVH() const { return m_BVH; }
+
+            UIContext& getUIContext() { return m_UIContext; }
 
         protected:
             bool m_Initialized = false;
@@ -104,6 +114,7 @@ namespace engine {
 
             BVH m_BVH;
             std::vector<CollisionComponent*> m_CollisionComponents;
+            UIContext m_UIContext;
 
             void updateEntities(float deltaTime) {
                 for (auto& entity : m_Entities) {
@@ -128,14 +139,11 @@ namespace engine {
 
             bool update();
             bool render();
+            void updateUI();
+            void renderUI();
+            void prepareRender();
 
-            // Prepare entities for rendering with interpolation
-            void prepareRender() {
-                if (m_CurrentScene) {
-                    float alpha = m_PhysicsAccumulator / FIXED_TIMESTEP;
-                    m_CurrentScene->prepareRender(alpha);
-                }
-            }
+            bool processUIEvent(const SDL_Event& event);
 
             const std::string& getCurrentSceneName() const;
             std::shared_ptr<Scene> getCurrentScene() const;
@@ -165,18 +173,14 @@ namespace engine {
             static constexpr float MAX_DELTA_TIME = 0.25f;
     };
 
-    inline SceneManager& getSceneManager() {
-        return SceneManager::getInstance();
-    }
-    
+    inline SceneManager& getSceneManager() { return SceneManager::getInstance(); }
+    inline bool switchToScene(const std::string& name) { return getSceneManager().changeScene(name); }
+
     template<typename T>
 
     bool createScene(const std::string& name) {
         static_assert(std::is_base_of_v<Scene, T>, "T must derive from Scene");
         return getSceneManager().registerScene(name, std::make_shared<T>());
     }
-    
-    inline bool switchToScene(const std::string& name) {
-        return getSceneManager().changeScene(name);
-    }
+
 }

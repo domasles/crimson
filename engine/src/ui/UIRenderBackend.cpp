@@ -8,6 +8,7 @@
 #include <Shader.h>
 
 using namespace engine::utils::logger;
+using namespace engine::utils::math;
 
 namespace engine::ui {
     bool UIRenderBackend::init(engine::GLRenderer* renderer, int screenWidth, int screenHeight) {
@@ -17,7 +18,7 @@ namespace engine::ui {
 
         buildUIProjection(screenWidth, screenHeight);
 
-        Logger::engine_debug("[UI] RenderBackend initialized ({}x{})", screenWidth, screenHeight);
+        Logger::engine_debug("RenderBackend initialized");
 
         return true;
     }
@@ -48,7 +49,15 @@ namespace engine::ui {
     }
 
     void UIRenderBackend::endUIPass() {
+        Shader* shader = m_Renderer->getDefaultShader();
+
+        if (shader) {
+            shader->use();
+            shader->setVec2("u_Translation", Vector2{0.0f, 0.0f});
+        }
+
         glDisable(GL_SCISSOR_TEST);
+
         glBindVertexArray(0);
         glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -116,7 +125,7 @@ namespace engine::ui {
 
         shader->use();
         shader->setMat4("u_Projection", m_UIProjection.data());
-        shader->setVec2("u_Translation", engine::utils::math::Vector2{translation.x, translation.y});
+        shader->setVec2("u_Translation", Vector2{translation.x, translation.y});
 
         if (texture != 0) {
             glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(texture));
@@ -150,7 +159,7 @@ namespace engine::ui {
         auto tex = engine::getResources().loadTexture(source);
 
         if (!tex) {
-            Logger::engine_warn("[UI] Failed to load texture: {}", source);
+            Logger::engine_warn("Failed to load texture: {}", source);
             return 0;
         }
 

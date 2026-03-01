@@ -42,6 +42,9 @@
 #include <filesystem>
 #include <fstream>
 
+#include <cstdio>
+#include <print>
+
 #include <utility>
 #include <format>
 #include <string>

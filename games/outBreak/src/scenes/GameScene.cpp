@@ -1,6 +1,6 @@
 ﻿#include <pch.h>
 
-#include <scenes/MainScene.h>
+#include <scenes/GameScene.h>
 
 #include <entities/GameManager.h>
 #include <entities/Paddle.h>
@@ -8,15 +8,15 @@
 #include <entities/Ball.h>
 
 namespace outBreak {
-    void MainScene::init() {
+    void GameScene::init() {
         setInputSystem(std::make_unique<InputSystem>("config"));
 
         if (hasInputSystem()) {
             getInputSystem()->loadInputActions("InputActions.json");
         }
 
-        getCore().setBackgroundColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
-        getCore().setOutOfBoundsColor(true, Color(0.0f, 0.0f, 0.0f, 1.0f));
+        setBackgroundColor(Color(1.0f, 1.0f, 1.0f, 1.0f));
+        setOutOfBoundsColor(true, Color(0.0f, 0.0f, 0.0f, 1.0f));
 
         m_Ball = createEntity<Ball>();
         m_Paddle = createEntity<Paddle>();
@@ -36,15 +36,15 @@ namespace outBreak {
         }
     }
 
-    void MainScene::update(const float deltaTime) {
+    void GameScene::update(const float deltaTime) {
         updateEntities(deltaTime);
     }
 
-    void MainScene::render() {
+    void GameScene::render() {
         renderEntities();
     }
 
-    void MainScene::createBricks() {
+    void GameScene::createBricks() {
         const int ROWS = 8;
         const int COLS = 18;
         const float BRICK_WIDTH = 80.0f;

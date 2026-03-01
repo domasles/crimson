@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <Engine.h>
-#include <vector>
 
 using namespace engine;
 
@@ -11,20 +10,21 @@ namespace outBreak {
     class Brick;
     class GameManager;
 
-    class MainScene : public Scene {
+    class GameScene : public Scene {
         public:
-            MainScene() { m_Name = "MainScene"; }
+            GameScene() { m_Name = "GameScene"; }
 
             void init() override;
             void update(const float deltaTime) override;
             void render() override;
 
         private:
+            void createBricks();
+
             Ball* m_Ball;
             Paddle* m_Paddle;
             GameManager* m_GameManager;
-            std::vector<Brick*> m_Bricks;
 
-            void createBricks();
+            std::vector<Brick*> m_Bricks;
     };
 }

@@ -13,11 +13,6 @@ file(GLOB_RECURSE ENGINE_SOURCES
 
 add_library(engine STATIC ${ENGINE_SOURCES})
 
-set_target_properties(engine PROPERTIES
-    CXX_STANDARD 20
-    CXX_STANDARD_REQUIRED ON
-)
-
 target_include_directories(engine
     PUBLIC
         src/include

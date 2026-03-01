@@ -31,15 +31,7 @@ namespace engine {
             std::string makeKey(const std::string& filePath) const;
     };
 
-    inline ResourceManager& getResources() { 
-        return ResourceManager::getInstance(); 
-    }
-    
-    inline std::shared_ptr<Texture> loadTexture(const std::string& filePath) {
-        return getResources().loadTexture(filePath);
-    }
-    
-    inline std::shared_ptr<Sound> loadSound(const std::string& filePath) {
-        return getResources().loadSound(filePath);
-    }
+    inline ResourceManager& getResources() { return ResourceManager::getInstance(); }
+    inline std::shared_ptr<Texture> loadTexture(const std::string& filePath) { return getResources().loadTexture(filePath); }
+    inline std::shared_ptr<Sound> loadSound(const std::string& filePath) { return getResources().loadSound(filePath); }
 }

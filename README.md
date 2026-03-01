@@ -43,8 +43,8 @@ A simple, powerful 2D game engine designed for learning game development fundame
 ## Quick Start
 
 ### Prerequisites
-- **CMake 3.16+**
-- **Visual Studio 2022** (Windows), **GCC 7+** (Linux), or **Xcode** (macOS)
+- **CMake 4.x**
+- **Visual Studio 2026** (Windows), **GCC 14+** (Linux), or **Xcode** (macOS), or any **C++23** compatible compiler
 - **Git** with submodules support
 
 ### Setup

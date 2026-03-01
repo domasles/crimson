@@ -19,11 +19,6 @@ else()
     add_library(${libName} SHARED ${OUTBREAK_SOURCES})
 endif()
 
-set_target_properties(${libName} PROPERTIES
-    CXX_STANDARD 20
-    CXX_STANDARD_REQUIRED ON
-)
-
 if(WASM)
     set_target_properties(${libName} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/games/outBreak"

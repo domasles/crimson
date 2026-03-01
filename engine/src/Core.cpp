@@ -65,8 +65,8 @@ using namespace engine;
 
         // PASS 3: UI overlay
         core.getRenderer()->beginPass(RenderPass::UI);
-        UIManager::getInstance().update();
-        UIManager::getInstance().render();
+        SceneManager::getInstance().updateUI();
+        SceneManager::getInstance().renderUI();
         core.getRenderer()->endPass();
 
         core.getRenderer()->endFrame();
@@ -237,7 +237,7 @@ namespace engine {
                 m_WindowResized = true;
             }
 
-            UIManager::getInstance().processEvent(event);
+            SceneManager::getInstance().processUIEvent(event);
         }
 
         return true;
@@ -271,6 +271,7 @@ namespace engine {
                 }
 
                 SceneManager::getInstance().update();
+                SceneManager::getInstance().updateUI();
                 SceneManager::getInstance().prepareRender();
 
                 // PASS 1: Render all opaque game objects
@@ -285,22 +286,19 @@ namespace engine {
 
                 // PASS 3: UI overlay
                 m_Renderer->beginPass(RenderPass::UI);
-                UIManager::getInstance().update();
-                UIManager::getInstance().render();
+                SceneManager::getInstance().renderUI();
                 m_Renderer->endPass();
 
                 m_Renderer->endFrame();
                 SDL_GL_SwapWindow(m_Window.get());
             }
+
+            UIManager::getInstance().shutdown();
         #endif
     }
 
     void Core::setBackgroundColor(const Color& color) {
         m_BackgroundColor = color;
-    }
-
-    void Core::setOutOfBoundsColor(bool custom) {
-        m_UseCustomOutOfBoundsColor = custom;
     }
 
     void Core::setOutOfBoundsColor(bool custom, const Color& color) {

@@ -1,6 +1,7 @@
+#include <pch.h>
+
 #include <ui/UISystemInterface.h>
 #include <utils/logger.h>
-#include <SDL3/SDL.h>
 
 using namespace engine::utils::logger;
 
@@ -19,13 +20,13 @@ namespace engine::ui {
         switch (type) {
             case Rml::Log::LT_ERROR:
             case Rml::Log::LT_ASSERT:
-                Logger::engine_error("[UI] {}", message);
+                Logger::engine_error("{}", message);
                 break;
             case Rml::Log::LT_WARNING:
-                Logger::engine_warn("[UI] {}", message);
+                Logger::engine_warn("{}", message);
                 break;
             default:
-                Logger::engine_debug("[UI] {}", message);
+                Logger::engine_debug("{}", message);
                 break;
         }
 

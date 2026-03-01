@@ -13,10 +13,8 @@ constexpr int WINDOW_HEIGHT = 900;
 constexpr bool RESIZABLE = true;
 constexpr bool VSYNC = true;
 
-Core& engineCore = getCore();
-
 GAME_API bool start() {
-    if (!engineCore.init("outBreak", "OutBreak", WINDOW_WIDTH, WINDOW_HEIGHT, RESIZABLE, VSYNC)) {
+    if (!getCore().init("outBreak", "OutBreak", WINDOW_WIDTH, WINDOW_HEIGHT, RESIZABLE, VSYNC)) {
         return false;
     }
 

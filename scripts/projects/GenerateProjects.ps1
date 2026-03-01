@@ -2,7 +2,7 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectRoot = Resolve-Path (Join-Path $ScriptDir '..\..')
 $EmsdkBat = Join-Path $ProjectRoot "vendor\emsdk\emsdk_env.bat"
 
-Write-Host "Generating Visual Studio 2022 solution and Emscripten build files..."
+Write-Host "Generating Visual Studio 2026 solution and Emscripten build files..."
 Push-Location $ProjectRoot
 
 $envLines = cmd.exe /c "`"$EmsdkBat`" & set"
@@ -17,7 +17,7 @@ foreach ($line in $envLines) {
 
 try {
     & emcmake cmake -B build-wasm -G "Ninja Multi-Config"
-    & cmake -B build-native -G "Visual Studio 17 2022"
+    & cmake -B build-native -G "Visual Studio 18 2026"
 }
 catch {
     Write-Host "Failed to generate project files!"

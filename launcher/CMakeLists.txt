@@ -43,8 +43,6 @@ if(WASM)
         )
 
         set_target_properties(${GAME_EXEC} PROPERTIES
-            CXX_STANDARD 20
-            CXX_STANDARD_REQUIRED ON
             OUTPUT_NAME "${OUTPUT_NAME}"
             RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>/${game}"
             SUFFIX ".html"
@@ -70,11 +68,6 @@ if(WASM)
 else()
     add_executable(launcher ${LAUNCHER_SOURCES})
     set(LAUNCHER_TARGET launcher)
-
-    set_target_properties(${LAUNCHER_TARGET} PROPERTIES
-        CXX_STANDARD 20
-        CXX_STANDARD_REQUIRED ON
-    )
 
     target_link_libraries(${LAUNCHER_TARGET}
         PRIVATE
