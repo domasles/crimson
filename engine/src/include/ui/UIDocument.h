@@ -1,5 +1,9 @@
 #pragma once
 
+#include <utils/filesystem.h>
+
+using namespace engine::utils::filesystem;
+
 namespace Rml {
     class ElementDocument;
 }
@@ -19,6 +23,7 @@ namespace engine::ui {
             UIDocument& operator=(const UIDocument&) = delete;
 
             UIDocument& listen(const std::string& elementId, const std::string& event, std::function<void()> callback);
+            UIDocument& setDocument(const std::string& path);
 
             void show();
             void hide();

@@ -1,6 +1,8 @@
 #include <pch.h>
 
 #include <ui/UIDocument.h>
+#include <ui/UIContext.h>
+
 #include <utils/logger.h>
 
 using namespace engine::utils::logger;
@@ -61,6 +63,11 @@ namespace engine::ui {
         el->AddEventListener(event, listener.get());
         m_Listeners.push_back(std::move(listener));
 
+        return *this;
+    }
+
+    UIDocument& UIDocument::setDocument(const std::string& path) {
+        *this = getCurrentContext().loadDocument(getGamePath() + "/" + path);
         return *this;
     }
 

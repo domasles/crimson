@@ -21,7 +21,7 @@
 
 #include <mapCollisionTiles/MapTile.h>
 
-#include <ui/Document.h>
+#include <ui/UIDocument.h>
 #include <ui/Font.h>
 
 #include <Component.h>

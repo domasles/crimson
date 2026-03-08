@@ -18,8 +18,8 @@
 
 #include <utils/rendering.h>
 
-#include <Input.h>
 #include <GLRenderer.h>
+#include <Input.h>
 
 using namespace engine::utils::rendering;
 

@@ -42,6 +42,7 @@ using namespace engine;
 
         core.updateViewport();
         core.getRenderer()->clear(SceneManager::getInstance().getBackgroundColor());
+
         if (s_WASMUpdate) s_WASMUpdate();
 
         SceneManager::getInstance().update();

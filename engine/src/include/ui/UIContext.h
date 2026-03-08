@@ -9,10 +9,6 @@ namespace Rml {
 }
 
 namespace engine::ui {
-    class UIContext;
-
-    UIContext& getCurrentContext();
-
     class UIContext {
         public:
             UIContext() = default;
@@ -40,4 +36,6 @@ namespace engine::ui {
         private:
             Rml::Context* m_Context = nullptr;
     };
+
+    UIContext& getCurrentContext();
 }

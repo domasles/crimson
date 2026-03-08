@@ -14,7 +14,7 @@ namespace outBreak {
             void render() override {}
 
         private:
-            engine::ui::UIDocument m_Document;
+            UIDocument m_Document;
     };
 }
 
