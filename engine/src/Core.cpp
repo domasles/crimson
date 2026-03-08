@@ -19,8 +19,6 @@ using namespace engine::ui;
 using namespace engine;
 
 #ifdef ENGINE_PLATFORM_EMSCRIPTEN
-    static std::function<void()> s_WASMUpdate;
-
     static void emscripten_main_loop() {
         Core& core = Core::getInstance();
 
@@ -29,43 +27,7 @@ using namespace engine;
             return;
         }
 
-        {
-            int windowWidth, windowHeight;
-
-            SDL_GetWindowSize(core.getWindow(), &windowWidth, &windowHeight);
-
-            glDisable(GL_SCISSOR_TEST);
-            glViewport(0, 0, windowWidth, windowHeight);
-
-            core.getRenderer()->clear(SceneManager::getInstance().getOutOfBoundsColor());
-        }
-
-        core.updateViewport();
-        core.getRenderer()->clear(SceneManager::getInstance().getBackgroundColor());
-
-        if (s_WASMUpdate) s_WASMUpdate();
-
-        SceneManager::getInstance().update();
-        SceneManager::getInstance().updateUI();
-        SceneManager::getInstance().prepareRender();
-
-        // PASS 1: Render all opaque game objects
-        core.getRenderer()->beginPass(RenderPass::Opaque);
-        SceneManager::getInstance().render();
-        core.getRenderer()->endPass();
-
-        // PASS 2: Render all debug gizmos
-        core.getRenderer()->beginPass(RenderPass::Debug);
-        Gizmos::renderGizmos();
-        core.getRenderer()->endPass();
-
-        // PASS 3: UI overlay
-        core.getRenderer()->beginPass(RenderPass::UI);
-        SceneManager::getInstance().renderUI();
-        core.getRenderer()->endPass();
-
-        core.getRenderer()->endFrame();
-        SDL_GL_SwapWindow(core.getWindow());
+        core.runFrame();
     }
 #endif
 
@@ -221,6 +183,8 @@ namespace engine {
             UIManager::getInstance().init(m_Renderer.get(), physW, physH);
         }
 
+        updateViewport();
+
         return true;
     }
 
@@ -232,6 +196,10 @@ namespace engine {
                 return false;
             }
 
+            if (event.type == SDL_EVENT_WINDOW_RESIZED) {
+                updateViewport();
+            }
+
             SceneManager::getInstance().processUIEvent(event);
         }
 
@@ -239,48 +207,54 @@ namespace engine {
     }
 
     void Core::run(std::function<void()> customUpdate) {
+        m_CustomUpdate = std::move(customUpdate);
+
         #ifdef ENGINE_PLATFORM_EMSCRIPTEN
-            s_WASMUpdate = customUpdate;
             emscripten_set_main_loop(emscripten_main_loop, 0, 1);
         #else
-            while (processEvents()) {
-                int windowWidth, windowHeight;
-                SDL_GetWindowSize(m_Window.get(), &windowWidth, &windowHeight);
-
-                glDisable(GL_SCISSOR_TEST);
-                glViewport(0, 0, windowWidth, windowHeight);
-
-                m_Renderer->clear(SceneManager::getInstance().getOutOfBoundsColor());
-
-                updateViewport();
-                m_Renderer->clear(SceneManager::getInstance().getBackgroundColor());
-                if (customUpdate) customUpdate();
-
-                SceneManager::getInstance().update();
-                SceneManager::getInstance().updateUI();
-                SceneManager::getInstance().prepareRender();
-
-                // PASS 1: Render all opaque game objects
-                m_Renderer->beginPass(RenderPass::Opaque);
-                SceneManager::getInstance().render();
-                m_Renderer->endPass();
-
-                // PASS 2: Render all debug gizmos
-                m_Renderer->beginPass(RenderPass::Debug);
-                Gizmos::renderGizmos();
-                m_Renderer->endPass();
-
-                // PASS 3: UI overlay
-                m_Renderer->beginPass(RenderPass::UI);
-                SceneManager::getInstance().renderUI();
-                m_Renderer->endPass();
-
-                m_Renderer->endFrame();
-                SDL_GL_SwapWindow(m_Window.get());
-            }
-
+            while (processEvents()) runFrame();
             UIManager::getInstance().shutdown();
         #endif
+    }
+
+    void Core::runFrame() {
+        int windowWidth, windowHeight;
+        SDL_GetWindowSize(m_Window.get(), &windowWidth, &windowHeight);
+
+        glDisable(GL_SCISSOR_TEST);
+        glViewport(0, 0, windowWidth, windowHeight);
+        m_Renderer->clear(SceneManager::getInstance().getOutOfBoundsColor());
+
+        applyLetterboxViewport();
+        m_Renderer->clear(SceneManager::getInstance().getBackgroundColor());
+
+        if (m_CustomUpdate) m_CustomUpdate();
+
+        SceneManager::getInstance().update();
+        SceneManager::getInstance().updateUI();
+        SceneManager::getInstance().prepareRender();
+
+        // PASS 1: Render all opaque game objects
+        m_Renderer->beginPass(RenderPass::Opaque);
+        SceneManager::getInstance().render();
+        m_Renderer->endPass();
+
+        // PASS 2: Render all debug gizmos
+        m_Renderer->beginPass(RenderPass::Debug);
+        Gizmos::renderGizmos();
+        m_Renderer->endPass();
+
+        // PASS 3: UI overlay
+        m_Renderer->beginPass(RenderPass::UI);
+        SceneManager::getInstance().renderUI();
+        m_Renderer->endPass();
+
+        m_Renderer->endFrame();
+        SDL_GL_SwapWindow(m_Window.get());
+    }
+
+    void Core::applyLetterboxViewport() {
+        m_Renderer->setViewport(m_LetterboxX, m_LetterboxY, m_ViewportW, m_ViewportH);
     }
 
     void Core::setVectorScale(int targetWindowWidth, int targetWindowHeight) {
@@ -376,8 +350,6 @@ namespace engine {
 
         m_Renderer->setViewport(0, 0, windowWidth, windowHeight);
         m_Renderer->setOrthographicProjection(0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight), 0.0f);
-
-        updateViewport();
         
         return true;
     }
@@ -413,6 +385,8 @@ namespace engine {
         m_LetterboxX = viewportX;
         m_LetterboxY = viewportY;
         m_LetterboxScale = scale;
+        m_ViewportW = viewportWidth;
+        m_ViewportH = viewportHeight;
 
         m_Renderer->setViewport(viewportX, viewportY, viewportWidth, viewportHeight);
         m_Renderer->setOrthographicProjection(0.0f, virtualWidth, virtualHeight, 0.0f);

@@ -39,6 +39,7 @@ namespace engine {
             const std::string& getName() const { return m_ParentFolder; }
 
             void run(std::function<void()> customUpdate);
+            void runFrame();
 
             void setVSync(bool enabled);
             bool getVSync() const { return m_VSync; }
@@ -52,6 +53,7 @@ namespace engine {
 
             int getLetterboxX() const { return m_LetterboxX; }
             int getLetterboxY() const { return m_LetterboxY; }
+
             float getLetterboxScale() const { return m_LetterboxScale; }
 
             GLRenderer* getRenderer() const;
@@ -72,6 +74,8 @@ namespace engine {
             bool initFullScreenWindow(const std::string& title);
             bool initRenderer();
 
+            void applyLetterboxViewport();
+
             float calculateUniformScale(int width, int height, float baseWidth, float baseHeight);
 
             int m_WindowWidth = 0;
@@ -88,8 +92,11 @@ namespace engine {
 
             int m_LetterboxX = 0;
             int m_LetterboxY = 0;
+            int m_ViewportW  = 0;
+            int m_ViewportH  = 0;
             float m_LetterboxScale = 1.0f;
 
+            std::function<void()> m_CustomUpdate;
             std::string m_ParentFolder;
 
             std::unique_ptr<SDL_Window, void(*)(SDL_Window*)> m_Window;
