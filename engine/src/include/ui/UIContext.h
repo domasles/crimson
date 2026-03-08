@@ -21,6 +21,8 @@ namespace engine::ui {
             UIContext& operator=(UIContext&&) = delete;
 
             void init(int width, int height);
+            void resize(int width, int height, float dpRatio);
+
             void shutdown();
 
             bool initialized() const { return m_Context != nullptr; }

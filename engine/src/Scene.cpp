@@ -204,6 +204,10 @@ namespace engine {
         if (m_CurrentScene) m_CurrentScene->renderUI();
     }
 
+    void SceneManager::resizeUI(int width, int height, float dpRatio) {
+        if (m_CurrentScene) m_CurrentScene->getUIContext().resize(width, height, dpRatio);
+    }
+
     void SceneManager::prepareRender() {
         if (m_CurrentScene) {
             float alpha = m_PhysicsAccumulator / FIXED_TIMESTEP;

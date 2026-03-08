@@ -6,7 +6,6 @@
 #include <GLRenderer.h>
 #include <Resources.h>
 #include <Shader.h>
-#include <Core.h>
 
 using namespace engine::utils::logger;
 using namespace engine::utils::math;
@@ -14,6 +13,9 @@ using namespace engine::utils::math;
 namespace engine::ui {
     bool UIRenderBackend::init(engine::GLRenderer* renderer, int screenWidth, int screenHeight) {
         m_Renderer = renderer;
+        m_PhysWidth = screenWidth;
+        m_PhysHeight = screenHeight;
+        
         Logger::engine_debug("RenderBackend initialized");
 
         return true;
@@ -38,6 +40,10 @@ namespace engine::ui {
 
     void UIRenderBackend::beginUIPass() {
         std::memcpy(m_SavedProjection.data(), m_Renderer->getProjectionMatrix(), 16 * sizeof(float));
+        glGetIntegerv(GL_VIEWPORT, m_SavedViewport.data());
+
+        glViewport(0, 0, m_PhysWidth, m_PhysHeight);
+        m_Renderer->setOrthographicProjection(0.0f, static_cast<float>(m_PhysWidth), static_cast<float>(m_PhysHeight), 0.0f);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -58,6 +64,7 @@ namespace engine::ui {
         glBindTexture(GL_TEXTURE_2D, 0);
 
         m_Renderer->setProjectionMatrix(m_SavedProjection.data());
+        glViewport(m_SavedViewport[0], m_SavedViewport[1], m_SavedViewport[2], m_SavedViewport[3]);
     }
 
     Rml::CompiledGeometryHandle UIRenderBackend::CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices) {
@@ -209,17 +216,7 @@ namespace engine::ui {
     }
 
     void UIRenderBackend::SetScissorRegion(Rml::Rectanglei region) {
-        const int lbX = Core::getInstance().getLetterboxX();
-        const int lbY = Core::getInstance().getLetterboxY();
-        const float lbS = Core::getInstance().getLetterboxScale();
-
-        const int screenX = lbX + static_cast<int>(region.Left() * lbS);
-        const int screenW = static_cast<int>(region.Width() * lbS);
-        const int screenH = static_cast<int>(region.Height() * lbS);
-
-        const int virtualH = static_cast<int>(Core::getInstance().getLogicalWindowSize().getY());
-        const int screenY  = lbY + static_cast<int>((virtualH - region.Top() - region.Height()) * lbS);
-
-        glScissor(screenX, screenY, screenW, screenH);
+        const int screenY = m_PhysHeight - region.Top() - region.Height();
+        glScissor(region.Left(), screenY, region.Width(), region.Height());
     }
 }

@@ -62,6 +62,14 @@ namespace engine::ui {
         Rml::LoadFontFace(path, fallback);
     }
 
+    void UIManager::updateSize(int width, int height, float dpRatio) {
+        m_Width = width;
+        m_Height = height;
+        m_DpRatio = dpRatio;
+
+        if (m_RenderBackend) m_RenderBackend->updateSize(width, height);
+    }
+
     void UIManager::beginUIPass() {
         if (m_RenderBackend) m_RenderBackend->beginUIPass();
     }

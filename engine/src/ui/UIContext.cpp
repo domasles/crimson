@@ -79,7 +79,10 @@ namespace engine::ui {
 
         if (!m_Context) {
             Logger::engine_error("Rml::CreateContext({}) failed.", name);
+            return;
         }
+
+        m_Context->SetDensityIndependentPixelRatio(UIManager::getInstance().getDpRatio());
     }
 
     void UIContext::shutdown() {
@@ -87,6 +90,13 @@ namespace engine::ui {
             Rml::RemoveContext(m_Context->GetName());
             m_Context = nullptr;
         }
+    }
+
+    void UIContext::resize(int width, int height, float dpRatio) {
+        if (!m_Context) return;
+
+        m_Context->SetDimensions(Rml::Vector2i{width, height});
+        m_Context->SetDensityIndependentPixelRatio(dpRatio);
     }
 
     void UIContext::update() {
@@ -131,42 +141,23 @@ namespace engine::ui {
 
         const int mods = getRmlModifiers();
 
-        const int lbX = Core::getInstance().getLetterboxX();
-        const int lbY = Core::getInstance().getLetterboxY();
-        const float lbS = Core::getInstance().getLetterboxScale();
-
-        auto toVirtual = [&](float wx, float wy, int& vx, int& vy) {
-            vx = static_cast<int>((wx - lbX) / lbS);
-            vy = static_cast<int>((wy - lbY) / lbS);
-        };
-
         switch (event.type) {
             case SDL_EVENT_MOUSE_MOTION: {
-                int vx, vy;
-
-                toVirtual(event.motion.x, event.motion.y, vx, vy);
-                const bool notOver = m_Context->ProcessMouseMove(vx, vy, mods);
-
+                const bool notOver = m_Context->ProcessMouseMove(static_cast<int>(event.motion.x), static_cast<int>(event.motion.y), mods);
                 return !notOver;
             }
 
             case SDL_EVENT_MOUSE_BUTTON_DOWN: {
-                int vx, vy;
+                m_Context->ProcessMouseMove(static_cast<int>(event.button.x), static_cast<int>(event.button.y), mods);
 
-                toVirtual(event.button.x, event.button.y, vx, vy);
-                m_Context->ProcessMouseMove(vx, vy, mods);
                 const bool notConsumed = m_Context->ProcessMouseButtonDown(event.button.button - 1, mods);
-
                 return !notConsumed;
             }
 
             case SDL_EVENT_MOUSE_BUTTON_UP: {
-                int vx, vy;
+                m_Context->ProcessMouseMove(static_cast<int>(event.button.x), static_cast<int>(event.button.y), mods);
 
-                toVirtual(event.button.x, event.button.y, vx, vy);
-                m_Context->ProcessMouseMove(vx, vy, mods);
                 const bool notConsumed = m_Context->ProcessMouseButtonUp(event.button.button - 1, mods);
-
                 return !notConsumed;
             }
 

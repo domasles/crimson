@@ -23,15 +23,20 @@ namespace engine::ui {
             void beginUIPass();
             void endUIPass();
 
-            int getWidth()  const { return m_Width; }
+            void updateSize(int width, int height, float dpRatio);
+
+            int getWidth() const { return m_Width; }
             int getHeight() const { return m_Height; }
+
+            float getDpRatio() const { return m_DpRatio; }
 
         private:
             UIManager(const UIManager&)            = delete;
             UIManager& operator=(const UIManager&) = delete;
 
-            int  m_Width = 0;
-            int  m_Height = 0;
+            int m_Width = 0;
+            int m_Height = 0;
+            float m_DpRatio = 1.0f;
             bool m_Initialized = false;
 
             std::unique_ptr<UISystemInterface> m_SystemInterface;

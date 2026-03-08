@@ -28,6 +28,8 @@ namespace engine::ui {
             void beginUIPass();
             void endUIPass();
 
+            void updateSize(int width, int height) { m_PhysWidth = width; m_PhysHeight = height; }
+
             Rml::CompiledGeometryHandle CompileGeometry(Rml::Span<const Rml::Vertex> vertices, Rml::Span<const int> indices) override;
 
             void RenderGeometry(Rml::CompiledGeometryHandle geometry, Rml::Vector2f translation, Rml::TextureHandle texture) override;
@@ -44,7 +46,11 @@ namespace engine::ui {
         private:
             engine::GLRenderer* m_Renderer = nullptr;
 
+            int m_PhysWidth = 0;
+            int m_PhysHeight = 0;
+
             std::array<float, 16> m_SavedProjection{};
+            std::array<GLint, 4>  m_SavedViewport{};
 
             std::unordered_map<Rml::CompiledGeometryHandle, UIGeometryData> m_Geometries;
             Rml::CompiledGeometryHandle m_NextHandle = 1;

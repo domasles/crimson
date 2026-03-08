@@ -149,8 +149,11 @@ namespace engine {
 
             bool update();
             bool render();
+
             void updateUI();
             void renderUI();
+            void resizeUI(int width, int height, float dpRatio);
+
             void prepareRender();
 
             bool processUIEvent(const SDL_Event& event);

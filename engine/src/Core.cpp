@@ -214,7 +214,12 @@ namespace engine {
         }
 
         ENGINE_LOG_INIT("Renderer");
-        UIManager::getInstance().init(m_Renderer.get(), m_TargetWindowWidth, m_TargetWindowHeight);
+
+        {
+            int physW = 0, physH = 0;
+            SDL_GetWindowSize(m_Window.get(), &physW, &physH);
+            UIManager::getInstance().init(m_Renderer.get(), physW, physH);
+        }
 
         return true;
     }
@@ -411,6 +416,9 @@ namespace engine {
 
         m_Renderer->setViewport(viewportX, viewportY, viewportWidth, viewportHeight);
         m_Renderer->setOrthographicProjection(0.0f, virtualWidth, virtualHeight, 0.0f);
+
+        UIManager::getInstance().updateSize(windowWidth, windowHeight, scale);
+        SceneManager::getInstance().resizeUI(windowWidth, windowHeight, scale);
     }
 
     float Core::calculateUniformScale(int width, int height, float baseWidth, float baseHeight) {
