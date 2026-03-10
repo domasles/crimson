@@ -6,6 +6,7 @@
 #include <utils/logger.h>
 #include <utils/math.h>
 
+#include <components/AudioSourceComponent.h>
 #include <components/BoxRendererComponent.h>
 #include <components/CollisionComponent.h>
 #include <components/TransformComponent.h>

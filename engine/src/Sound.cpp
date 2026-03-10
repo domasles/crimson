@@ -10,6 +10,8 @@ using namespace engine::utils::filesystem;
 using namespace engine::utils::logger;
 
 namespace engine {
+    Sound::Sound(const std::string& filePath) : m_FilePath(filePath) {}
+
     Sound::~Sound() {
         if (m_Audio) {
             MIX_DestroyAudio(m_Audio);
@@ -18,15 +20,15 @@ namespace engine {
     }
 
     bool Sound::loadSound() {
-        std::string filePath = getGamePath() + "/" + m_FilePath;
+        const std::string fullPath = getGamePath() + "/" + m_FilePath;
         MIX_Mixer* mixer = Core::getInstance().getMixer();
 
         if (!mixer) {
-            Logger::engine_error("Mixer not initialized");
+            Logger::engine_error("Sound::loadSound() - mixer not initialized");
             return false;
         }
 
-        m_Audio = MIX_LoadAudio(mixer, filePath.c_str(), false);
+        m_Audio = MIX_LoadAudio(mixer, fullPath.c_str(), false);
 
         if (!m_Audio) {
             Logger::engine_error("MIX_LoadAudio Error: {}", SDL_GetError());
@@ -40,33 +42,6 @@ namespace engine {
         }
 
         ENGINE_LOG_INIT(("Sound: " + relativePath).c_str());
-        return true;
-    }
-
-    bool Sound::play(int loops) {
-        if (!m_Audio) {
-            Logger::engine_error("Sound not loaded!");
-            return false;
-        }
-
-        MIX_Track* track = Core::getInstance().getFreeTrack();
-
-        if (!track) {
-            Logger::engine_error("No available track to play sound");
-            return false;
-        }
-
-        MIX_SetTrackAudio(track, m_Audio);
-        SDL_PropertiesID props = SDL_CreateProperties();
-        SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, loops);
-
-        if (!MIX_PlayTrack(track, props)) {
-            SDL_DestroyProperties(props);
-            Logger::engine_error("MIX_PlayTrack Error: {}", SDL_GetError());
-            return false;
-        }
-
-        SDL_DestroyProperties(props);
         return true;
     }
 }
