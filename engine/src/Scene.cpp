@@ -82,6 +82,31 @@ namespace engine {
         m_BVH.update(s_enabled);
     }
 
+    CameraComponent* Scene::getPrimaryCamera() const {
+        if (m_PrimaryCamera && m_PrimaryCamera->getEntity()) {
+            return m_PrimaryCamera;
+        }
+
+        return nullptr;
+    }
+
+    void Scene::setPrimaryCamera(CameraComponent* camera) {
+        if (camera) m_PrimaryCamera = camera;
+        else m_PrimaryCamera = nullptr;
+    }
+
+    void Scene::updateEntities(float deltaTime) {
+        for (auto& entity : m_Entities) {
+            entity->update(deltaTime);
+        }
+    }
+
+    void Scene::renderEntities() {
+        for (auto& entity : m_Entities) {
+            entity->render();
+        }
+    }
+
     SceneManager& SceneManager::getInstance() {
         try {
             static SceneManager& instance = *new SceneManager();

@@ -92,11 +92,10 @@ namespace engine {
             bool hasInputSystem() const { return m_InputSystem != nullptr; }
 
             void setOutOfBoundsColor(const Color& color) { m_OutOfBoundsColor = color; }
-
             void rebuildBVH();
 
-            void setPrimaryCamera(CameraComponent* camera) { m_PrimaryCamera = camera; }
-            CameraComponent* getPrimaryCamera() const { return m_PrimaryCamera; }
+            CameraComponent* getPrimaryCamera() const;
+            void setPrimaryCamera(CameraComponent* camera);
 
             Map* getMap() { return m_Map.get(); }
             const Map* getMap() const { return m_Map.get(); }
@@ -125,22 +124,11 @@ namespace engine {
             std::vector<CollisionComponent*> m_CollisionComponents;
 
             UIContext m_UIContext;
-
             Color m_OutOfBoundsColor { 0.0f, 0.0f, 0.0f, 1.0f };
-
             CameraComponent* m_PrimaryCamera = nullptr;
 
-            void updateEntities(float deltaTime) {
-                for (auto& entity : m_Entities) {
-                    entity->update(deltaTime);
-                }
-            }
-
-            void renderEntities() {
-                for (auto& entity : m_Entities) {
-                    entity->render();
-                }
-            }
+            void updateEntities(float deltaTime);
+            void renderEntities();
     };
 
     class SceneManager {
@@ -206,5 +194,4 @@ namespace engine {
         static_assert(std::is_base_of_v<Scene, T>, "T must derive from Scene");
         return getSceneManager().registerScene(name, std::make_shared<T>());
     }
-
 }
