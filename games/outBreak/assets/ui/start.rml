@@ -4,8 +4,8 @@
     </head>
     <body>
         <div id="container">
-            <h1 id="title">OutBreak</h1>
-            <button id="play-btn">Play</button>
+            <h1 id="title">OUTBREAK</h1>
+            <button id="play-btn">PLAY</button>
         </div>
     </body>
 </rml>

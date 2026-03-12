@@ -8,6 +8,7 @@
 
 #include <components/AudioSourceComponent.h>
 #include <components/BoxRendererComponent.h>
+#include <components/CameraComponent.h>
 #include <components/CollisionComponent.h>
 #include <components/TransformComponent.h>
 #include <components/TextureComponent.h>

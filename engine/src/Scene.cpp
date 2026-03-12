@@ -3,6 +3,8 @@
 #include <utils/logger.h>
 
 #include <components/CollisionComponent.h>
+#include <components/TransformComponent.h>
+#include <components/CameraComponent.h>
 
 #include <Scene.h>
 
@@ -49,8 +51,10 @@ namespace engine {
         m_Entities.clear();
         m_BVH.clear();
         m_CollisionComponents.clear();
+
         m_CollisionCacheDirty = true;
         m_Initialized = false;
+        m_PrimaryCamera = nullptr;
     }
 
     void Scene::rebuildBVH() {
@@ -146,6 +150,10 @@ namespace engine {
             newScene->setInitialized(true);
             newScene->init();
 
+            if (!newScene->getPrimaryCamera()) {
+                Logger::engine_warn("Scene '{}': no primary camera has been set!", newScene->getName());
+            }
+
             newScene->rebuildBVH();
             newScene->update(0.0f);
         }
@@ -196,6 +204,14 @@ namespace engine {
         return true;
     }
 
+    Color SceneManager::getBackgroundColor() const {
+        if (m_CurrentScene) {
+            if (auto* cam = m_CurrentScene->getPrimaryCamera()) return cam->getBackgroundColor();
+        }
+
+        return Color{ 0.0f, 0.0f, 0.0f, 1.0f };
+    }
+
     void SceneManager::updateUI() {
         if (m_CurrentScene) m_CurrentScene->updateUI();
     }
@@ -212,6 +228,14 @@ namespace engine {
         if (m_CurrentScene) {
             float alpha = m_PhysicsAccumulator / FIXED_TIMESTEP;
             m_CurrentScene->prepareRender(alpha);
+
+            if (auto* cam = m_CurrentScene->getPrimaryCamera()) {
+                auto* transform = cam->getEntity() ? cam->getEntity()->getComponent<TransformComponent>() : nullptr;
+                Vector2 camPos = transform ? transform->getInterpolatedPosition() : Vector2{ 0.0f, 0.0f };
+
+                Vector2 viewSize = getCore().getLogicalWindowSize();
+                getCore().getRenderer()->applyCameraProjection(camPos, cam->getZoom(), viewSize.getRawX(), viewSize.getRawY());
+            }
         }
     }
 

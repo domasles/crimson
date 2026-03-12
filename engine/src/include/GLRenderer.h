@@ -42,6 +42,7 @@ namespace engine {
 
             void setProjectionMatrix(const float* matrix);
             void setOrthographicProjection(float left, float right, float bottom, float top);
+            void applyCameraProjection(const Vector2& camPos, float zoom, float viewW, float viewH);
 
             const float* getProjectionMatrix() const { return m_ProjectionMatrix.data(); }
 

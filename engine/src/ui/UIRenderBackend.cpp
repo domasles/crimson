@@ -15,8 +15,8 @@ namespace engine::ui {
         m_Renderer = renderer;
         m_PhysWidth = screenWidth;
         m_PhysHeight = screenHeight;
-        
-        Logger::engine_debug("RenderBackend initialized");
+
+        ENGINE_LOG_INIT("UI Render Backend");
 
         return true;
     }

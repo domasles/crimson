@@ -2,22 +2,13 @@
 
 #include <Engine.h>
 
-#include <entities/Camera.h>
-
 using namespace engine;
 
 namespace outBreak {
-    class StartScene : public Scene {
+    class Camera : public Entity {
         public:
-            StartScene() { m_Name = "StartScene"; }
-
             void init() override;
             void update(float deltaTime) override {}
             void render() override {}
-
-        private:
-            Camera* m_Camera = nullptr;
-            UIDocument m_Document;
     };
 }
-

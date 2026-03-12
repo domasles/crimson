@@ -2,6 +2,8 @@
 
 #include <Engine.h>
 
+#include <entities/Camera.h>
+
 using namespace engine;
 
 namespace outBreak {
@@ -21,9 +23,10 @@ namespace outBreak {
         private:
             void createBricks();
 
-            Ball* m_Ball;
-            Paddle* m_Paddle;
-            GameManager* m_GameManager;
+            Ball* m_Ball = nullptr;
+            Paddle* m_Paddle = nullptr;
+            Camera* m_Camera = nullptr;
+            GameManager* m_GameManager = nullptr;
 
             std::vector<Brick*> m_Bricks;
     };

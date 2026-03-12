@@ -128,6 +128,18 @@ namespace engine {
         m_ProjectionDirty = true;
     }
 
+    void GLRenderer::applyCameraProjection(const Vector2& camPos, float zoom, float viewW, float viewH) {
+        float halfW = viewW / (2.0f * zoom);
+        float halfH = viewH / (2.0f * zoom);
+
+        setOrthographicProjection(
+            camPos.getRawX() - halfW,
+            camPos.getRawX() + halfW,
+            camPos.getRawY() + halfH,
+            camPos.getRawY() - halfH
+        );
+    }
+
     void GLRenderer::createQuadBuffers() {
         glGenVertexArrays(1, &m_QuadVAO);
         glGenBuffers(1, &m_QuadVBO);

@@ -7,7 +7,6 @@ using namespace engine::ui;
 
 namespace outBreak {
     void StartScene::init() {
-        setBackgroundColor(Color(0.05f, 0.05f, 0.1f, 1.0f));
         setFont("assets/fonts/inter.ttf", true);
 
         m_Document.setDocument("assets/ui/start.rml");

@@ -12,6 +12,8 @@ using namespace engine::collisions;
 using namespace engine::ui;
 
 namespace engine {
+    class CameraComponent;
+
     class Scene {
         public:
             virtual ~Scene() = default;
@@ -89,10 +91,12 @@ namespace engine {
             void setInputSystem(std::unique_ptr<InputSystem> inputSystem) { m_InputSystem = std::move(inputSystem); }
             bool hasInputSystem() const { return m_InputSystem != nullptr; }
 
-            void  setBackgroundColor(const Color& color) { m_BackgroundColor = color; }
-            void  setOutOfBoundsColor(const Color& color) { m_OutOfBoundsColor = color; }
+            void setOutOfBoundsColor(const Color& color) { m_OutOfBoundsColor = color; }
 
             void rebuildBVH();
+
+            void setPrimaryCamera(CameraComponent* camera) { m_PrimaryCamera = camera; }
+            CameraComponent* getPrimaryCamera() const { return m_PrimaryCamera; }
 
             Map* getMap() { return m_Map.get(); }
             const Map* getMap() const { return m_Map.get(); }
@@ -105,7 +109,6 @@ namespace engine {
 
             UIContext& getUIContext() { return m_UIContext; }
 
-            Color getBackgroundColor()  const { return m_BackgroundColor; }
             Color getOutOfBoundsColor() const { return m_OutOfBoundsColor; }
 
         protected:
@@ -123,8 +126,9 @@ namespace engine {
 
             UIContext m_UIContext;
 
-            Color m_BackgroundColor  { 0.0f, 0.0f, 0.0f, 1.0f };
             Color m_OutOfBoundsColor { 0.0f, 0.0f, 0.0f, 1.0f };
+
+            CameraComponent* m_PrimaryCamera = nullptr;
 
             void updateEntities(float deltaTime) {
                 for (auto& entity : m_Entities) {
@@ -158,7 +162,7 @@ namespace engine {
 
             bool processUIEvent(const SDL_Event& event);
 
-            Color getBackgroundColor() const { return m_CurrentScene ? m_CurrentScene->getBackgroundColor() : Color{0.0f, 0.0f, 0.0f, 1.0f}; }
+            Color getBackgroundColor() const;
             Color getOutOfBoundsColor() const { return m_CurrentScene ? m_CurrentScene->getOutOfBoundsColor() : Color{0.0f, 0.0f, 0.0f, 1.0f}; }
 
             const std::string& getCurrentSceneName() const;
@@ -193,8 +197,8 @@ namespace engine {
     inline SceneManager& getSceneManager() { return SceneManager::getInstance(); }
     inline bool switchToScene(const std::string& name) { return getSceneManager().changeScene(name); }
 
-    inline void setBackgroundColor(const Color& color) { if (auto* s = SceneManager::getInstance().getCurrentSceneRaw()) s->setBackgroundColor(color); }
     inline void setOutOfBoundsColor(const Color& color) { if (auto* s = SceneManager::getInstance().getCurrentSceneRaw()) s->setOutOfBoundsColor(color); }
+    inline void setPrimaryCamera(CameraComponent* camera) { if (auto* s = SceneManager::getInstance().getCurrentSceneRaw()) s->setPrimaryCamera(camera); }
 
     template<typename T>
 

@@ -40,7 +40,7 @@ namespace engine::ui {
         m_RenderBackend->init(renderer, width, height);
 
         m_Initialized = true;
-        ENGINE_LOG_INIT("UIManager initialized.");
+        ENGINE_LOG_INIT("UI Manager");
 
         return true;
     }
