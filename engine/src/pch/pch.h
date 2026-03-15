@@ -18,12 +18,12 @@
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL.h>
 
-#include <rmlui/Core/ElementDocument.h>
-#include <rmlui/Core/RenderInterface.h>
-#include <rmlui/Core/SystemInterface.h>
-#include <rmlui/Core/Context.h>
-#include <rmlui/Core/Input.h>
-#include <rmlui/Core.h>
+#include <RmlUi/Core/ElementDocument.h>
+#include <RmlUi/Core/RenderInterface.h>
+#include <RmlUi/Core/SystemInterface.h>
+#include <RmlUi/Core/Context.h>
+#include <RmlUi/Core/Input.h>
+#include <RmlUi/Core.h>
 
 #include <nlohmann/json.hpp>
 
