@@ -44,6 +44,24 @@ namespace engine {
 
     void Scene::removeEntity(Entity* entity) {
         m_CollisionCacheDirty = true;
+        auto* transform = entity->getComponent<TransformComponent>();
+
+        if (transform != nullptr) {
+            auto childrenCopy = transform->getChildren();
+
+            for (Entity* child : childrenCopy) {
+                auto* childTransform = child->getComponent<TransformComponent>();
+
+                if (childTransform != nullptr) {
+                    childTransform->detach();
+                }
+            }
+        }
+
+        if (m_PrimaryCamera != nullptr && m_PrimaryCamera->getEntity() == entity) {
+            m_PrimaryCamera = nullptr;
+        }
+
         m_Entities.erase(std::remove_if(m_Entities.begin(), m_Entities.end(), [entity](const auto& ptr) { return ptr.get() == entity; }), m_Entities.end());
     }
 

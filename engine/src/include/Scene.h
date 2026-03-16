@@ -107,7 +107,6 @@ namespace engine {
             const BVH& getBVH() const { return m_BVH; }
 
             UIContext& getUIContext() { return m_UIContext; }
-
             Color getOutOfBoundsColor() const { return m_OutOfBoundsColor; }
 
         protected:

@@ -54,8 +54,22 @@ namespace engine {
             void setInterpolatedSize(const Vector2& size) { m_InterpolatedSize = size; }
             void setInterpolatedScale(const Vector2& scale) { m_InterpolatedScale = scale; }
 
+            void setParent(Entity* parent);
+            bool hasParent() const { return m_Parent != nullptr; }
+            void detach();
+
+            Entity* getParent() const { return m_Parent; }
+            const std::vector<Entity*>& getChildren() const { return m_Children; }
+
+            float getWorldRotation() const;
+            
+            Vector2 getWorldPosition() const;
+            Vector2 getWorldScale() const;
+
         private:
             Transform m_Transform;
+            Entity* m_Parent = nullptr;
+            std::vector<Entity*> m_Children;
 
             Vector2 m_PreviousPosition{ 0.0f, 0.0f };
             Vector2 m_InterpolatedPosition{ 0.0f, 0.0f };
