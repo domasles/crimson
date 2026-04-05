@@ -169,6 +169,10 @@ endif()
 set(_saved_build_shared ${BUILD_SHARED_LIBS})
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
+set(FT_DISABLE_HARFBUZZ ON CACHE BOOL "Disable HarfBuzz support in vendored FreeType" FORCE)
+set(FT_DYNAMIC_HARFBUZZ OFF CACHE BOOL "Do not dynamically load HarfBuzz in vendored FreeType" FORCE)
+set(FT_REQUIRE_HARFBUZZ OFF CACHE BOOL "Do not require HarfBuzz for vendored FreeType" FORCE)
+
 add_subdirectory(vendor/freetype)
 
 if(NOT TARGET Freetype::Freetype)
