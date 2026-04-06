@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
 
-if(NOT CMAKE_CONFIGURATION_TYPES)
-    set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Available build types" FORCE)
-endif()
-
 project(Launcher LANGUAGES CXX)
 
 file(GLOB_RECURSE LAUNCHER_SOURCES
@@ -96,25 +92,4 @@ else()
     target_precompile_headers(${LAUNCHER_TARGET} PRIVATE src/pch/pch.h)
 
     strip_debug_symbols(${LAUNCHER_TARGET})
-
-    add_custom_command(TARGET ${LAUNCHER_TARGET} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "$<TARGET_FILE:SDL3::SDL3-shared>"
-        "$<TARGET_FILE_DIR:${LAUNCHER_TARGET}>"
-        COMMENT "Copying SDL3 library to launcher output directory"
-    )
-
-    add_custom_command(TARGET ${LAUNCHER_TARGET} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "$<TARGET_FILE:SDL3_image::SDL3_image-shared>"
-        "$<TARGET_FILE_DIR:${LAUNCHER_TARGET}>"
-        COMMENT "Copying SDL3_image library to launcher output directory"
-    )
-
-    add_custom_command(TARGET ${LAUNCHER_TARGET} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "$<TARGET_FILE:SDL3_mixer::SDL3_mixer-shared>"
-        "$<TARGET_FILE_DIR:${LAUNCHER_TARGET}>"
-        COMMENT "Copying SDL3_mixer library to launcher output directory"
-    )
 endif()

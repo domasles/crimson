@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
 
-if(NOT CMAKE_CONFIGURATION_TYPES)
-    set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Available build types" FORCE)
-endif()
-
 project(Engine LANGUAGES CXX)
 
 file(GLOB_RECURSE ENGINE_SOURCES
