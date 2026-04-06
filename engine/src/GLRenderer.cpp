@@ -45,6 +45,8 @@ namespace engine {
         createIdentityMatrix(m_ProjectionMatrix.data());
 
         m_Initialized = true;
+        ENGINE_LOG_INIT("GL Renderer");
+
         return true;
     }
 
@@ -228,6 +230,106 @@ namespace engine {
             glDeleteBuffers(1, &m_LineVBO);
             m_LineVBO = 0;
         }
+    }
+
+    uint32_t GLRenderer::createGeometry(const float* vertexData, size_t vertexCount, const int* indices, size_t indexCount) {
+        if (!vertexData || vertexCount == 0 || !indices || indexCount == 0) return 0;
+
+        GeometryData data;
+
+        glGenVertexArrays(1, &data.vao);
+        glGenBuffers(1, &data.vbo);
+        glGenBuffers(1, &data.ebo);
+
+        glBindVertexArray(data.vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, data.vbo);
+        glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(vertexCount * sizeof(float) * 8), vertexData, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data.ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(indexCount * sizeof(int)), indices, GL_STATIC_DRAW);
+
+        constexpr GLsizei stride = 8 * sizeof(float);
+
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(0));
+        glEnableVertexAttribArray(0);
+
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(2 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(4 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+
+        glBindVertexArray(0);
+
+        data.indexCount = static_cast<int>(indexCount);
+        uint32_t handle = m_NextGeometryHandle++;
+        m_GeometryData[handle] = data;
+
+        return handle;
+    }
+
+    void GLRenderer::destroyGeometry(uint32_t geometry) {
+        auto it = m_GeometryData.find(geometry);
+        if (it == m_GeometryData.end()) return;
+
+        GeometryData& data = it->second;
+
+        if (data.vao) glDeleteVertexArrays(1, &data.vao);
+        if (data.vbo) glDeleteBuffers(1, &data.vbo);
+        if (data.ebo) glDeleteBuffers(1, &data.ebo);
+
+        m_GeometryData.erase(it);
+    }
+
+    void GLRenderer::drawGeometry(uint32_t geometry, GLuint texture, const Vector2& translation) {
+        auto it = m_GeometryData.find(geometry);
+        if (it == m_GeometryData.end()) return;
+
+        GeometryData& data = it->second;
+        m_SpriteShader.use();
+        updateUniforms();
+
+        m_SpriteShader.setInt("u_UseTexture", texture != 0 ? 1 : 0);
+        m_SpriteShader.setInt("u_Texture", 0);
+        m_SpriteShader.setVec2("u_Translation", translation);
+
+        bindTexture(texture);
+        bindVAO(data.vao);
+        glDrawElements(GL_TRIANGLES, data.indexCount, GL_UNSIGNED_INT, nullptr);
+    }
+
+    GLuint GLRenderer::createTexture(int width, int height, const void* pixels) {
+        if (width <= 0 || height <= 0) return 0;
+        GLuint id = 0;
+
+        glGenTextures(1, &id);
+        glBindTexture(GL_TEXTURE_2D, id);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        return id;
+    }
+
+    void GLRenderer::destroyTexture(GLuint texture) {
+        if (texture != 0) {
+            glDeleteTextures(1, &texture);
+        }
+    }
+
+    void GLRenderer::enableScissor(bool enable) {
+        if (enable) glEnable(GL_SCISSOR_TEST);
+        else glDisable(GL_SCISSOR_TEST);
+    }
+
+    void GLRenderer::setScissorRegion(int x, int y, int width, int height) {
+        glScissor(x, y, width, height);
     }
 
     void GLRenderer::createOrthographicMatrix(float left, float right, float bottom, float top, float* out) {

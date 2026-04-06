@@ -35,8 +35,8 @@ namespace outBreak {
         if (input && transform && input->getInputSystem()) {
             Vector2 movementInput = input->getMovementVector();
             Vector2 currentPos = transform->getPosition();
-
             Vector2 paddleSize = transform->getSize();
+
             float paddleWidth = paddleSize.getRawX();
             float game_width = getLogicalWindowSize().getRawX();
 

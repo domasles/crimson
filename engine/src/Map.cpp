@@ -72,10 +72,6 @@ namespace engine {
         }
 
         std::string relativePath = m_WorkingDir + "/" + m_FileName;
-
-        if (relativePath.find("assets/") == 0) {
-            relativePath = relativePath.substr(7);
-        }
         
         ENGINE_LOG_INIT(("Map: " + relativePath).c_str());
     }

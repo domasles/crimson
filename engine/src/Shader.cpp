@@ -72,7 +72,7 @@ namespace engine {
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
 
-        ENGINE_LOG_INIT("Shader");
+        ENGINE_LOG_INIT("Shaders");
         return true;
     }
 

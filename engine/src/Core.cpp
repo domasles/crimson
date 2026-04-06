@@ -120,6 +120,7 @@ namespace engine {
 
         for (int i = 0; i < 32; ++i) {
             MIX_Track* track = MIX_CreateTrack(m_Mixer);
+
             if (track) {
                 m_Tracks.push_back(track);
             }
@@ -174,8 +175,6 @@ namespace engine {
             Logger::engine_error("initRenderer failed");
             return false;
         }
-
-        ENGINE_LOG_INIT("Renderer");
 
         {
             int physW = 0, physH = 0;

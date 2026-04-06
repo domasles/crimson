@@ -20,7 +20,7 @@ namespace engine {
     }
 
     bool Sound::loadSound() {
-        const std::string fullPath = getGamePath() + "/" + m_FilePath;
+        const std::string filePath = getGamePath() + "/" + m_FilePath;
         MIX_Mixer* mixer = Core::getInstance().getMixer();
 
         if (!mixer) {
@@ -28,20 +28,15 @@ namespace engine {
             return false;
         }
 
-        m_Audio = MIX_LoadAudio(mixer, fullPath.c_str(), false);
+        m_Audio = MIX_LoadAudio(mixer, filePath.c_str(), false);
 
         if (!m_Audio) {
             Logger::engine_error("MIX_LoadAudio Error: {}", SDL_GetError());
             return false;
         }
 
-        std::string relativePath = m_FilePath;
+        ENGINE_LOG_INIT(("Sound: " + m_FilePath).c_str());
 
-        if (relativePath.find("assets/") == 0) {
-            relativePath = relativePath.substr(7);
-        }
-
-        ENGINE_LOG_INIT(("Sound: " + relativePath).c_str());
         return true;
     }
 }

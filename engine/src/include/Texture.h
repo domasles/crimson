@@ -8,7 +8,7 @@ using namespace engine::utils::math;
 namespace engine {
     class Texture {
         public:
-            Texture(const std::string& filePath) : m_TextureID(0), m_Width(0), m_Height(0), m_FilePath(filePath) {}
+            Texture(const std::string& filePath) : m_FilePath(filePath) {}
             ~Texture();
 
             bool loadTexture(bool linearFiltering = false);
@@ -23,9 +23,9 @@ namespace engine {
 
         private:
             std::string m_FilePath;
-            GLuint m_TextureID;
+            GLuint m_TextureID = 0;
 
-            int m_Width;
-            int m_Height;
+            int m_Width = 0;
+            int m_Height = 0;
     };
 }

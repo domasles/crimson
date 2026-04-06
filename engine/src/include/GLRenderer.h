@@ -48,6 +48,18 @@ namespace engine {
 
             Shader* getDefaultShader() { return &m_SpriteShader; }
 
+            uint32_t createGeometry(const float* vertexData, size_t vertexCount, const int* indices, size_t indexCount);
+
+            void destroyGeometry(uint32_t geometry);
+            void drawGeometry(uint32_t geometry, GLuint texture, const Vector2& translation);
+
+            GLuint createTexture(int width, int height, const void* pixels);
+
+            void destroyTexture(GLuint texture);
+
+            void enableScissor(bool enable);
+            void setScissorRegion(int x, int y, int width, int height);
+
         private:
             bool m_Initialized = false;
 
@@ -99,6 +111,17 @@ namespace engine {
 
             void createOrthographicMatrix(float left, float right, float bottom, float top, float* out);
             void createIdentityMatrix(float* out);
+
+            struct GeometryData {
+                GLuint vao = 0;
+                GLuint vbo = 0;
+                GLuint ebo = 0;
+
+                int indexCount = 0;
+            };
+
+            std::unordered_map<uint32_t, GeometryData> m_GeometryData;
+            uint32_t m_NextGeometryHandle = 1;
 
             void bindVAO(GLuint vao);
             void bindTexture(GLuint texture);

@@ -9,8 +9,8 @@
 
 namespace outBreak {
     void GameScene::init() {
-        setInputSystem(std::make_unique<InputSystem>("config"));
-        if (hasInputSystem()) getInputSystem()->loadInputActions("InputActions.json");
+        setInputSystem(std::make_unique<InputSystem>("config/InputActions.json"));
+        if (hasInputSystem()) getInputSystem()->loadInputActions();
         setOutOfBoundsColor(Color(0.0f, 0.0f, 0.0f, 1.0f));
 
         m_Camera = createEntity<Camera>();

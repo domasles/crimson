@@ -9,14 +9,6 @@ namespace engine {
 }
 
 namespace engine::ui {
-    struct UIGeometryData {
-        GLuint vao = 0;
-        GLuint vbo = 0;
-        GLuint ebo = 0;
-
-        int indexCount = 0;
-    };
-
     class UIRenderBackend : public Rml::RenderInterface {
         public:
             UIRenderBackend() = default;
@@ -52,8 +44,7 @@ namespace engine::ui {
             std::array<float, 16> m_SavedProjection{};
             std::array<GLint, 4>  m_SavedViewport{};
 
-            std::unordered_map<Rml::CompiledGeometryHandle, UIGeometryData> m_Geometries;
-            Rml::CompiledGeometryHandle m_NextHandle = 1;
+            std::unordered_set<Rml::CompiledGeometryHandle> m_Geometries;
 
             std::unordered_map<Rml::TextureHandle, std::shared_ptr<engine::Texture>> m_ManagedTextures;
             std::unordered_set<GLuint> m_GeneratedTextures;

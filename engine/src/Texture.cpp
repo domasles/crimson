@@ -90,13 +90,8 @@ namespace engine {
         SDL_DestroySurface(surface);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        std::string relativePath = m_FilePath;
+        ENGINE_LOG_INIT(("Texture: " + m_FilePath).c_str());
 
-        if (relativePath.find("assets/") == 0) {
-            relativePath = relativePath.substr(7);
-        }
-
-        ENGINE_LOG_INIT(("Texture: " + relativePath).c_str());
         return true;
     }
 }

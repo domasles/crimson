@@ -35,13 +35,13 @@ namespace engine {
 
     class InputSystem {
         public:
-            InputSystem(const std::string& workingDir) : m_WorkingDir(workingDir) {}
+            InputSystem(const std::string& filePath) : m_FilePath(filePath) {}
             ~InputSystem() = default;
 
             void addMovementAction(const std::string& name, const SDL_Keycode key, const Vector2& m_Direction);
             void addSimpleAction(const std::string& name, const SDL_Keycode key);
 
-            const bool loadInputActions(const std::string& fileName);
+            const bool loadInputActions();
             const bool isActionPressed(const std::string& actionName) const;
 
             const Vector2 getMovementVector() const;
@@ -51,7 +51,7 @@ namespace engine {
 
             json m_JsonFile;
 
-            std::string m_WorkingDir;
+            std::string m_FilePath;
             std::unordered_map<std::string, std::unique_ptr<InputAction>> m_Actions;
     };
 }

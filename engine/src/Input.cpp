@@ -30,8 +30,8 @@ namespace engine {
         m_Actions[name] = std::make_unique<SimpleInputAction>(key);
     }
 
-    const bool InputSystem::loadInputActions(const std::string& fileName) {
-        const std::string& filePath = getGamePath() + "/" + m_WorkingDir + "/" + fileName;
+    const bool InputSystem::loadInputActions() {
+        const std::string& filePath = getGamePath() + "/" + m_FilePath;
         loadJSONFile(filePath, &m_JsonFile);
 
         if (m_IsLoaded) {
@@ -85,7 +85,7 @@ namespace engine {
             return false;
         }
 
-        ENGINE_LOG_INIT(("Input Config: " + fileName).c_str());
+        ENGINE_LOG_INIT(("Input Config: " + m_FilePath).c_str());
         return true;
     }
 

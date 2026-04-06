@@ -1,7 +1,7 @@
 #include <pch.h>
 
 #include <ui/UISystemInterface.h>
-#include <ui/UIRenderBackend.h>
+#include <ui/UIRenderer.h>
 #include <ui/UIManager.h>
 
 #include <utils/logger.h>
