@@ -7,9 +7,7 @@ using namespace engine::utils::math;
 namespace engine {
     class Transform {
         public:
-            Transform(const Vector2& position, const Vector2& size = {100.0f, 100.0f}, float rotation = 0.0f) : m_Position(position), m_Size(size), m_Rotation(rotation) {}
-
-            Transform() = default;
+            Transform(const Vector2& position = Vector2{0.0f, 0.0f}, const Vector2& size = Vector2{100.0f, 100.0f}, float rotation = 0.0f) {}
             ~Transform() = default;
 
             void setPosition(const Vector2& position) { m_Position = position; }

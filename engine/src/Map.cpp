@@ -12,17 +12,17 @@ using namespace engine::utils::filesystem;
 using namespace engine::utils::logger;
 
 namespace engine {
-    void Map::loadMap(const std::string& fileName, const Vector2& minTileSize, const Vector2& mapOrigin) {
-        m_FileName = fileName;
+    void Map::loadMap(const std::string& filePath, const Vector2& minTileSize, const Vector2& mapOrigin) {
+        m_FilePath = filePath;
         m_DesiredTileSize = minTileSize;
         m_Origin = mapOrigin;
 
-        const std::string& filePath = getGamePath() + "/" + m_WorkingDir + "/" + m_FileName;
+        const std::string fullPath = getGamePath() + "/" + m_FilePath;
 
-        loadJSONFile(filePath, &m_JsonFile);
+        loadJSONFile(fullPath, &m_JsonFile);
 
         if (!validateMapStructure()) {
-            std::string relativePath = m_WorkingDir + "/" + m_FileName;
+            std::string relativePath = m_FilePath;
 
             if (relativePath.find("assets/") == 0) {
                 relativePath = relativePath.substr(7);
@@ -71,9 +71,7 @@ namespace engine {
             }
         }
 
-        std::string relativePath = m_WorkingDir + "/" + m_FileName;
-        
-        ENGINE_LOG_INIT(("Map: " + relativePath).c_str());
+        ENGINE_LOG_INIT(("Map: " + m_FilePath).c_str());
     }
 
     void Map::render() {
@@ -82,8 +80,10 @@ namespace engine {
 
     bool Map::loadTilesets() {
         for (const auto& tileset : m_JsonFile["defs"]["tilesets"]) {
-            const std::string& fullRelPath = m_WorkingDir + "/" + (std::string)tileset["relPath"];
-            const std::string& fileName = getFileName(fullRelPath);
+            const std::string tilesetRelPath = tileset["relPath"];
+            const std::string mapDir = getParentPath(m_FilePath);
+            const std::string fullRelPath = mapDir.empty() ? tilesetRelPath : mapDir + "/" + tilesetRelPath;
+            const std::string fileName = getFileName(fullRelPath);
 
             const float pxWid = tileset["pxWid"];
             const float pxHei = tileset["pxHei"];
@@ -153,7 +153,8 @@ namespace engine {
     }
     
     bool Map::validateMapStructure() const {
-        std::string relativePath = m_WorkingDir + "/" + m_FileName;
+        std::string relativePath = m_FilePath;
+
         if (relativePath.find("assets/") == 0) {
             relativePath = relativePath.substr(7);
         }
@@ -200,13 +201,7 @@ namespace engine {
         m_MapTiles.clear();
         parseIntGridLayers(scene);
 
-        std::string relativePath = m_WorkingDir + "/" + m_FileName;
-
-        if (relativePath.find("assets/") == 0) {
-            relativePath = relativePath.substr(7);
-        }
-
-        ENGINE_LOG_INIT(("Map: Generated " + std::to_string(m_MapTiles.size()) + " collision tile entities from " + relativePath).c_str());
+        ENGINE_LOG_INIT(("Map: Generated " + std::to_string(m_MapTiles.size()) + " collision tile entities from " + m_FilePath).c_str());
     }
 
     void Map::parseIntGridLayers(Scene* scene) {
