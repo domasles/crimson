@@ -42,19 +42,32 @@ namespace engine {
             return;
         }
 
-        MIX_SetTrackAudio(m_Track, m_Sound->getAudio());
+        MIX_Track* trackToUse = m_Track;
+
+        if (MIX_TrackPlaying(trackToUse) && !m_Loop) {
+            MIX_Track* freeTrack = Core::getInstance().getFreeTrack();
+
+            if (freeTrack) {
+                trackToUse = freeTrack;
+            }
+        }
+
+        MIX_SetTrackAudio(trackToUse, m_Sound->getAudio());
+        MIX_SetTrackGain(trackToUse, m_Volume);
 
         SDL_PropertiesID props = SDL_CreateProperties();
         SDL_SetNumberProperty(props, MIX_PROP_PLAY_LOOPS_NUMBER, m_Loop ? -1 : 0);
 
-        if (!MIX_PlayTrack(m_Track, props)) {
+        if (!MIX_PlayTrack(trackToUse, props)) {
             SDL_DestroyProperties(props);
             Logger::engine_error("MIX_PlayTrack Error: {}", SDL_GetError());
             return;
         }
 
         SDL_DestroyProperties(props);
-        m_State = SoundState::Playing;
+        if (trackToUse == m_Track) {
+            m_State = SoundState::Playing;
+        }
     }
 
     void AudioSourceComponent::stop() {

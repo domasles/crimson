@@ -27,7 +27,7 @@ namespace engine {
 
     class Map {
         public:
-            Map(const std::string& filePath) : m_FilePath(filePath) {}
+            Map(const std::string& filePath) {}
             ~Map() = default;
             
             void loadMap(const std::string& filePath, const Vector2& minTileSize, const Vector2& mapOrigin);
@@ -68,7 +68,7 @@ namespace engine {
             Vector2 m_CropRegion{ 0.0f, 0.0f };
             Vector2 m_CropSize{ 0.0f, 0.0f };
 
-            std::string m_FilePath;
+            std::string m_FilePath{""};
 
             std::shared_ptr<TileRenderQueue> textureQueue;
             std::unordered_map<std::string, Tileset> m_Tilesets;

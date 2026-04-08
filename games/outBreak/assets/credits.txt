@@ -1,3 +1,7 @@
-assets/ball.png from Raven Fantasy Icons:
+textures/ball.png:
 Creator - Caio from Clockwork Raven Studios [https://clockworkraven.itch.io]
 Assets - Raven Fantasy Icons [https://clockworkraven.itch.io/raven-fantasy-icons]
+
+audio/sfx/bounce.mp3:
+Creator - DRAGON-STUDIO [https://pixabay.com/users/dragon-studio-38165424/]
+Sound effect - Tennis Ball Hit [https://pixabay.com/sound-effects/film-special-effects-tennis-ball-hit-386155/]

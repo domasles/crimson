@@ -1,5 +1,6 @@
 #include <pch.h>
 
+#include <components/AudioSourceComponent.h>
 #include <entities/Ball.h>
 
 using namespace engine::collisions::types;
@@ -10,8 +11,11 @@ namespace outBreak {
         auto* transform = addComponent<TransformComponent>();
         auto* texture = addComponent<TextureComponent>();
         auto* collision = addComponent<CollisionComponent>();
+        auto* audio = addComponent<engine::AudioSourceComponent>();
 
         texture->setTexture(loadTexture("assets/textures/ball.png"));
+        audio->setSound(loadSound("assets/audio/sfx/bounce.mp3"));
+        audio->setVolume(0.8f);
 
         transform->setSize({BALL_SIZE, BALL_SIZE});
         transform->setPosition(m_InitialPosition);
@@ -39,15 +43,27 @@ namespace outBreak {
             if (nextPos.getRawX() < 0.0f) {
                 nextPos = Vector2{ 0.0f, nextPos.getRawY() };
                 setDirectionX(1.0f);
+
+                if (auto* audio = getComponent<engine::AudioSourceComponent>()) {
+                    audio->play();
+                }
             }
             else if (nextPos.getRawX() + BALL_SIZE > game_width) {
                 nextPos = Vector2{ game_width - BALL_SIZE, nextPos.getRawY() };
                 setDirectionX(-1.0f);
+
+                if (auto* audio = getComponent<engine::AudioSourceComponent>()) {
+                    audio->play();
+                }
             }
 
             if (nextPos.getRawY() < 0.0f) {
                 nextPos = Vector2{ nextPos.getRawX(), 0.0f };
                 setDirectionY(1.0f);
+
+                if (auto* audio = getComponent<engine::AudioSourceComponent>()) {
+                    audio->play();
+                }
             }
 
             transform->move(movement);

@@ -1,5 +1,7 @@
 #include <pch.h>
 
+#include <components/AudioSourceComponent.h>
+
 #include <entities/GameManager.h>
 #include <entities/Paddle.h>
 #include <entities/Brick.h>
@@ -57,6 +59,10 @@ namespace outBreak {
         CollisionResult collision = ballCollision->checkCollisionWithEntity(m_Paddle);
         
         if (collision.hasCollision) {
+            if (auto* audio = m_Ball->getComponent<engine::AudioSourceComponent>()) {
+                audio->play();
+            }
+
             Vector2 ballPos = ballTransform->getPosition();
             Vector2 ballSize = ballTransform->getSize();
             
@@ -113,6 +119,9 @@ namespace outBreak {
             if (!brick || brick->isDestroyed()) continue;
 
             brick->setDestroyed(true);
+            if (auto* audio = m_Ball->getComponent<engine::AudioSourceComponent>()) {
+                audio->play();
+            }
 
             auto* brickTransform = brick->getComponent<TransformComponent>();
 
