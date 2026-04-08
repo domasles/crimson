@@ -103,6 +103,18 @@ namespace outBreak {
         }
     }
 
+    void Brick::onHit(const CollisionResult& collision) {
+        if (m_IsDestroyed) return;
+
+        if (m_GameManager) {
+            m_GameManager->onBrickHit(this);
+            return;
+        }
+
+        setDestroyed(true);
+        Vector2 brickCenter = getPosition() + Vector2{ 25.0f, 15.0f };
+    }
+
     void Brick::addWaveFromOrigin(Vector2 origin) {
         if (m_IsDestroyed) return;
 

@@ -1,10 +1,21 @@
 #include <pch.h>
 
+#include <components/AudioSourceComponent.h>
+
 #include <entities/GameManager.h>
 #include <entities/Brick.h>
 #include <entities/Ball.h>
 
 namespace outBreak {
+    void GameManager::init() {
+        auto* audio = addComponent<AudioSourceComponent>();
+
+        audio->setSound(loadSound("assets/audio/music/bg-music.mp3"));
+        audio->setVolume(0.3f);
+        audio->setLoop(true);
+        audio->setAutoPlay(true);
+    }
+
     void GameManager::update(float deltaTime) {
         updateComponents(deltaTime);
         checkBallBounds();
@@ -34,7 +45,7 @@ namespace outBreak {
 
         for (auto* brick : m_Bricks) {
             if (brick) {
-                brick->setDestroyed(false); // Make brick alive again
+                brick->setDestroyed(false);
                 auto* renderer = brick->getComponent<BoxRendererComponent>();
 
                 if (renderer) {

@@ -1,11 +1,14 @@
 #pragma once
 
+#include <entities/GameManager.h>
+
 #include <Engine.h>
-#include <vector>
 
 using namespace engine;
 
 namespace outBreak {
+    class GameManager;
+
     class Brick : public Entity {
         public:
             Brick() = default;
@@ -27,6 +30,9 @@ namespace outBreak {
             void addWaveFromOrigin(Vector2 origin);
             void setLocalOffset(const Vector2& offset) { m_LocalOffset = offset; }
 
+            void onHit(const CollisionResult& collision);
+            void setGameManager(GameManager* gameManager) { m_GameManager = gameManager; }
+
             Vector2 getPosition() const { return m_Position; }
 
         private:
@@ -46,6 +52,7 @@ namespace outBreak {
 
             Vector2 m_Position{ 0.0f, 0.0f };
             Vector2 m_LocalOffset{ 0.0f, 0.0f };
+            GameManager* m_GameManager = nullptr;
             
             std::vector<WaveData> m_ActiveWaves;
 

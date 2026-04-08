@@ -14,7 +14,7 @@ namespace outBreak {
             GameManager() = default;
             virtual ~GameManager() = default;
 
-            void init() override {}
+            void init() override;
             void update(float deltaTime) override;
             void render() override {}
 

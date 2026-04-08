@@ -28,12 +28,20 @@ namespace engine {
             if (mixer) m_Track = MIX_CreateTrack(mixer);
         }
 
-        if (m_Track) MIX_SetTrackGain(m_Track, m_Volume);
+        if (m_Track) {
+            MIX_SetTrackGain(m_Track, m_Volume);
+            if (m_AutoPlay) play();
+        }
     }
 
     void AudioSourceComponent::setVolume(float volume) {
         m_Volume = std::clamp(volume, 0.0f, 1.0f);
         if (m_Track) MIX_SetTrackGain(m_Track, m_Volume);
+    }
+
+    void AudioSourceComponent::setAutoPlay(bool autoPlay) {
+        m_AutoPlay = autoPlay;
+        if (m_AutoPlay) play();
     }
 
     void AudioSourceComponent::play() {
@@ -87,10 +95,6 @@ namespace engine {
             MIX_ResumeTrack(m_Track);
             m_State = SoundState::Playing;
         }
-    }
-
-    void AudioSourceComponent::init() {
-        if (m_AutoPlay) play();
     }
 
     void AudioSourceComponent::onDestroy() {

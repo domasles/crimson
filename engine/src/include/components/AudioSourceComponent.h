@@ -18,11 +18,12 @@ namespace engine {
 
             void setLoop(bool loop) { m_Loop = loop; }
             void setVolume(float volume);
-            void setAutoPlay(bool autoPlay) { m_AutoPlay = autoPlay; }
+            void setAutoPlay(bool autoPlay);
 
             float getVolume() const { return m_Volume; }
-            bool  getLoop() const { return m_Loop; }
-            bool  isAutoPlay() const { return m_AutoPlay; }
+
+            bool getLoop() const { return m_Loop; }
+            bool isAutoPlay() const { return m_AutoPlay; }
 
             void play();
             void stop();
@@ -32,7 +33,7 @@ namespace engine {
             bool isPlaying() const { return m_State == SoundState::Playing; }
             bool isPaused()  const { return m_State == SoundState::Paused; }
 
-            void init() override;
+            void init() override {}
             void onDestroy() override;
 
             SoundState getState()  const { return m_State; }

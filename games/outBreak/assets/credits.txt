@@ -4,4 +4,8 @@ Assets - Raven Fantasy Icons [https://clockworkraven.itch.io/raven-fantasy-icons
 
 audio/sfx/bounce.mp3:
 Creator - DRAGON-STUDIO [https://pixabay.com/users/dragon-studio-38165424/]
-Sound effect - Tennis Ball Hit [https://pixabay.com/sound-effects/film-special-effects-tennis-ball-hit-386155/]
+Asset - Tennis Ball Hit [https://pixabay.com/sound-effects/film-special-effects-tennis-ball-hit-386155/]
+
+audio/music/bg-music.mp3:
+Creator - FreeMusicForVideo [https://pixabay.com/users/freemusicforvideo-52198157/]
+Asset - Lofi Chill Music [https://pixabay.com/music/lofi-lofi-chill-music-495628/]

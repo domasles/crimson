@@ -25,7 +25,6 @@ namespace outBreak {
 
         createBricks();
 
-        m_Ball->setGameManager(m_GameManager);
         m_GameManager->setBall(m_Ball);
 
         for (auto* brick : m_Bricks) {
@@ -44,6 +43,7 @@ namespace outBreak {
     void GameScene::createBricks() {
         const int ROWS = 8;
         const int COLS = 18;
+
         const float BRICK_WIDTH = 80.0f;
         const float BRICK_HEIGHT = 30.0f;
         const float BRICK_SPACING = 5.0f;
@@ -59,6 +59,7 @@ namespace outBreak {
 
                 brick->init(Vector2{x, y});
                 brick->setGridPosition(row, col);
+                brick->setGameManager(m_GameManager);
 
                 // Store offset relative to grid center
                 brick->setLocalOffset(Vector2{ x - (totalWidth / 2.0f - BRICK_WIDTH / 2.0f), 0.0f });

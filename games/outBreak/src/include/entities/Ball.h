@@ -6,8 +6,6 @@ using namespace engine;
 
 namespace outBreak {
     class Brick;
-    class GameManager;
-
     class Ball : public Entity {
         public:
             Ball() = default;
@@ -19,8 +17,6 @@ namespace outBreak {
 
             void resetDirection();
             void resetPosition();
-
-            void setGameManager(GameManager* gameManager) { m_GameManager = gameManager; }
 
             Vector2 getInitialPosition() const { return m_InitialPosition; }
             Vector2 getVelocity() const { return m_Direction * BALL_SPEED; }
@@ -40,7 +36,5 @@ namespace outBreak {
             Vector2 m_InitialPosition{ getLogicalWindowSize().getRawX()/2 - BALL_SIZE/2, 700.0f };
             Vector2 m_Direction{ Vector2{1.0f, -1.0f}.normalize() };
             Vector2 m_LocalOffset{ 0.0f, 0.0f };
-
-            GameManager* m_GameManager = nullptr;
     };
 }

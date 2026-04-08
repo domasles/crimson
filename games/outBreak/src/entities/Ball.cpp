@@ -2,7 +2,6 @@
 
 #include <components/AudioSourceComponent.h>
 
-#include <entities/GameManager.h>
 #include <entities/Brick.h>
 #include <entities/Ball.h>
 
@@ -14,11 +13,11 @@ namespace outBreak {
         auto* transform = addComponent<TransformComponent>();
         auto* texture = addComponent<TextureComponent>();
         auto* collision = addComponent<CollisionComponent>();
-        auto* audio = addComponent<engine::AudioSourceComponent>();
+        auto* audio = addComponent<AudioSourceComponent>();
 
         texture->setTexture(loadTexture("assets/textures/ball.png"));
         audio->setSound(loadSound("assets/audio/sfx/bounce.mp3"));
-        audio->setVolume(0.8f);
+        audio->setVolume(0.5f);
 
         transform->setSize({BALL_SIZE, BALL_SIZE});
         transform->setPosition(m_InitialPosition);
@@ -31,7 +30,7 @@ namespace outBreak {
     }
 
     void Ball::playImpactSound() {
-        if (auto* audio = getComponent<engine::AudioSourceComponent>()) {
+        if (auto* audio = getComponent<AudioSourceComponent>()) {
             audio->play();
         }
     }
@@ -88,8 +87,6 @@ namespace outBreak {
     void Ball::handleCollisions(Vector2& nextPos) {
         if (handleWallCollision(nextPos)) return;
 
-        if (!m_GameManager) return;
-
         auto* ballCollision = getComponent<CollisionComponent>();
         if (!ballCollision) return;
 
@@ -99,7 +96,7 @@ namespace outBreak {
         if (!collision.hasCollision) return;
 
         if (auto* brick = dynamic_cast<Brick*>(collision.hitEntity)) {
-            m_GameManager->onBrickHit(brick);
+            brick->onHit(collision);
         }
 
         reflectDirection(collision.contactNormal);
