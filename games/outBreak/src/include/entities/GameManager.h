@@ -19,18 +19,14 @@ namespace outBreak {
             void render() override {}
 
             void setBall(Ball* ball) { m_Ball = ball; }
-            void setPaddle(Paddle* paddle) { m_Paddle = paddle; }
             void addBrick(Brick* brick) { m_Bricks.push_back(brick); }
             void resetGame();
+            void onBrickHit(Brick* brick);
 
         private:
             Ball* m_Ball = nullptr;
-            Paddle* m_Paddle = nullptr;
             std::vector<Brick*> m_Bricks;
 
-            void checkCollisions();
-            void checkBallPaddleCollision();
-            void checkBallBrickCollisions();
             void checkBallBounds();
             void triggerWaveEffect(Vector2 origin);
             bool allBricksDestroyed();

@@ -1,6 +1,9 @@
 #include <pch.h>
 
 #include <components/AudioSourceComponent.h>
+
+#include <entities/GameManager.h>
+#include <entities/Brick.h>
 #include <entities/Ball.h>
 
 using namespace engine::collisions::types;
@@ -27,48 +30,98 @@ namespace outBreak {
         resetDirection();
     }
 
+    void Ball::playImpactSound() {
+        if (auto* audio = getComponent<engine::AudioSourceComponent>()) {
+            audio->play();
+        }
+    }
+
+    void Ball::reflectDirection(const Vector2& normal) {
+        float randomX = Random::getFloat(0.7f, 1.3f);
+        float randomY = Random::getFloat(0.7f, 1.3f);
+
+        float xSign = (m_Direction.getRawX() > 0.0f) ? 1.0f : -1.0f;
+        float ySign = (m_Direction.getRawY() > 0.0f) ? 1.0f : -1.0f;
+
+        bool impactIsVertical = std::fabs(normal.getRawY()) >= std::fabs(normal.getRawX());
+
+        float newX = impactIsVertical ? xSign * randomX : normal.getRawX() * randomX;
+        float newY = impactIsVertical ? normal.getRawY() * randomY : ySign * randomY;
+
+        m_Direction = Vector2{ newX, newY }.normalize();
+        m_RotationSpeed = Random::getFloat(-180.0f, 180.0f);
+    }
+
+    bool Ball::handleWallCollision(Vector2& nextPos) {
+        float game_width = getLogicalWindowSize().getRawX();
+
+        if (nextPos.getRawX() < 0.0f) {
+            nextPos = Vector2{ 0.0f, nextPos.getRawY() };
+
+            reflectDirection(Vector2{1.0f, 0.0f});
+            playImpactSound();
+
+            return true;
+        }
+
+        if (nextPos.getRawX() + BALL_SIZE > game_width) {
+            nextPos = Vector2{ game_width - BALL_SIZE, nextPos.getRawY() };
+
+            reflectDirection(Vector2{-1.0f, 0.0f});
+            playImpactSound();
+
+            return true;
+        }
+
+        if (nextPos.getRawY() < 0.0f) {
+            nextPos = Vector2{ nextPos.getRawX(), 0.0f };
+
+            reflectDirection(Vector2{0.0f, 1.0f});
+            playImpactSound();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    void Ball::handleCollisions(Vector2& nextPos) {
+        if (handleWallCollision(nextPos)) return;
+
+        if (!m_GameManager) return;
+
+        auto* ballCollision = getComponent<CollisionComponent>();
+        if (!ballCollision) return;
+
+        MultiCollisionResult collisions = ballCollision->getAllCollisionsAt(nextPos);
+        CollisionResult collision = collisions.getFirstBlocking();
+
+        if (!collision.hasCollision) return;
+
+        if (auto* brick = dynamic_cast<Brick*>(collision.hitEntity)) {
+            m_GameManager->onBrickHit(brick);
+        }
+
+        reflectDirection(collision.contactNormal);
+        nextPos = nextPos + collision.contactNormal * 2.0f;
+        playImpactSound();
+    }
+
     void Ball::update(float deltaTime) {
         updateComponents(deltaTime);
         auto* transform = getComponent<TransformComponent>();
 
-        if (transform) {
-            Vector2 currentPos = transform->getPosition();
-            Vector2 velocity = m_Direction * BALL_SPEED;
-            Vector2 movement = velocity * deltaTime;
+        if (!transform) return;
 
-            float game_width = getLogicalWindowSize().getRawX();
+        Vector2 currentPos = transform->getPosition();
+        Vector2 velocity = m_Direction * BALL_SPEED;
+        Vector2 movement = velocity * deltaTime;
+        Vector2 nextPos = currentPos + movement;
 
-            Vector2 nextPos = currentPos + movement;
+        handleCollisions(nextPos);
 
-            if (nextPos.getRawX() < 0.0f) {
-                nextPos = Vector2{ 0.0f, nextPos.getRawY() };
-                setDirectionX(1.0f);
-
-                if (auto* audio = getComponent<engine::AudioSourceComponent>()) {
-                    audio->play();
-                }
-            }
-            else if (nextPos.getRawX() + BALL_SIZE > game_width) {
-                nextPos = Vector2{ game_width - BALL_SIZE, nextPos.getRawY() };
-                setDirectionX(-1.0f);
-
-                if (auto* audio = getComponent<engine::AudioSourceComponent>()) {
-                    audio->play();
-                }
-            }
-
-            if (nextPos.getRawY() < 0.0f) {
-                nextPos = Vector2{ nextPos.getRawX(), 0.0f };
-                setDirectionY(1.0f);
-
-                if (auto* audio = getComponent<engine::AudioSourceComponent>()) {
-                    audio->play();
-                }
-            }
-
-            transform->move(movement);
-            transform->rotate(m_RotationSpeed * BALL_ROTATION_SPEED * deltaTime);
-        }
+        transform->setPosition(nextPos);
+        transform->rotate(m_RotationSpeed * BALL_ROTATION_SPEED * deltaTime);
     }
 
     void Ball::render() {
@@ -79,27 +132,6 @@ namespace outBreak {
         }
     }
 
-    void Ball::setDirectionX(float sign) { 
-        float randomX = Random::getFloat(0.7f, 1.3f);
-        float randomY = Random::getFloat(0.7f, 1.3f);
-        float ySign = (m_Direction.getRawY() > 0) ? 1.0f : -1.0f;
-
-        Vector2 newDirection{ sign * randomX, ySign * randomY };
-
-        m_Direction = newDirection.normalize();
-        m_RotationSpeed = Random::getFloat(-180.0f, 180.0f);
-    }
-
-    void Ball::setDirectionY(float sign) {
-        float randomX = Random::getFloat(0.7f, 1.3f);
-        float randomY = Random::getFloat(0.7f, 1.3f);
-        float xSign = (m_Direction.getRawX() > 0) ? 1.0f : -1.0f;
-
-        Vector2 newDirection{ xSign * randomX, sign * randomY };
-
-        m_Direction = newDirection.normalize();
-        m_RotationSpeed = Random::getFloat(-180.0f, 180.0f);
-    }
 
     void Ball::resetDirection() { 
         float randomX = Random::getFloat(-1.0f, 1.0f);

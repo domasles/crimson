@@ -25,8 +25,8 @@ namespace outBreak {
 
         createBricks();
 
+        m_Ball->setGameManager(m_GameManager);
         m_GameManager->setBall(m_Ball);
-        m_GameManager->setPaddle(m_Paddle);
 
         for (auto* brick : m_Bricks) {
             m_GameManager->addBrick(brick);
