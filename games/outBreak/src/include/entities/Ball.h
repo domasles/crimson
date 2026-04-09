@@ -36,5 +36,7 @@ namespace outBreak {
             Vector2 m_InitialPosition{ getLogicalWindowSize().getRawX()/2 - BALL_SIZE/2, 700.0f };
             Vector2 m_Direction{ Vector2{1.0f, -1.0f}.normalize() };
             Vector2 m_LocalOffset{ 0.0f, 0.0f };
+
+            Entity* m_LastCollisionEntity = nullptr;
     };
 }

@@ -93,7 +93,13 @@ namespace outBreak {
         MultiCollisionResult collisions = ballCollision->getAllCollisionsAt(nextPos);
         CollisionResult collision = collisions.getFirstBlocking();
 
-        if (!collision.hasCollision) return;
+        if (!collision.hasCollision) {
+            m_LastCollisionEntity = nullptr;
+            return;
+        }
+
+        bool shouldPlaySound = collision.hitEntity != m_LastCollisionEntity;
+        m_LastCollisionEntity = collision.hitEntity;
 
         if (auto* brick = dynamic_cast<Brick*>(collision.hitEntity)) {
             brick->onHit(collision);
@@ -101,7 +107,7 @@ namespace outBreak {
 
         reflectDirection(collision.contactNormal);
         nextPos = nextPos + collision.contactNormal * 2.0f;
-        playImpactSound();
+        if (shouldPlaySound) playImpactSound();
     }
 
     void Ball::update(float deltaTime) {
