@@ -5,8 +5,7 @@
 #include <entities/Brick.h>
 #include <entities/Ball.h>
 
-using namespace engine::collisions::types;
-using namespace engine::collisions::shapes;
+using namespace engine::collisions;
 
 namespace outBreak {
     void Ball::init() {
@@ -22,7 +21,7 @@ namespace outBreak {
         transform->setSize({BALL_SIZE, BALL_SIZE});
         transform->setPosition(m_InitialPosition);
 
-        collision->setCollisionType(std::make_unique<TriggerCollision>());
+        collision->setCollisionType(CollisionType::Trigger);
         collision->setCollisionShape(std::make_unique<CircleShape>());
         collision->setParticipatesInQueries(false);
 

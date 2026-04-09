@@ -5,17 +5,20 @@
 
 #include <components/CollisionComponent.h>
 #include <components/TransformComponent.h>
+#include <collisions/shapes/BoxShape.h>
 
 #include <Entity.h>
 #include <Scene.h>
 
+using namespace engine::collisions::shapes;
+using namespace engine::collisions;
 using namespace engine::utils::logger;
 
 namespace engine {
     void CollisionComponent::init() {
         Component::init();
 
-        m_Collision.type = std::make_unique<BlockCollision>();
+        m_Collision.type = CollisionType::Block;
         m_Collision.shape = std::make_unique<BoxShape>();
         m_Collision.offset = {0, 0};
 
@@ -82,7 +85,7 @@ namespace engine {
         CollisionResult result;
 
         result.hasCollision = collisionResult.hasCollision;
-        result.hitType = collisionResult.hasCollision ? otherCollision->getCollisionType() : nullptr;
+        result.hitType = collisionResult.hasCollision ? otherCollision->getCollisionType() : CollisionType::None;
         result.hitEntity = collisionResult.hasCollision ? other : nullptr;
         result.contactPoint = collisionResult.contactPoint;
         result.contactNormal = collisionResult.contactNormal;
@@ -156,7 +159,7 @@ namespace engine {
         for (auto* candidate : s_candidates) {
             if (candidate == this || !candidate->isEnabled()) continue;
 
-            if (candidate->getParticipatesInQueries() || (candidate->getCollisionType() && candidate->getCollisionType()->shouldBlock())) {
+            if (candidate->getParticipatesInQueries() || shouldBlock(candidate->getCollisionType())) {
                 s_otherEntities.push_back(candidate->getEntity());
             }
         }

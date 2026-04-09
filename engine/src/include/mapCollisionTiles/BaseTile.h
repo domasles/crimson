@@ -5,12 +5,6 @@
 #include <components/TransformComponent.h>
 #include <components/CollisionComponent.h>
 
-#include <collisions/types/BlockCollision.h>
-#include <collisions/shapes/BoxShape.h>
-
-using namespace engine::collisions::types;
-using namespace engine::collisions::shapes;
-
 namespace engine::mapCollisionTiles {
     class BaseTile : public Entity {
         public:
@@ -22,7 +16,7 @@ namespace engine::mapCollisionTiles {
             virtual void update(float deltaTime) override;
             virtual void render() override {}
 
-            void setCollisionType(std::unique_ptr<CollisionType> newType);
+            void setCollisionType(CollisionType newType);
 
         protected:
             virtual void configureCollision();

@@ -2,16 +2,9 @@
 
 #include <utils/collision.h>
 
-#include <collisions/types/TriggerCollision.h>
-#include <collisions/types/BlockCollision.h>
-#include <collisions/types/NoneCollision.h>
-#include <collisions/shapes/BoxShape.h>
-
 #include <Component.h>
 
 using namespace engine::utils::collision;
-using namespace engine::collisions::types;
-using namespace engine::collisions::shapes;
 
 namespace engine {
     class Entity;
@@ -24,7 +17,7 @@ namespace engine {
             void init() override;
             void update(float deltaTime) override;
 
-            void setCollisionType(std::unique_ptr<CollisionType> type) { m_Collision.type = std::move(type); }
+            void setCollisionType(CollisionType type) { m_Collision.type = type; }
             void setCollisionShape(std::unique_ptr<CollisionShape> shape) { m_Collision.shape = std::move(shape); }
             void setOffset(const Vector2& offset) { m_Collision.offset = offset; }
 
@@ -35,8 +28,9 @@ namespace engine {
             void setParticipatesInQueries(bool participates) { m_ParticipatesInQueries = participates; }
 
             const Collision& getCollision() const { return m_Collision; }
-            const CollisionType* getCollisionType() const { return m_Collision.type.get(); }
             const CollisionShape* getCollisionShape() const { return m_Collision.shape.get(); }
+
+            CollisionType getCollisionType() const { return m_Collision.type; }
 
             CollisionResult testCollisionAt(const Vector2& testPosition) const;
             CollisionResult checkCollisionWithEntity(Entity* other) const;

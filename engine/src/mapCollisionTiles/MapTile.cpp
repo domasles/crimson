@@ -1,4 +1,7 @@
 #include <mapCollisionTiles/MapTile.h>
+#include <collisions/shapes/BoxShape.h>
+
+using namespace engine::collisions::shapes;
 
 namespace engine::mapCollisionTiles {
     void MapTile::init() {
@@ -34,7 +37,7 @@ namespace engine::mapCollisionTiles {
         auto* collision = getComponent<CollisionComponent>();
 
         if (collision) {
-            collision->setCollisionType(std::make_unique<BlockCollision>());
+            collision->setCollisionType(CollisionType::Block);
             collision->setCollisionShape(std::make_unique<BoxShape>());
             collision->setParticipatesInQueries(true);
         }

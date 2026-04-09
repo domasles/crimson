@@ -3,11 +3,14 @@
 #include <utils/filesystem.h>
 #include <utils/logger.h>
 
+#include <collisions/shapes/BoxShape.h>
+
 #include <Resources.h>
 #include <Scene.h>
 #include <Core.h>
 #include <Map.h>
 
+using namespace engine::collisions::shapes;
 using namespace engine::utils::filesystem;
 using namespace engine::utils::logger;
 
@@ -237,11 +240,7 @@ namespace engine {
                         auto* mapTile = scene->createEntity<MapTile>();
                         mapTile->init(worldPosition, tileSize);
 
-                        auto collisionType = getCollisionType(layerIdentifier, value);
-                        if (collisionType) {
-                            mapTile->setCollisionType(std::move(collisionType));
-                        }
-
+                        mapTile->setCollisionType(getCollisionType(layerIdentifier, value));
                         m_MapTiles.push_back(mapTile);
                     }
                 }
@@ -251,16 +250,16 @@ namespace engine {
         }
     }
 
-    void Map::setLayerCollisionType(const std::string& layerIdentifier, std::unique_ptr<CollisionType> type) {
-        m_LayerCollisionTypes[layerIdentifier] = std::move(type);
+    void Map::setLayerCollisionType(const std::string& layerIdentifier, CollisionType type) {
+        m_LayerCollisionTypes[layerIdentifier] = type;
     }
 
-    void Map::setValueCollisionType(int value, std::unique_ptr<CollisionType> type) {
-        m_ValueCollisionTypes[value] = std::move(type);
+    void Map::setValueCollisionType(int value, CollisionType type) {
+        m_ValueCollisionTypes[value] = type;
     }
 
-    void Map::setLayerValueCollisionType(const std::string& layerIdentifier, int value, std::unique_ptr<CollisionType> type) {
-        m_LayerValueCollisionTypes[layerIdentifier][value] = std::move(type);
+    void Map::setLayerValueCollisionType(const std::string& layerIdentifier, int value, CollisionType type) {
+        m_LayerValueCollisionTypes[layerIdentifier][value] = type;
     }
 
     void Map::setLayerCollisionShape(const std::string& layerIdentifier, std::unique_ptr<CollisionShape> shape) {
@@ -275,14 +274,14 @@ namespace engine {
         m_LayerValueCollisionShapes[layerIdentifier][value] = std::move(shape);
     }
 
-    std::unique_ptr<CollisionType> Map::getCollisionType(const std::string& layerIdentifier, int value) const {
+    CollisionType Map::getCollisionType(const std::string& layerIdentifier, int value) const {
         // 1. Check layer-value specific (highest priority)
         auto layerIt = m_LayerValueCollisionTypes.find(layerIdentifier);
 
         if (layerIt != m_LayerValueCollisionTypes.end()) {
             auto valueIt = layerIt->second.find(value);
             if (valueIt != layerIt->second.end()) {
-                return valueIt->second->clone();
+                return valueIt->second;
             }
         }
 
@@ -290,18 +289,18 @@ namespace engine {
         auto valueIt = m_ValueCollisionTypes.find(value);
 
         if (valueIt != m_ValueCollisionTypes.end()) {
-            return valueIt->second->clone();
+            return valueIt->second;
         }
 
         // 3. Check layer-specific (low priority)
         auto layerTypeIt = m_LayerCollisionTypes.find(layerIdentifier);
 
         if (layerTypeIt != m_LayerCollisionTypes.end()) {
-            return layerTypeIt->second->clone();
+            return layerTypeIt->second;
         }
 
         // 4. Default (lowest priority) - sensible default
-        return std::make_unique<BlockCollision>();
+        return CollisionType::Block;
     }
 
     std::unique_ptr<CollisionShape> Map::getCollisionShape(const std::string& layerIdentifier, int value) const {

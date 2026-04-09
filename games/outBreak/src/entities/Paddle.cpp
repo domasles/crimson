@@ -2,8 +2,7 @@
 
 #include <entities/Paddle.h>
 
-using namespace engine::collisions::types;
-using namespace engine::collisions::shapes;
+using namespace engine::collisions;
 
 namespace outBreak {
     void Paddle::init() {
@@ -17,7 +16,7 @@ namespace outBreak {
 
         renderer->setColor(Color(0.0f, 0.0f, 0.0f, 1.0f));
 
-        collision->setCollisionType(std::make_unique<BlockCollision>());
+        collision->setCollisionType(CollisionType::Block);
         collision->setCollisionShape(std::make_unique<BoxShape>());
         collision->setParticipatesInQueries(true);
 

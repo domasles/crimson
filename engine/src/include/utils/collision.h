@@ -15,8 +15,8 @@ namespace engine {
 namespace engine::utils::collision {
     struct CollisionResult {
         bool hasCollision = false;
-        const CollisionType* hitType = nullptr;
 
+        CollisionType hitType = CollisionType::None;
         Entity* hitEntity = nullptr;
 
         Vector2 contactPoint{0, 0};
@@ -39,7 +39,7 @@ namespace engine::utils::collision {
     };
 
     struct Collision {
-        std::unique_ptr<CollisionType> type;
+        CollisionType type = CollisionType::Block;
         std::unique_ptr<CollisionShape> shape;
 
         Vector2 offset{0, 0};

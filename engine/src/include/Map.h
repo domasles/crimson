@@ -4,10 +4,7 @@
 #include <utils/tileset.h>
 #include <utils/collision.h>
 
-#include <collisions/types/BlockCollision.h>
-#include <collisions/types/NoneCollision.h>
-#include <collisions/shapes/BoxShape.h>
-
+#include <collisions/CollisionShape.h>
 #include <mapCollisionTiles/MapTile.h>
 
 #include <Texture.h>
@@ -17,8 +14,6 @@ using namespace engine::utils::tileset;
 using namespace engine::utils::collision;
 using namespace engine::utils::rendering;
 using namespace engine::mapCollisionTiles;
-using namespace engine::collisions::types;
-using namespace engine::collisions::shapes;
 
 using json = nlohmann::json;
 
@@ -38,9 +33,9 @@ namespace engine {
             Vector2 getEntityPosition(std::string entityName) const;
             std::vector<std::pair<std::string, Vector2>> getEntitiesPositions() const;
 
-            void setLayerCollisionType(const std::string& layerIdentifier, std::unique_ptr<CollisionType> type);
-            void setValueCollisionType(int value, std::unique_ptr<CollisionType> type);
-            void setLayerValueCollisionType(const std::string& layerIdentifier, int value, std::unique_ptr<CollisionType> type);
+            void setLayerCollisionType(const std::string& layerIdentifier, CollisionType type);
+            void setValueCollisionType(int value, CollisionType type);
+            void setLayerValueCollisionType(const std::string& layerIdentifier, int value, CollisionType type);
 
             void setLayerCollisionShape(const std::string& layerIdentifier, std::unique_ptr<CollisionShape> shape);
             void setValueCollisionShape(int value, std::unique_ptr<CollisionShape> shape);
@@ -76,15 +71,15 @@ namespace engine {
             
             void parseIntGridLayers(Scene* scene);
 
-            std::unordered_map<std::string, std::unique_ptr<CollisionType>> m_LayerCollisionTypes;
-            std::unordered_map<int, std::unique_ptr<CollisionType>> m_ValueCollisionTypes;
-            std::unordered_map<std::string, std::unordered_map<int, std::unique_ptr<CollisionType>>> m_LayerValueCollisionTypes;
+            std::unordered_map<std::string, CollisionType> m_LayerCollisionTypes;
+            std::unordered_map<int, CollisionType> m_ValueCollisionTypes;
+            std::unordered_map<std::string, std::unordered_map<int, CollisionType>> m_LayerValueCollisionTypes;
 
             std::unordered_map<std::string, std::unique_ptr<CollisionShape>> m_LayerCollisionShapes;
             std::unordered_map<int, std::unique_ptr<CollisionShape>> m_ValueCollisionShapes;
             std::unordered_map<std::string, std::unordered_map<int, std::unique_ptr<CollisionShape>>> m_LayerValueCollisionShapes;
 
-            std::unique_ptr<CollisionType> getCollisionType(const std::string& layerIdentifier, int value) const;
+            CollisionType getCollisionType(const std::string& layerIdentifier, int value) const;
             std::unique_ptr<CollisionShape> getCollisionShape(const std::string& layerIdentifier, int value) const;
     };
 }

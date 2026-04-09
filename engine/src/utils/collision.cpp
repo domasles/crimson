@@ -2,21 +2,20 @@
 
 #include <utils/collision.h>
 
-#include <collisions/types/BlockCollision.h>
 #include <collisions/shapes/BoxShape.h>
 
 #include <Entity.h>
 
 using namespace engine::collisions::shapes;
-using namespace engine::collisions::types;
+using namespace engine::collisions;
 
 namespace engine::utils::collision {
     bool CollisionResult::isBlocking() const {
-        return hitType && hitType->shouldBlock();
+        return shouldBlock(hitType);
     }
 
     bool CollisionResult::isTrigger() const {
-        return hitType && hitType->shouldTriggerEvents() && !hitType->shouldBlock();
+        return shouldTriggerEvents(hitType) && !shouldBlock(hitType);
     }
 
     bool MultiCollisionResult::hasBlockingCollision() const {
@@ -56,31 +55,27 @@ namespace engine::utils::collision {
     }
 
     Collision::Collision() {
-        type = std::make_unique<BlockCollision>();
         shape = std::make_unique<BoxShape>();
     }
 
     Collision::Collision(const Vector2& size) : size(size) {
-        type = std::make_unique<BlockCollision>();
         shape = std::make_unique<BoxShape>();
     }
 
     Collision::Collision(const Vector2& offset, const Vector2& size) : offset(offset), size(size) {
-        type = std::make_unique<BlockCollision>();
         shape = std::make_unique<BoxShape>();
     }
 
-    Collision::Collision(const Collision& other) : offset(other.offset), size(other.size) {
-        if (other.type) type = other.type->clone();
+    Collision::Collision(const Collision& other) : type(other.type), offset(other.offset), size(other.size) {
         if (other.shape) shape = other.shape->clone();
     }
 
     Collision& Collision::operator=(const Collision& other) {
         if (this != &other) {
+            type = other.type;
             offset = other.offset;
             size = other.size;
 
-            if (other.type) type = other.type->clone();
             if (other.shape) shape = other.shape->clone();
         }
 

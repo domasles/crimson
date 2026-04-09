@@ -14,10 +14,6 @@
 #include <components/TextureComponent.h>
 #include <components/InputComponent.h>
 
-#include <collisions/types/TriggerCollision.h>
-#include <collisions/types/BlockCollision.h>
-#include <collisions/types/NoneCollision.h>
-
 #include <collisions/shapes/CircleShape.h>
 #include <collisions/shapes/BoxShape.h>
 
@@ -50,7 +46,4 @@ namespace engine::utils {
     using namespace filesystem;
 }
 
-namespace engine::collisions {
-    using namespace types;
-    using namespace shapes;
-}
+using namespace engine::collisions::shapes;
