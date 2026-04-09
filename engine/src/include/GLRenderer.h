@@ -25,9 +25,6 @@ namespace engine {
             bool init();
             void shutdown();
 
-            void beginFrame() {}
-            void endFrame();
-
             void beginPass(RenderPass pass);
             void endPass();
 

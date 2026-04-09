@@ -59,10 +59,6 @@ namespace engine {
         m_Initialized = false;
     }
 
-    void GLRenderer::endFrame() {
-        glFlush();
-    }
-
     void GLRenderer::beginPass(RenderPass pass) {
         if (pass != m_CurrentPass) {
             endPass();

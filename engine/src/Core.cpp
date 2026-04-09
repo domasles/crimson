@@ -147,6 +147,8 @@ namespace engine {
                 windowSuccess = initWindowedWindow(title, width, height, resizable);
 
                 if (windowSuccess) {
+                    m_WindowWidth = width;
+                    m_WindowHeight = height;
                     m_TargetWindowWidth = width;
                     m_TargetWindowHeight = height;
 
@@ -159,7 +161,7 @@ namespace engine {
                 windowSuccess = initFullScreenWindow(title);
 
                 if (windowSuccess) {
-                    Vector2 windowSize = getWindowSize();
+                    SDL_GetWindowSize(m_Window.get(), &m_WindowWidth, &m_WindowHeight);
 
                     m_TargetWindowWidth = m_DefaultWindowWidth;
                     m_TargetWindowHeight = m_DefaultWindowHeight;
@@ -172,11 +174,23 @@ namespace engine {
 
         if (!windowSuccess) {
             Logger::engine_error("Window initialization failed");
+
+            for (MIX_Track* track : m_Tracks) {
+                if (track) MIX_DestroyTrack(track);
+            }
+
+            m_Tracks.clear();
             return false;
         }
 
         if (!initRenderer()) {
             Logger::engine_error("initRenderer failed");
+
+            for (MIX_Track* track : m_Tracks) {
+                if (track) MIX_DestroyTrack(track);
+            }
+
+            m_Tracks.clear();
             return false;
         }
 
@@ -200,6 +214,9 @@ namespace engine {
             }
 
             if (event.type == SDL_EVENT_WINDOW_RESIZED) {
+                m_WindowWidth = event.window.data1;
+                m_WindowHeight = event.window.data2;
+
                 updateViewport();
             }
 
@@ -221,11 +238,9 @@ namespace engine {
     }
 
     void Core::runFrame() {
-        int windowWidth, windowHeight;
-        SDL_GetWindowSize(m_Window.get(), &windowWidth, &windowHeight);
-
         glDisable(GL_SCISSOR_TEST);
-        glViewport(0, 0, windowWidth, windowHeight);
+        glViewport(0, 0, m_WindowWidth, m_WindowHeight);
+
         m_Renderer->clear(SceneManager::getInstance().getOutOfBoundsColor());
 
         applyLetterboxViewport();
@@ -252,7 +267,6 @@ namespace engine {
         SceneManager::getInstance().renderUI();
         m_Renderer->endPass();
 
-        m_Renderer->endFrame();
         SDL_GL_SwapWindow(m_Window.get());
     }
 
@@ -284,8 +298,6 @@ namespace engine {
     }
 
     Vector2 Core::getWindowSize() {
-        SDL_GetWindowSize(getWindow(), &m_WindowWidth, &m_WindowHeight);
-
         float w = std::max(m_WindowWidth, m_TargetWindowWidth);
         float h = std::max(m_WindowHeight, m_TargetWindowHeight);
 
@@ -346,10 +358,8 @@ namespace engine {
             return false;
         }
 
-        int windowWidth = 0;
-        int windowHeight = 0;
-
-        SDL_GetWindowSize(m_Window.get(), &windowWidth, &windowHeight);
+        int windowWidth = m_WindowWidth;
+        int windowHeight = m_WindowHeight;
 
         m_Renderer->setViewport(0, 0, windowWidth, windowHeight);
         m_Renderer->setOrthographicProjection(0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight), 0.0f);
@@ -358,10 +368,8 @@ namespace engine {
     }
 
     void Core::updateViewport() {
-        int windowWidth = 0;
-        int windowHeight = 0;
-
-        SDL_GetWindowSize(m_Window.get(), &windowWidth, &windowHeight);
+        int windowWidth = m_WindowWidth;
+        int windowHeight = m_WindowHeight;
 
         float virtualWidth = 0.0f;
         float virtualHeight = 0.0f;
