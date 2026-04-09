@@ -33,7 +33,7 @@ A simple, powerful 2D game engine designed for learning game development fundame
 - **Universal Platform Support**: Windows, Linux, macOS (native) + WebAssembly (web).
 - **Modern CMake Integration**: Industry-standard build system with full IDE support.
 - **Development Automation**: Build and deployment scripts for streamlined workflows.
-- **Everything included through Git submodules**: SDL3, JSON library, WxWidgets and any other dependencies that might become required in the future.
+- **Everything included through Git submodules**: SDL3, SDL3_image, SDL3_mixer, JSON library, Freetype, RmlUi, and any other dependencies that might become required in the future.
 
 ### Coming Soon
 - **UI System**: Immediate-mode GUI for game interfaces and debug tools.
@@ -271,9 +271,10 @@ cmake --build build-native
 ## External Submodule Dependencies
 
 - **[SDL3](https://github.com/libsdl-org/SDL)**: For graphics, audio, and input handling
-- **[SDL3_image](https://github.com/libsdl-org/SDL_image)**: For image loading (PNG, JPG, BMP, GIF)
+- **[SDL3_image](https://github.com/libsdl-org/SDL_image)**: For image loading
 - **[SDL3_mixer](https://github.com/libsdl-org/SDL_mixer)**: For audio mixing and playback
-- **[WxWidgets](https://github.com/wxWidgets/wxWidgets)**: For cross-platform GUI
+- **[Freetype](https://gitlab.freedesktop.org/freetype/freetype)**: For font rendering and text layout
+- **[RmlUi](https://github.com/mikke89/RmlUi)**: For immediate-mode UI rendering
 - **[Json](https://github.com/nlohmann/json)**: For JSON parsing throughout engine
 - **[Emscripten](https://github.com/emscripten-core/emsdk.git)**: For WebAssembly support
 
