@@ -147,8 +147,6 @@ namespace engine {
                 windowSuccess = initWindowedWindow(title, width, height, resizable);
 
                 if (windowSuccess) {
-                    m_WindowWidth = width;
-                    m_WindowHeight = height;
                     m_TargetWindowWidth = width;
                     m_TargetWindowHeight = height;
 
@@ -161,8 +159,6 @@ namespace engine {
                 windowSuccess = initFullScreenWindow(title);
 
                 if (windowSuccess) {
-                    SDL_GetWindowSize(m_Window.get(), &m_WindowWidth, &m_WindowHeight);
-
                     m_TargetWindowWidth = m_DefaultWindowWidth;
                     m_TargetWindowHeight = m_DefaultWindowHeight;
 
@@ -197,6 +193,10 @@ namespace engine {
         {
             int physW = 0, physH = 0;
             SDL_GetWindowSize(m_Window.get(), &physW, &physH);
+
+            m_WindowWidth = physW;
+            m_WindowHeight = physH;
+
             UIManager::getInstance().init(m_Renderer.get(), physW, physH);
         }
 
