@@ -54,7 +54,7 @@ namespace engine::ui {
         Rml::Element* el = m_Doc->GetElementById(elementId);
 
         if (!el) {
-            Logger::engine_warn("UIDocument::listen: element '{}' not found.", elementId);
+            Logger::engine_warn("UIDocument::listen: element '{}' not found", elementId);
             return *this;
         }
 

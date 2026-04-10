@@ -42,13 +42,13 @@ namespace engine {
 
         try {
             if (!m_JsonFile.contains("actions")) {
-                Logger::engine_error("Missing 'actions' field in JSON.");
+                Logger::engine_error("Missing 'actions' field in JSON");
                 return false;
             }
 
             for (const auto& [name, data] : m_JsonFile["actions"].items()) {
                 if (!data.contains("type") || !data.contains("key")) {
-                    Logger::engine_error("Malformed action data: missing 'type' or 'key'.");
+                    Logger::engine_error("Malformed action data: missing 'type' or 'key'");
                     return false;
                 }
 
@@ -62,7 +62,7 @@ namespace engine {
 
                 if (type == "movement") {
                     if (!data.contains("vector") || data["vector"].size() < 2) {
-                        Logger::engine_error("Malformed movement action: missing 'vector'.");
+                        Logger::engine_error("Malformed movement action: missing 'vector'");
                         return false;
                     }
 

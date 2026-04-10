@@ -5,6 +5,7 @@
 
 #include <ui/UIManager.h>
 
+#include <AudioManager.h>
 #include <Gizmos.h>
 #include <Scene.h>
 #include <Core.h>
@@ -51,20 +52,9 @@ namespace engine {
     }
 
     Core::~Core() {
-        for (MIX_Track* track : m_Tracks) {
-            if (track) {
-                MIX_DestroyTrack(track);
-            }
-        }
-
-        m_Tracks.clear();
-
-        if (m_Mixer) {
-            MIX_DestroyMixer(m_Mixer);
-            m_Mixer = nullptr;
-        }
-
+        AudioManager::getInstance().shutdown();
         UIManager::getInstance().shutdown();
+
         m_Renderer->shutdown();
         
         if (m_GLContext) {
@@ -72,7 +62,6 @@ namespace engine {
             m_GLContext = nullptr;
         }
 
-        MIX_Quit();
         SDL_Quit();
     }
 
@@ -104,26 +93,9 @@ namespace engine {
 
         ENGINE_LOG_INIT("SDL");
 
-        if (!MIX_Init()) {
-            Logger::engine_error("MIX_Init failed: {}", SDL_GetError());
+        if (!AudioManager::getInstance().init()) {
+            Logger::engine_error("AudioManager initialization failed");
             return false;
-        }
-
-        m_Mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, nullptr);
-
-        if (!m_Mixer) {
-            Logger::engine_error("MIX_CreateMixerDevice failed: {}", SDL_GetError());
-            return false;
-        }
-
-        m_Tracks.reserve(32);
-
-        for (int i = 0; i < 32; ++i) {
-            MIX_Track* track = MIX_CreateTrack(m_Mixer);
-
-            if (track) {
-                m_Tracks.push_back(track);
-            }
         }
 
         ENGINE_LOG_INIT("Audio");
@@ -170,23 +142,11 @@ namespace engine {
 
         if (!windowSuccess) {
             Logger::engine_error("Window initialization failed");
-
-            for (MIX_Track* track : m_Tracks) {
-                if (track) MIX_DestroyTrack(track);
-            }
-
-            m_Tracks.clear();
             return false;
         }
 
         if (!initRenderer()) {
             Logger::engine_error("initRenderer failed");
-
-            for (MIX_Track* track : m_Tracks) {
-                if (track) MIX_DestroyTrack(track);
-            }
-
-            m_Tracks.clear();
             return false;
         }
 
@@ -413,14 +373,6 @@ namespace engine {
         return std::min(scaleX, scaleY);
     }
 
-    MIX_Track* Core::getFreeTrack() {
-        for (MIX_Track* track : m_Tracks) {
-            if (track && !MIX_TrackPlaying(track)) {
-                return track;
-            }
-        }
-        return m_Tracks.empty() ? nullptr : m_Tracks[0];
-    }
 
     void Core::setVSync(bool enabled) {
         m_VSync = enabled;

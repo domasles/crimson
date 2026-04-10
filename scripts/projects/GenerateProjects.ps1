@@ -2,7 +2,7 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ProjectRoot = Resolve-Path (Join-Path $ScriptDir '..\..')
 $EmsdkBat = Join-Path $ProjectRoot "vendor\emsdk\emsdk_env.bat"
 
-Write-Host "Generating Visual Studio 2026 solution and Emscripten build files..."
+Write-Host "Generating Visual Studio 2026 solution and Emscripten build files"
 Push-Location $ProjectRoot
 
 $envLines = cmd.exe /c "`"$EmsdkBat`" & set"
@@ -30,7 +30,7 @@ finally {
 Write-Host ""
 Write-Host "Project generation completed successfully!"
 Write-Host "Solution file: build-native\Crimson.sln"
-Write-Host "Build files are located in the 'build-native' directory."
+Write-Host "Build files are located in the 'build-native' directory"
 Write-Host ""
 Write-Host "To develop:"
 Write-Host "  1. Open build-native\Crimson.sln in Visual Studio, or"

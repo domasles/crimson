@@ -19,7 +19,7 @@ namespace engine::ui {
 
     bool UIManager::init(engine::GLRenderer* renderer, int width, int height) {
         if (m_Initialized) {
-            Logger::engine_warn("UIManager::init() called more than once - ignoring.");
+            Logger::engine_warn("UIManager::init() called more than once - ignoring");
             return true;
         }
 
@@ -33,7 +33,7 @@ namespace engine::ui {
         Rml::SetRenderInterface(m_RenderBackend.get());
 
         if (!Rml::Initialise()) {
-            Logger::engine_error("RmlUI initialization failed.");
+            Logger::engine_error("RmlUI initialization failed");
             return false;
         }
 
@@ -55,7 +55,7 @@ namespace engine::ui {
         m_SystemInterface.reset();
 
         m_Initialized = false;
-        ENGINE_LOG_INIT("UIManager shut down.");
+        ENGINE_LOG_INIT("UIManager shut down");
     }
 
     void UIManager::loadFont(const std::string& path, bool fallback) {

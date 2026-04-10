@@ -82,7 +82,6 @@ cmake --build build-native --config Debug
 cmake --build build-wasm --config Debug
 
 # Build specific game only
-cmake --build build-native --target crimson --config Debug
 cmake --build build-native --target outBreak --config Debug
 ```
 
@@ -115,13 +114,11 @@ cmake --build build-native --target clean
 ### Game-Specific Development
 ```bash
 # Work on individual games
-cmake --build build-native --target crimson
 cmake --build build-native --target outBreak
 cmake --build build-native --target launcher   # Game launcher also builds all games with itself
 
 # WebAssembly deployment
-cmake --build build-wasm --target crimson --config Release
-cmake --build build-wasm --target outBreak
+cmake --build build-wasm --target outBreak --config Release
 ```
 
 ## Project Structure
@@ -204,12 +201,12 @@ engine/
 - **[SDL3](https://github.com/libsdl-org/SDL)** - Modern graphics, audio, input, and windowing
 - **[SDL3_image](https://github.com/libsdl-org/SDL_image)** - Image loading (PNG, JPG, BMP, GIF)
 - **[SDL3_mixer](https://github.com/libsdl-org/SDL_mixer)** - Audio mixing and playback
-- **[WxWidgets](https://github.com/wxWidgets/wxWidgets)** - Cross-platform GUI toolkit
+- **[RmlUi](https://github.com/mikke89/RmlUi)** - UI rendering
 
 ### Header-Only Libraries
 - **[Json](https://github.com/nlohmann/json)** - JSON parsing throughout engine
-
-**Zero Installation Required**: All dependencies are included as submodules and built automatically.
+- **[Nuklear](https://github.com/Immediate-Mode-UI/Nuklear)** - Immediate-mode UI library for the launcher
+- **[glad](https://github.com/dav1dde/glad)** - OpenGL function loader
 
 ## Troubleshooting
 
@@ -276,7 +273,7 @@ cmake --build build-native
 - **[Freetype](https://gitlab.freedesktop.org/freetype/freetype)**: For font rendering and text layout
 - **[RmlUi](https://github.com/mikke89/RmlUi)**: For immediate-mode UI rendering
 - **[Json](https://github.com/nlohmann/json)**: For JSON parsing throughout engine
-- **[Emscripten](https://github.com/emscripten-core/emsdk.git)**: For WebAssembly support
+- **[Emscripten](https://github.com/emscripten-core/emsdk)**: For WebAssembly support
 
 ---
 

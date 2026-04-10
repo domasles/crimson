@@ -3,7 +3,8 @@
 #include <utils/logger.h>
 
 #include <components/AudioSourceComponent.h>
-#include <Core.h>
+
+#include <AudioManager.h>
 
 using namespace engine::utils::logger;
 
@@ -14,9 +15,7 @@ namespace engine {
 
     void AudioSourceComponent::setSound(std::shared_ptr<Sound> sound) {
         if (m_Track) {
-            MIX_StopTrack(m_Track, 0);
-            MIX_DestroyTrack(m_Track);
-
+            AudioManager::getInstance().releaseTrack(m_Track);
             m_Track = nullptr;
         }
 
@@ -24,8 +23,7 @@ namespace engine {
         m_State = SoundState::Stopped;
 
         if (m_Sound && m_Sound->isLoaded()) {
-            MIX_Mixer* mixer = Core::getInstance().getMixer();
-            if (mixer) m_Track = MIX_CreateTrack(mixer);
+            m_Track = AudioManager::getInstance().requestTrack();
         }
 
         if (m_Track) {
@@ -53,9 +51,9 @@ namespace engine {
         MIX_Track* trackToUse = m_Track;
 
         if (MIX_TrackPlaying(trackToUse) && !m_Loop) {
-            MIX_Track* freeTrack = Core::getInstance().getFreeTrack();
-
+            MIX_Track* freeTrack = AudioManager::getInstance().requestTrack();
             if (freeTrack) {
+                m_Track = freeTrack;
                 trackToUse = freeTrack;
             }
         }
@@ -99,9 +97,7 @@ namespace engine {
 
     void AudioSourceComponent::onDestroy() {
         if (m_Track) {
-            MIX_StopTrack(m_Track, 0);
-            MIX_DestroyTrack(m_Track);
-
+            AudioManager::getInstance().releaseTrack(m_Track);
             m_Track = nullptr;
         }
 

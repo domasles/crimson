@@ -5,7 +5,7 @@ OS_TYPE="$(uname)"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
 EMSDK_DIR="$(cd "$SCRIPT_DIR/../../vendor/emsdk" &> /dev/null && pwd)"
 
-echo "Generating build files for $OS_TYPE and Emscripten build files..."
+echo "Generating build files for $OS_TYPE and Emscripten build files"
 
 if [[ "$OS_TYPE" == "Darwin" ]]; then
     if command -v xcodebuild &> /dev/null; then
@@ -38,8 +38,8 @@ fi
 
 echo ""
 echo "Project generation completed successfully!"
-echo "Native build files are located in the 'build-native' directory."
-echo "WASM build files are located in the 'build-wasm' directory."
+echo "Native build files are located in the 'build-native' directory"
+echo "WASM build files are located in the 'build-wasm' directory"
 echo ""
 
 if [[ "$GENERATOR" == "Xcode" ]]; then

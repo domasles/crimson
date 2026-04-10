@@ -30,7 +30,7 @@
         auto selectedGame = selectGame(availableGames);
 
         if (!selectedGame) {
-            std::println(stderr, "No game selected or available.");
+            std::println(stderr, "No game selected or available");
             return -1;
         }
 
@@ -58,7 +58,7 @@
         }
 
         if (!startFunc) {
-            std::println(stderr, "Game entry point 'start' not found.");
+            std::println(stderr, "Game entry point 'start' not found");
             unloadLibrary(libraryHandle);
             return -1;
         }

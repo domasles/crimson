@@ -4,7 +4,7 @@
 #include <utils/logger.h>
 
 #include <Sound.h>
-#include <Core.h>
+#include <AudioManager.h>
 
 using namespace engine::utils::filesystem;
 using namespace engine::utils::logger;
@@ -21,7 +21,7 @@ namespace engine {
 
     bool Sound::loadSound() {
         const std::string filePath = getGamePath() + "/" + m_FilePath;
-        MIX_Mixer* mixer = Core::getInstance().getMixer();
+        MIX_Mixer* mixer = AudioManager::getInstance().getMixer();
 
         if (!mixer) {
             Logger::engine_error("Sound::loadSound() - mixer not initialized");
@@ -36,7 +36,6 @@ namespace engine {
         }
 
         ENGINE_LOG_INIT(("Sound: " + m_FilePath).c_str());
-
         return true;
     }
 }

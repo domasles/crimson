@@ -37,7 +37,7 @@ else()
             )
         endforeach()
     else()
-        message(FATAL_ERROR "No valid multi-configuration build generators found. Please install one.")
+        message(FATAL_ERROR "No valid multi-configuration build generators found, please install one")
     endif()
 endif()
 

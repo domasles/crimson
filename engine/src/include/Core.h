@@ -28,9 +28,6 @@ namespace engine {
         public:
             static Core& getInstance();
 
-            MIX_Mixer* getMixer() const { return m_Mixer; }
-            MIX_Track* getFreeTrack();
-
             bool init(const std::string& workingDir, const std::string& title, const int width=800, const int height=600, const bool resizable=false, const bool vsync=true);
             bool init(const std::string& workingDir, const std::string& title, const bool fullScreen=false, const bool vsync=true);
             bool initInternal(const std::string& workingDir, const std::string& title, WindowMode mode, int width = 0, int height = 0, bool resizable = false, bool vsync = true);
@@ -103,9 +100,6 @@ namespace engine {
             std::unique_ptr<GLRenderer> m_Renderer;
 
             SDL_GLContext m_GLContext = nullptr;
-
-            MIX_Mixer* m_Mixer = nullptr;
-            std::vector<MIX_Track*> m_Tracks;
     };
 
     inline Core& getCore() { return Core::getInstance(); }

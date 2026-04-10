@@ -78,7 +78,7 @@ namespace engine::ui {
         m_Context = Rml::CreateContext(name, Rml::Vector2i{width, height});
 
         if (!m_Context) {
-            Logger::engine_error("Rml::CreateContext({}) failed.", name);
+            Logger::engine_error("Rml::CreateContext({}) failed", name);
             return;
         }
 

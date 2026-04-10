@@ -11,17 +11,17 @@ if (-not $DisplayName) {
 }
 
 if ($GameName -notmatch '^[a-zA-Z_]+$') {
-    Write-Host "Error: GameName can only contain letters (a-z, A-Z) and underscores (_)."
+    Write-Host "Error: GameName can only contain letters (a-z, A-Z) and underscores (_)"
     exit 1
 }
 
 if ($DisplayName -notmatch '^[a-zA-Z_ ]+$') {
-    Write-Host "Error: DisplayName can only contain letters (a-z, A-Z), underscores (_), and spaces."
+    Write-Host "Error: DisplayName can only contain letters (a-z, A-Z), underscores (_), and spaces"
     exit 1
 }
 
 if ($DisplayName -match '[\r\n]') {
-    Write-Host "Error: DisplayName cannot contain line breaks."
+    Write-Host "Error: DisplayName cannot contain line breaks"
     exit 1
 }
 
