@@ -132,6 +132,9 @@ namespace engine {
 
     class SceneManager {
         public:
+            SceneManager() : m_LastFrameTime(SDL_GetTicksNS()) {}
+            ~SceneManager() = default;
+
             static SceneManager& getInstance();
 
             bool registerScene(const std::string& name, std::shared_ptr<Scene> scene);
@@ -158,9 +161,6 @@ namespace engine {
             Scene* getCurrentSceneRaw() const;
 
         private:
-            SceneManager() : m_LastFrameTime(SDL_GetTicksNS()) {}
-            ~SceneManager() = default;
-
             SceneManager(const SceneManager&) = delete;
             SceneManager& operator=(const SceneManager&) = delete;
 

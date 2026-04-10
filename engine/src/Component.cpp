@@ -1,24 +1,16 @@
 #include <pch.h>
 
+#include <utils/singleton.h>
 #include <utils/logger.h>
 
 #include <Component.h>
 
 using namespace engine::utils::logger;
+using namespace engine::utils;
 
 namespace engine {
     ComponentManager& ComponentManager::getInstance() {
-        try {
-            static ComponentManager& instance = *new ComponentManager();
-            return instance;
-        }
-
-        catch (const std::bad_alloc& e) {
-            Logger::engine_error("Memory allocation failed: {}", e.what());
-        }
-
-        static ComponentManager fallbackInstance;
-        return fallbackInstance;
+        return singleton<ComponentManager>();
     }
     
     std::unique_ptr<Component> ComponentManager::createComponent(const std::string& name) {

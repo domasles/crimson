@@ -1,26 +1,18 @@
 #include <pch.h>
 
 #include <utils/filesystem.h>
+#include <utils/singleton.h>
 #include <utils/logger.h>
 
 #include <Resources.h>
 
 using namespace engine::utils::filesystem;
 using namespace engine::utils::logger;
+using namespace engine::utils;
 
 namespace engine {
     ResourceManager& ResourceManager::getInstance() {
-        try {
-            static ResourceManager instance;
-            return instance;
-        }
-
-        catch (const std::bad_alloc& e) {
-            Logger::engine_error("Memory allocation failed: {}", e.what());
-        }
-
-        static ResourceManager fallbackInstance;
-        return fallbackInstance;
+        return singleton<ResourceManager>();
     }
 
     std::shared_ptr<Texture> ResourceManager::loadTexture(const std::string& filePath) {

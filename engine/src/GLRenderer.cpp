@@ -57,6 +57,8 @@ namespace engine {
 
         destroyBuffers();
         m_Initialized = false;
+
+        Logger::engine_info("GL Renderer shut down");
     }
 
     void GLRenderer::beginPass(RenderPass pass) {

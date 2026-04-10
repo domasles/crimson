@@ -10,16 +10,16 @@ namespace engine {
         public:
             static AudioManager& getInstance();
 
-            AudioManager();
-            ~AudioManager();
+            AudioManager() = default;
+            ~AudioManager() = default;
 
             bool init();
             void shutdown();
 
             MIX_Mixer* getMixer() const { return m_Mixer; }
             MIX_Track* requestTrack();
-            void releaseTrack(MIX_Track* track);
 
+            void releaseTrack(MIX_Track* track);
             bool isInitialized() const { return m_Initialized; }
 
         private:

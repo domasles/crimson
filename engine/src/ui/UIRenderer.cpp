@@ -35,6 +35,8 @@ namespace engine::ui {
 
         m_GeneratedTextures.clear();
         m_ManagedTextures.clear();
+
+        Logger::engine_info("UI Renderer shut down");
     }
 
     void UIRenderBackend::beginUIPass() {

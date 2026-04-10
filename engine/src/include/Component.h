@@ -25,6 +25,9 @@ namespace engine {
 
     class ComponentManager {
         public:
+            ComponentManager() = default;
+            ~ComponentManager() = default;
+
             static ComponentManager& getInstance();
 
             template<typename T>
@@ -42,9 +45,6 @@ namespace engine {
             std::unique_ptr<Component> createComponent(const std::string& name);
 
         private:
-            ComponentManager() = default;
-            ~ComponentManager() = default;
-
             ComponentManager(const ComponentManager&) = delete;
             ComponentManager& operator=(const ComponentManager&) = delete;
 

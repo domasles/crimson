@@ -1,18 +1,16 @@
 #include <pch.h>
 
+#include <utils/singleton.h>
 #include <utils/logger.h>
 
 #include <AudioManager.h>
 
 using namespace engine::utils::logger;
+using namespace engine::utils;
 
 namespace engine {
-    AudioManager::AudioManager() = default;
-    AudioManager::~AudioManager() = default;
-
     AudioManager& AudioManager::getInstance() {
-        static AudioManager instance;
-        return instance;
+        return singleton<AudioManager>();
     }
 
     bool AudioManager::init() {
@@ -55,9 +53,9 @@ namespace engine {
         }
 
         MIX_Quit();
-
         m_Initialized = false;
-        ENGINE_LOG_INIT("Audio Manager shut down");
+
+        Logger::engine_info("Audio Manager shut down");
     }
 
     bool AudioManager::createMixer() {

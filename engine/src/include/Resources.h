@@ -6,6 +6,9 @@
 namespace engine {
     class ResourceManager {
         public:
+            ResourceManager() = default;
+            ~ResourceManager() = default;
+
             static ResourceManager& getInstance();
 
             std::shared_ptr<Texture> loadTexture(const std::string& filePath);
@@ -19,9 +22,6 @@ namespace engine {
             size_t getSoundCount() const { return m_Sounds.size(); }
 
         private:
-            ResourceManager() = default;
-            ~ResourceManager() = default;
-
             ResourceManager(const ResourceManager&) = delete;
             ResourceManager& operator=(const ResourceManager&) = delete;
 

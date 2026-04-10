@@ -4,17 +4,15 @@
 #include <ui/UIRenderer.h>
 #include <ui/UIManager.h>
 
+#include <utils/singleton.h>
 #include <utils/logger.h>
 
 using namespace engine::utils::logger;
+using namespace engine::utils;
 
 namespace engine::ui {
-    UIManager::UIManager()  = default;
-    UIManager::~UIManager() = default;
-
     UIManager& UIManager::getInstance() {
-        static UIManager instance;
-        return instance;
+        return singleton<UIManager>();
     }
 
     bool UIManager::init(engine::GLRenderer* renderer, int width, int height) {
@@ -55,7 +53,8 @@ namespace engine::ui {
         m_SystemInterface.reset();
 
         m_Initialized = false;
-        ENGINE_LOG_INIT("UIManager shut down");
+
+        Logger::engine_info("UIManager shut down");
     }
 
     void UIManager::loadFont(const std::string& path, bool fallback) {

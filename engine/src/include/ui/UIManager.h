@@ -12,8 +12,8 @@ namespace engine::ui {
         public:
             static UIManager& getInstance();
 
-            UIManager();
-            ~UIManager();
+            UIManager() = default;
+            ~UIManager() = default;
 
             bool init(engine::GLRenderer* renderer, int width, int height);
             void shutdown();

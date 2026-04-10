@@ -1,5 +1,6 @@
 #include <pch.h>
 
+#include <utils/singleton.h>
 #include <utils/logger.h>
 
 #include <components/CollisionComponent.h>
@@ -10,6 +11,7 @@
 
 using namespace engine::utils::logger;
 using namespace engine::utils::math;
+using namespace engine::utils;
 
 namespace engine {
     void Scene::prepareRender(float alpha) {
@@ -126,17 +128,7 @@ namespace engine {
     }
 
     SceneManager& SceneManager::getInstance() {
-        try {
-            static SceneManager& instance = *new SceneManager();
-            return instance;
-        }
-
-        catch (const std::bad_alloc& e) {
-            Logger::engine_error("Memory allocation failed: {}", e.what());
-        }
-
-        static SceneManager fallbackInstance;
-        return fallbackInstance;
+        return singleton<SceneManager>();
     }
 
     bool SceneManager::registerScene(const std::string& name, std::shared_ptr<Scene> scene) {

@@ -90,6 +90,8 @@ namespace engine::ui {
             Rml::RemoveContext(m_Context->GetName());
             m_Context = nullptr;
         }
+
+        Logger::engine_info("UI Context shut down");
     }
 
     void UIContext::resize(int width, int height, float dpRatio) {
