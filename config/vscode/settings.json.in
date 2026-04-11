@@ -18,7 +18,7 @@
     "C_Cpp.default.compilerPath": "@COMPILER_PATH@",
     "C_Cpp.default.cStandard": "c17",
     "C_Cpp.default.cppStandard": "c++23",
-    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+    "C_Cpp.default.compileCommands": "@BUILD_DIR@/compile_commands.json",
     "C_Cpp.intelliSenseEngine": "default",
     
     "files.exclude": {

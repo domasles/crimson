@@ -26,11 +26,15 @@ using namespace engine::utils::rendering;
 namespace engine {
     class Core {
         public:
+            Core() : m_Window(nullptr, SDL_DestroyWindow) {}
+            ~Core() {}
+
             static Core& getInstance();
 
             bool init(const std::string& workingDir, const std::string& title, const int width=800, const int height=600, const bool resizable=false, const bool vsync=true);
             bool init(const std::string& workingDir, const std::string& title, const bool fullScreen=false, const bool vsync=true);
             bool initInternal(const std::string& workingDir, const std::string& title, WindowMode mode, int width = 0, int height = 0, bool resizable = false, bool vsync = true);
+            void shutdown();
 
             bool processEvents();
             const std::string& getName() const { return m_ParentFolder; }
@@ -61,9 +65,6 @@ namespace engine {
             Vector2 getLogicalWindowSize();
 
         private:
-            Core() : m_Window(nullptr, SDL_DestroyWindow) {}
-            ~Core();
-
             Core(const Core&) = delete;
             Core& operator=(const Core&) = delete;
 

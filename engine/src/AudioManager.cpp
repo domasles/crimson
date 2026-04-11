@@ -98,7 +98,6 @@ namespace engine {
 
     void AudioManager::releaseTrack(MIX_Track* track) {
         if (!m_Initialized || !track) return;
-
         MIX_StopTrack(track, 0);
     }
 }

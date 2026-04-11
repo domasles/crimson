@@ -8,6 +8,8 @@ file(GLOB_RECURSE LAUNCHER_SOURCES
     src/*.h
 )
 
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES ${LAUNCHER_SOURCES})
+
 if(WASM)
     set(OUTPUT_NAME "index" CACHE STRING "Executable output name (default: index)")
 

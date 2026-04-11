@@ -8,6 +8,8 @@ file(GLOB_RECURSE OUTBREAK_SOURCES
     src/*.h
 )
 
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES ${OUTBREAK_SOURCES})
+
 if(WASM)
     set(libName "outBreak_lib")
     add_library(${libName} STATIC ${OUTBREAK_SOURCES})

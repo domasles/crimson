@@ -21,11 +21,11 @@ namespace engine::ui {
             return true;
         }
 
-        m_Width  = width;
+        m_Width = width;
         m_Height = height;
 
         m_SystemInterface = std::make_unique<UISystemInterface>();
-        m_RenderBackend   = std::make_unique<UIRenderBackend>();
+        m_RenderBackend = std::make_unique<UIRenderBackend>();
 
         Rml::SetSystemInterface(m_SystemInterface.get());
         Rml::SetRenderInterface(m_RenderBackend.get());
@@ -54,7 +54,7 @@ namespace engine::ui {
 
         m_Initialized = false;
 
-        Logger::engine_info("UIManager shut down");
+        Logger::engine_info("UI Manager shut down");
     }
 
     void UIManager::loadFont(const std::string& path, bool fallback) {

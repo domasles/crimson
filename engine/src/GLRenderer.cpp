@@ -51,9 +51,7 @@ namespace engine {
     }
 
     void GLRenderer::shutdown() {
-        if (!m_Initialized) {
-            return;
-        }
+        if (!m_Initialized) return;
 
         destroyBuffers();
         m_Initialized = false;
@@ -358,9 +356,12 @@ namespace engine {
             if (texture != 0) {
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, texture);
-            } else {
+            }
+
+            else {
                 glBindTexture(GL_TEXTURE_2D, 0);
             }
+
             m_CurrentTexture = texture;
         }
     }
@@ -556,6 +557,7 @@ namespace engine {
             for (int i = 0; i < 4; i++) {
                 float relX = corners[i][0] - centerX;
                 float relY = corners[i][1] - centerY;
+
                 corners[i][0] = centerX + (relX * cosR - relY * sinR);
                 corners[i][1] = centerY + (relX * sinR + relY * cosR);
             }

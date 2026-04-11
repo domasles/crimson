@@ -8,6 +8,8 @@ file(GLOB_RECURSE ENGINE_SOURCES
     src/*.h
 )
 
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Source Files" FILES ${ENGINE_SOURCES})
+
 add_library(engine STATIC ${ENGINE_SOURCES})
 
 target_include_directories(engine

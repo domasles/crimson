@@ -42,13 +42,13 @@ namespace engine::utils::rendering {
 
     class RenderQueueManager {
         public:
+            RenderQueueManager() = default;
+            ~RenderQueueManager() = default;
+
             static RenderQueueManager& getInstance();
             void render(const std::shared_ptr<TileRenderQueue>& queue);
 
         private:
-            RenderQueueManager() = default;
-            ~RenderQueueManager() = default;
-
             RenderQueueManager(const RenderQueueManager&) = delete;
             RenderQueueManager& operator=(const RenderQueueManager&) = delete;
     };

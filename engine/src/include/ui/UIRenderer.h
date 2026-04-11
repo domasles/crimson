@@ -12,7 +12,7 @@ namespace engine::ui {
     class UIRenderBackend : public Rml::RenderInterface {
         public:
             UIRenderBackend() = default;
-            ~UIRenderBackend() override { shutdown(); }
+            ~UIRenderBackend() = default;
 
             bool init(engine::GLRenderer* renderer, int screenWidth, int screenHeight);
             void shutdown();

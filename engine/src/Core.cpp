@@ -1,5 +1,6 @@
 #include <pch.h>
 
+#include <utils/singleton.h>
 #include <utils/logger.h>
 #include <utils/math.h>
 
@@ -16,6 +17,7 @@
 
 using namespace engine::utils::logger;
 using namespace engine::utils::math;
+using namespace engine::utils;
 using namespace engine::ui;
 using namespace engine;
 
@@ -38,20 +40,10 @@ ENGINE_API void internalUpdate(std::function<void()> customUpdate) {
 
 namespace engine {
     Core& Core::getInstance() {
-        try {
-            static Core& instance = *new Core();
-            return instance;
-        }
-        
-        catch (const std::bad_alloc& e) {
-            Logger::engine_error("Memory allocation failed: {}", e.what());
-        }
-
-        static Core fallbackInstance;
-        return fallbackInstance;
+        return singleton<Core>();
     }
 
-    Core::~Core() {
+    void Core::shutdown() {
         AudioManager::getInstance().shutdown();
         UIManager::getInstance().shutdown();
 
@@ -193,7 +185,7 @@ namespace engine {
             emscripten_set_main_loop(emscripten_main_loop, 0, 1);
         #else
             while (processEvents()) runFrame();
-            UIManager::getInstance().shutdown();
+            shutdown();
         #endif
     }
 

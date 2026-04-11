@@ -1,9 +1,11 @@
 #include <pch.h>
 
+#include <utils/singleton.h>
 #include <utils/rendering.h>
 #include <utils/logger.h>
 
 using namespace engine::utils::logger;
+using namespace engine::utils;
 
 namespace engine::utils::rendering {
     void TileRenderQueue::add(const std::shared_ptr<Texture>& texture, const Vector2& size, const Vector2& position) {
@@ -31,17 +33,7 @@ namespace engine::utils::rendering {
     }
 
     RenderQueueManager& RenderQueueManager::getInstance() {
-        try {
-            static RenderQueueManager& instance = *new RenderQueueManager();
-            return instance;
-        }
-        
-        catch (const std::bad_alloc& e) {
-            Logger::engine_error("Memory allocation failed: {}", e.what());
-        }
-
-        static RenderQueueManager fallbackInstance;
-        return fallbackInstance;
+        return singleton<RenderQueueManager>();
     }
     
     void RenderQueueManager::render(const std::shared_ptr<TileRenderQueue>& queue) {
